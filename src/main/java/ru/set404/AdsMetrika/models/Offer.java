@@ -4,9 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+
 
 @Getter
 @Setter
@@ -20,14 +19,17 @@ public class Offer {
 
     @ManyToOne
     @JoinColumn(name = "person_id", referencedColumnName = "id")
-    private Person owner;
+    private User owner;
 
+    @NotEmpty(message = "Номер не может быть пустым")
     @Column(name = "adcombo_number", nullable = false)
     private int adcomboNumber;
 
+    @NotEmpty(message = "Имя не может быть пустым")
     @Column(name = "group_name", nullable = false)
     private String groupName;
 
+    @NotEmpty(message = "Имя не может быть пустым")
     @Column(name = "network_name", nullable = false)
     private String networkName;
 }

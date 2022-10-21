@@ -2,33 +2,32 @@ package ru.set404.AdsMetrika.security;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import ru.set404.AdsMetrika.models.Person;
+import ru.set404.AdsMetrika.models.User;
 
 import java.util.Collection;
 import java.util.Collections;
 
-public class PersonDetails implements UserDetails {
+public class UserDetails implements org.springframework.security.core.userdetails.UserDetails {
 
-    private final Person person;
+    private final User user;
 
-    public PersonDetails(Person person) {
-        this.person = person;
+    public UserDetails(User user) {
+        this.user = user;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority(person.getRole()));
+        return Collections.singletonList(new SimpleGrantedAuthority(user.getRole()));
     }
 
     @Override
     public String getPassword() {
-        return this.person.getPassword();
+        return this.user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return this.person.getUsername();
+        return this.user.getUsername();
     }
 
     @Override
@@ -50,9 +49,8 @@ public class PersonDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
     //Для получения данных аутентифицированного пользователя
-    public Person getPerson() {
-        return this.person;
+    public User getUser() {
+        return this.user;
     }
 }

@@ -5,31 +5,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import ru.set404.AdsMetrika.models.Person;
-import ru.set404.AdsMetrika.services.PeopleService;
+import ru.set404.AdsMetrika.models.User;
+import ru.set404.AdsMetrika.services.UsersService;
 
 @Component
-public class PersonValidator  implements Validator {
+public class UserValidator implements Validator {
 
-    private final PeopleService peopleService;
+    private final UsersService usersService;
 
     @Autowired
-    public PersonValidator(PeopleService peopleService) {
-        this.peopleService = peopleService;
+    public UserValidator(UsersService usersService) {
+        this.usersService = usersService;
     }
 
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return Person.class.equals(clazz);
+        return User.class.equals(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        Person person = (Person) target;
-        if (peopleService.loadUserByUsername(person.getUsername()).isPresent())
+        User person = (User) target;
+        if (usersService.loadUserByUsername(person.getUsername()).isPresent())
             errors.rejectValue("username", "", "Имя пользователя уже существует");
-
-
     }
 }

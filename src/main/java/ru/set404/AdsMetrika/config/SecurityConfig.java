@@ -3,25 +3,30 @@ package ru.set404.AdsMetrika.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ru.set404.AdsMetrika.services.PersonDetailsService;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import ru.set404.AdsMetrika.services.UserDetailsService;
 
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
+public class SecurityConfig {
 
-    private final PersonDetailsService personDetailsService;
+    private final UserDetailsService userDetailsService;
 
     @Autowired
-    public SecurityConfig(PersonDetailsService personDetailsService) {
-        this.personDetailsService = personDetailsService;
+    public SecurityConfig(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
     }
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/admin").hasRole("ADMIN")
                 .antMatchers("/auth/login", "/auth/registration", "/error").permitAll()
@@ -29,22 +34,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .formLogin().loginPage("/auth/login")
                 .loginProcessingUrl("/process_login")
-                .defaultSuccessUrl("/", true)
+                .successHandler(getAuthenticationSuccessHandler())
                 .failureUrl("/auth/login?error")
                 .and()
                 .logout()
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/auth/login");
+        return http.build();
     }
 
-    @Override
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(personDetailsService)
-                .passwordEncoder(getPasswordEncoder());;
+    @Bean
+    public AuthenticationManager authManager(HttpSecurity http)
+            throws Exception {
+        return http.getSharedObject(AuthenticationManagerBuilder.class)
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(getPasswordEncoder())
+                .and()
+                .build();
     }
 
     @Bean
     public PasswordEncoder getPasswordEncoder(){
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler getAuthenticationSuccessHandler(){
+        return new CustomUrlAuthenticationSuccessHandler();
     }
 }

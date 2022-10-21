@@ -2,10 +2,13 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Hello world</title>
+    <title>Statistics</title>
 </head>
 <body>
 Hello
+<ul>
+    <li th:each="offer : ${offers}" th:text="${offer.getNetworkName()}"></li>
+</ul>
 <form th:action="@{/logout}" th:method="POST">
     <input type="submit" value="Logout ">
 </form>
