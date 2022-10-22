@@ -7,13 +7,7 @@ import ru.set404.AdsMetrika.models.User;
 import java.util.Collection;
 import java.util.Collections;
 
-public class UserDetails implements org.springframework.security.core.userdetails.UserDetails {
-
-    private final User user;
-
-    public UserDetails(User user) {
-        this.user = user;
-    }
+public record UserDetails(User user) implements org.springframework.security.core.userdetails.UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -48,9 +42,5 @@ public class UserDetails implements org.springframework.security.core.userdetail
     @Override
     public boolean isEnabled() {
         return true;
-    }
-    //Для получения данных аутентифицированного пользователя
-    public User getUser() {
-        return this.user;
     }
 }

@@ -5,7 +5,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -21,6 +20,9 @@ public class User {
 
     @OneToMany(mappedBy = "owner")
     private List<Offer> offers;
+
+    @OneToMany(mappedBy = "owner")
+    private List<Credentials> credentials;
 
     @NotEmpty(message = "Введите имя")
     @Size(min = 2, max = 100, message = "Имя должно быть от двух до ста символов")

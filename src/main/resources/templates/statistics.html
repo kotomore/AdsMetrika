@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Statistics</title>
+</head>
+<body>
+
+<h1>TrafficFactory Offers</h1>
+<table>
+    <tr>
+        <th>Offer</th>
+        <th>Clicks</th>
+        <th>Cost</th>
+        <th>Hold</th>
+        <th>Approve</th>
+        <th>Approve $</th>
+
+    </tr>
+    <tr th:each="offer : ${trafficFactoryOffers}" >
+        <td th:text="${offer.getCampaignId()} + ' - ' + ${offer.getCampaignName()}"></td>
+        <td th:text="${offer.getClicks()}"></td>
+        <td th:text="${#numbers.formatDecimal(offer.getCost(), 1, 'COMMA', 2, 'POINT')}"></td>
+        <td th:text="${offer.getHoldCost()}"></td>
+        <td th:text="${offer.getApproveCount()}"></td>
+        <td th:text="${offer.getApproveCost()}"></td>
+    </tr>
+</table>
+<h1>ExoClick Offers</h1>
+<table>
+    <tr>
+        <th>Offer</th>
+        <th>Clicks</th>
+        <th>Cost</th>
+        <th>Hold</th>
+        <th>Approve</th>
+        <th>Approve $</th>
+
+    </tr>
+    <tr th:each="offer : ${exoOffers}" >
+        <td th:text="${offer.getCampaignId()} + ' - ' + ${offer.getCampaignName()}"></td>
+        <td th:text="${offer.getClicks()}"></td>
+        <td th:text="${#numbers.formatDecimal(offer.getCost(), 1, 'COMMA', 2, 'POINT')}"></td>
+        <td th:text="${offer.getHoldCost()}"></td>
+        <td th:text="${offer.getApproveCount()}"></td>
+        <td th:text="${offer.getApproveCost()}"></td>
+    </tr>
+</table>
+
+<form th:action="@{/logout}" th:method="POST">
+    <input type="submit" value="Logout ">
+</form>
+</body>
+</html>
