@@ -65,22 +65,21 @@ public class TrafficFactory implements NetworkStats {
         }
     }
 
-    public Map<Integer, NetworkStatEntity> getStat(List<String> trafficFactoryGroupId, List<Integer> adcomboCampaignId,
-                                                   LocalDate dateStart, LocalDate dateEnd)
+    public Map<Integer, NetworkStatEntity> getStat(Map<Integer, String> networkOffer, LocalDate dateStart,
+                                                   LocalDate dateEnd)
             throws IOException, InterruptedException {
 
         getAuth();
         Map<Integer, NetworkStatEntity> stat = new HashMap<>();
 
         ExecutorService service = Executors.newFixedThreadPool(4);
-        for (int i = 0; i < trafficFactoryGroupId.size(); i++) {
+        for (Integer offerId : networkOffer.keySet()) {
 
             Connection.Response responseLoop = response;
-            String groupId = trafficFactoryGroupId.get(i);
-            int campaignId = adcomboCampaignId.get(i);
+            String groupName = networkOffer.get(offerId);
             service.execute(() -> {
                 try {
-                    stat.put(campaignId, parse(responseLoop, groupId, dateStart, dateEnd));
+                    stat.put(offerId, parse(responseLoop, groupName, dateStart, dateEnd));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -115,7 +114,9 @@ public class TrafficFactory implements NetworkStats {
 
             cost = Double.parseDouble(elem.getElementsByClass("hg-admin-list-td-total")
                     .html()
-                    .replace("&nbsp;", "").replace("$", ""));
+                    .replace("&nbsp;", "")
+                    .replace("$", "")
+                    .replace(",", "."));
         } else {
             System.out.println("Offer id - " + offerId + " not found");
         }

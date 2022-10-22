@@ -1,17 +1,24 @@
 package ru.set404.AdsMetrika.services.network;
 
 public enum Network {
-    ADCOMBO ("adcombo"),
-    EXO ("exo"),
-    TF ("tf");
-    private String text;
+    ADCOMBO ("adcombo", "Adcombo"),
+    EXO ("exo", "ExoClick"),
+    TF ("tf", "Traffic Factory");
+    private final String name;
 
-    Network(String text) {
-        this.text = text;
+    private final String fullName;
+
+
+    Network(String name, String fullName) {
+        this.name = name;
+        this.fullName = fullName;
     }
 
-    public String getText() {
-        return text;
+    public String getName() {
+        return name;
+    }
+    public String getFullName() {
+        return fullName;
     }
 
 }

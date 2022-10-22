@@ -22,9 +22,8 @@ import ru.set404.AdsMetrika.util.StatisticsMapper;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/statistics")
@@ -33,6 +32,7 @@ public class UserController {
     private final ExoClick exoClick;
     private final TrafficFactory trafficFactory;
     private final Adcombo adCombo;
+
     @Autowired
     public UserController(OffersRepository offersRepository, ExoClick exoClick, TrafficFactory trafficFactory,
                           Adcombo adCombo) {
@@ -44,21 +44,26 @@ public class UserController {
 
     @GetMapping
     public String index(Model model) throws IOException, InterruptedException {
-        model.addAttribute("exoOffers", getFullStatistics(Network.EXO));
-        model.addAttribute("trafficFactoryOffers", getFullStatistics(Network.TF));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        List<Offer> userOffers = offersRepository.
+                findByOwner(((UserDetails) authentication.getPrincipal()).user());
 
+        Set<Network> networks = userOffers.stream().map(Offer::getNetworkName).collect(Collectors.toSet());
+
+        Map<Network, List<StatsEntity>> statistics = new HashMap<>();
+
+        for (Network network : networks)
+            statistics.put(network, getFullStatistics(userOffers, network));
+        model.addAttribute("statistics", statistics);
         return "statistics";
     }
 
-    public List<StatsEntity> getFullStatistics(Network network) throws IOException, InterruptedException {
+    public List<StatsEntity> getFullStatistics(List<Offer> userOffers, Network network)
+            throws IOException, InterruptedException {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        List<Offer> offers = offersRepository.
-                findByOwnerAndNetworkName(((UserDetails) authentication.getPrincipal()).user(),
-                        network);
-
-        List<String> groupNames = offers.stream().map(Offer::getGroupName).toList();
-        List<Integer> offerIds = offers.stream().map(Offer::getAdcomboNumber).toList();
+        Map<Integer, String> filterByNetworkUserOffers = userOffers.stream()
+                .filter(offer -> offer.getNetworkName() == network)
+                .collect(Collectors.toMap(Offer::getAdcomboNumber, Offer::getGroupName));
 
         NetworkStats networkStats = null;
         switch (network) {
@@ -67,19 +72,19 @@ public class UserController {
         }
 
         assert networkStats != null;
-        Map<Integer, NetworkStatEntity> exoClickStats = networkStats.getStat(groupNames,
-                offerIds,
+        Map<Integer, NetworkStatEntity> networkStatsMap = networkStats.getStat(filterByNetworkUserOffers,
                 LocalDate.now().minusDays(1),
                 LocalDate.now());
 
-        Map<Integer, AdcomboStatsEntity> adcomboStats = adCombo.getStat(network,
+        Map<Integer, AdcomboStatsEntity> adcomboStatsMap = adCombo.getStat(network,
                 LocalDate.now().minusDays(1),
                 LocalDate.now());
 
         List<StatsEntity> statsEntities = new ArrayList<>();
 
-        for (int offerId : offerIds) {
-            statsEntities.add(StatisticsMapper.map(offerId, exoClickStats, adcomboStats));
+        for (int offerId : filterByNetworkUserOffers.keySet()) {
+            if (networkStatsMap.containsKey(offerId) && adcomboStatsMap.containsKey(offerId))
+                statsEntities.add(StatisticsMapper.map(offerId, networkStatsMap, adcomboStatsMap));
         }
         return statsEntities;
     }

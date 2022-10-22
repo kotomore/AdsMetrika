@@ -25,4 +25,10 @@ public class StatsEntity {
         this.approveCount = approveCount;
         this.approveCost = approveCost;
     }
+    public boolean isLosing() {
+        return (cost-approveCost) > 0;
+    }
+    public int getROI() {
+        return (int) (((approveCost-cost)/cost) * 100);
+    }
 }

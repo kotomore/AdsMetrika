@@ -115,7 +115,7 @@ public class Adcombo {
                         "&tz_offset=-10800&cols=uniq_traffic&cols=orders_confirmed&cols=orders_hold" +
                         "&cols=orders_rejected&cols=orders_trashed&cols=orders_total&cols=approve_total" +
                         "&cols=cr_uniq&cols=ctr_uniq&cols=user_orders_confirmed_income&cols=user_total_hold_income" +
-                        "&cols=user_total_income&utm_source=" + network.getText() +
+                        "&cols=user_total_income&utm_source=" + network.getName() +
                         "&utm_source=-2&epc_factor=0&force=true")
 
                 .method(Connection.Method.GET)

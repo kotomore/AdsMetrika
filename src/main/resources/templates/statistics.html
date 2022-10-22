@@ -6,46 +6,33 @@
 </head>
 <body>
 
-<h1>TrafficFactory Offers</h1>
-<table>
-    <tr>
-        <th>Offer</th>
-        <th>Clicks</th>
-        <th>Cost</th>
-        <th>Hold</th>
-        <th>Approve</th>
-        <th>Approve $</th>
+<div th:each="statistic : ${statistics}">
+    <h1 th:text="${statistic.key.getFullName()} + ' Offers'">Network Offers</h1>
+    <table>
+        <tr>
+            <th>Offer</th>
+            <th>Clicks</th>
+            <th>Cost</th>
+            <th>Hold</th>
+            <th>Approve</th>
+            <th>Approve $</th>
+            <th>ROI %</th>
 
-    </tr>
-    <tr th:each="offer : ${trafficFactoryOffers}" >
-        <td th:text="${offer.getCampaignId()} + ' - ' + ${offer.getCampaignName()}"></td>
-        <td th:text="${offer.getClicks()}"></td>
-        <td th:text="${#numbers.formatDecimal(offer.getCost(), 1, 'COMMA', 2, 'POINT')}"></td>
-        <td th:text="${offer.getHoldCost()}"></td>
-        <td th:text="${offer.getApproveCount()}"></td>
-        <td th:text="${offer.getApproveCost()}"></td>
-    </tr>
-</table>
-<h1>ExoClick Offers</h1>
-<table>
-    <tr>
-        <th>Offer</th>
-        <th>Clicks</th>
-        <th>Cost</th>
-        <th>Hold</th>
-        <th>Approve</th>
-        <th>Approve $</th>
-
-    </tr>
-    <tr th:each="offer : ${exoOffers}" >
-        <td th:text="${offer.getCampaignId()} + ' - ' + ${offer.getCampaignName()}"></td>
-        <td th:text="${offer.getClicks()}"></td>
-        <td th:text="${#numbers.formatDecimal(offer.getCost(), 1, 'COMMA', 2, 'POINT')}"></td>
-        <td th:text="${offer.getHoldCost()}"></td>
-        <td th:text="${offer.getApproveCount()}"></td>
-        <td th:text="${offer.getApproveCost()}"></td>
-    </tr>
-</table>
+        </tr>
+        <tr th:style="${offer.isLosing() ? 'color: red;' : 'color: green;'}" th:each="offer : ${statistic.value}">
+            <td th:text="${offer.getCampaignId()} + ' - ' + ${offer.getCampaignName()}"></td>
+            <td th:text="${offer.getClicks()}"></td>
+            <td th:text="${#numbers.formatDecimal(offer.getCost(), 1, 'COMMA', 2, 'POINT')} + '$'"></td>
+            <td th:text="${offer.getHoldCost()}"></td>
+            <td th:text="${offer.getApproveCount()}"></td>
+            <td th:text="${offer.getApproveCost()} + '$'"></td>
+            <td th:text="${offer.getROI()} + '%'"></td>
+        </tr>
+    </table>
+</div>
+<div th:unless="${statistics}">
+    <h1>Has no offers</h1>
+</div>
 
 <form th:action="@{/logout}" th:method="POST">
     <input type="submit" value="Logout ">

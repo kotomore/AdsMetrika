@@ -8,9 +8,13 @@ import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.services.network.Network;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface OffersRepository extends JpaRepository<Offer, Integer> {
     List<Offer> findByOwnerAndNetworkName(User user, Network network);
+    List<Offer> findByOwner(User user);
+    @Query("select o.networkName from Offer o where o.owner = ?1")
+    Set<Network> findNetworksByOwner(User user);
 
 }

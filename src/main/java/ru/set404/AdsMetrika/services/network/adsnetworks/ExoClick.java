@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.rmi.AccessException;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -68,20 +67,19 @@ public class ExoClick implements NetworkStats{
         }
     }
 
-    public Map<Integer, NetworkStatEntity> getStat(List<String> exoGroupId, List<Integer> adcomboCampaignId,
-                                                   LocalDate dateStart, LocalDate dateEnd)
+    public Map<Integer, NetworkStatEntity> getStat(Map<Integer, String> networkOffer, LocalDate dateStart,
+                                                   LocalDate dateEnd)
             throws IOException, InterruptedException {
         getAuthToken();
         Map<Integer, NetworkStatEntity> stat = new HashMap<>();
         String token = authToken;
 
         ExecutorService service = Executors.newFixedThreadPool(6);
-        for (int i = 0; i < exoGroupId.size(); i++) {
-            String groupId = exoGroupId.get(i);
-            int campaignId = adcomboCampaignId.get(i);
+        for (Integer offerId : networkOffer.keySet()) {
+            String groupId = networkOffer.get(offerId);
             service.execute(() -> {
                 try {
-                    stat.put(campaignId, parse(groupId, token, dateStart, dateEnd));
+                    stat.put(offerId, parse(groupId, token, dateStart, dateEnd));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

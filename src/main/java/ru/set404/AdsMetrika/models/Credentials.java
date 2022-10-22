@@ -2,6 +2,7 @@ package ru.set404.AdsMetrika.models;
 
 import lombok.Getter;
 import lombok.Setter;
+import ru.set404.AdsMetrika.services.network.Network;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -28,7 +29,7 @@ public class Credentials {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @NotEmpty(message = "Имя сети не может быть пустым")
+    @Enumerated(EnumType.STRING)
     @Column(name = "network_name", nullable = false)
-    private String networkName;
+    private Network networkName;
 }

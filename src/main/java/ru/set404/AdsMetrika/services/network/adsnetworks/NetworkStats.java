@@ -9,6 +9,6 @@ import java.util.Map;
 
 @Service
 public interface NetworkStats {
-     Map<Integer, NetworkStatEntity> getStat(List<String> groupName, List<Integer> adcomboCampaignId,
-                                             LocalDate dateStart, LocalDate dateEnd) throws IOException, InterruptedException;
+    Map<Integer, NetworkStatEntity> getStat(Map<Integer, String> networkOffer, LocalDate dateStart, LocalDate dateEnd)
+            throws IOException, InterruptedException;
 }
