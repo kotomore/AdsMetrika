@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="utf-8"/>
+    <title>Dashboard | AdsMetrika - End-to-End analytics service </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description"/>
+    <meta content="Themesdesign" name="author"/>
+    <!-- App favicon -->
+    <link rel="shortcut icon" th:href="@{assets/images/favicon.ico}">
+
+    <!-- jquery.vectormap css -->
+    <link th:href="@{assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css}" rel="stylesheet"
+          type="text/css"/>
+
+    <!-- DataTables -->
+    <link th:href="@{assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css}" rel="stylesheet"
+          type="text/css"/>
+
+    <!-- Responsive datatable examples -->
+    <link th:href="@{assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css}" rel="stylesheet"
+          type="text/css"/>
+
+    <!-- Bootstrap Css -->
+    <link th:href="@{assets/css/bootstrap.min.css}" id="bootstrap-style" rel="stylesheet" type="text/css"/>
+    <!-- Icons Css -->
+    <link th:href="@{assets/css/icons.min.css}" rel="stylesheet" type="text/css"/>
+    <!-- App Css-->
+    <link th:href="@{assets/css/app.min.css}" id="app-style" rel="stylesheet" type="text/css"/>
+
+</head>
+
+<body data-topbar="dark">
+
+<div id="preloader">
+    <div id="status">
+        <div class="spinner">
+            <i class="ri-loader-line spin-icon"></i>
+        </div>
+    </div>
+</div>
+
+<!-- <body data-layout="horizontal" data-topbar="dark"> -->
+
+<!-- Begin page -->
+<div id="layout-wrapper">
+
+
+    <header id="page-topbar">
+        <div class="navbar-header">
+            <div class="d-flex">
+                <!-- LOGO -->
+                <div class="navbar-brand-box">
+                    <a th:href="@{/statistics}" class="logo logo-dark">
+                                <span class="logo-sm">
+                                    <img src="assets/images/logo-sm.png" alt="logo-sm" height="22">
+                                </span>
+                        <span class="logo-lg">
+                                    <img src="assets/images/logo-dark.png" alt="logo-dark" height="20">
+                                </span>
+                    </a>
+
+                    <a th:href="@{/statistics}" class="logo logo-light">
+                                <span class="logo-sm">
+                                    <img src="assets/images/logo-sm.png" alt="logo-sm-light" height="22">
+                                </span>
+                        <span class="logo-lg">
+                                    <img src="assets/images/logo-light.png" alt="logo-light" height="20">
+                                </span>
+                    </a>
+                </div>
+
+                <button type="button" class="btn btn-sm px-3 font-size-24 header-item waves-effect"
+                        id="vertical-menu-btn">
+                    <i class="ri-menu-2-line align-middle"></i>
+                </button>
+
+                <!-- App Search-->
+                <form class="app-search d-none d-lg-block">
+                    <div class="position-relative">
+                        <input type="text" class="form-control" placeholder="Search...">
+                        <span class="ri-search-line"></span>
+                    </div>
+                </form>
+
+            </div>
+            <div class="d-flex">
+
+                <div class="dropdown d-inline-block d-lg-none ms-2">
+                    <button type="button" class="btn header-item noti-icon waves-effect"
+                            id="page-header-search-dropdown"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="ri-search-line"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                         aria-labelledby="page-header-search-dropdown">
+
+                        <form class="p-3">
+                            <div class="mb-3 m-0">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Search ...">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="submit"><i class="ri-search-line"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="dropdown d-none d-lg-inline-block ms-1">
+                    <button type="button" class="btn header-item noti-icon waves-effect" data-toggle="fullscreen">
+                        <i class="ri-fullscreen-line"></i>
+                    </button>
+                </div>
+
+                <div class="dropdown d-inline-block user-dropdown">
+                    <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img class="rounded-circle header-profile-user" src="assets/images/users/avatar-1.jpg"
+                             alt="Header Avatar">
+                        <span th:text="${username}" class="d-none d-xl-inline-block ms-1">Username</span>
+                        <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <!-- item-->
+                        <a class="dropdown-item" href="#"><i class="ri-user-line align-middle me-1"></i> Offers</a>
+                        <a class="dropdown-item" href="#"><i class="ri-wallet-2-line align-middle me-1"></i> Credentials</a>
+                        <div class="dropdown-divider"></div>
+
+                        <form th:action="@{/logout}" th:method="POST">
+                            <input class="dropdown-item text-danger"  type="submit" value="Logout">
+                        </form>
+                    </div>
+                </div>
+
+                <div class="dropdown d-inline-block">
+                    <button type="button" class="btn header-item noti-icon right-bar-toggle waves-effect">
+                        <i class="ri-settings-2-line"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- ========== Left Sidebar Start ========== -->
+    <div class="vertical-menu">
+
+        <div data-simplebar class="h-100">
+
+
+            <!--- Sidemenu -->
+            <div id="sidebar-menu">
+                <!-- Left Menu Start -->
+                <ul class="metismenu list-unstyled" id="side-menu">
+                    <li class="menu-title">Menu</li>
+
+                    <li>
+                        <a href="index.html" class="waves-effect">
+                            <i class="ri-dashboard-line"></i><span
+                                class="badge rounded-pill bg-success float-end">0</span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="calendar.html" class=" waves-effect">
+                            <i class="ri-calendar-2-line"></i>
+                            <span>Offers</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="calendar.html" class=" waves-effect">
+                            <i class="ri-calendar-2-line"></i>
+                            <span>Credentials</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+            <!-- Sidebar -->
+        </div>
+    </div>
+    <!-- Left Sidebar End -->
+
+
+    <!-- ============================================================== -->
+    <!-- Start right Content here -->
+    <!-- ============================================================== -->
+    <div class="main-content">
+
+        <div class="page-content">
+            <div class="container-fluid">
+
+                <!-- start page title -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                            <h4 class="mb-sm-0">Dashboard</h4>
+
+                            <a id="datepicker" th:href="@{/statistics(ds=${currentDate}, de=${currentDate})}">Today</a>
+                            <a id="datepicker" th:href="@{/statistics(ds=${currentDate.minusDays(1)}, de=${currentDate.minusDays(1)})}">Yesterday</a>
+                            <a id="datepicker" th:href="@{/statistics(ds=${currentDate.minusDays(2)}, de=${currentDate})}">Last 3
+                                days</a>
+                            <a id="datepicker" th:href="@{/statistics(ds=${currentDate.minusDays(6)}, de=${currentDate})}">Last 7
+                                days</a>
+                            <a id="datepicker" th:href="@{/statistics(ds=${currentDate.withDayOfMonth(1)}, de=${currentDate})}">This
+                                Month</a>
+                            <a id="datepicker" th:href="@{/statistics(ds=${currentDate.minusMonths(1).withDayOfMonth(1)},de=${currentDate.minusMonths(1)
+                                .withDayOfMonth(currentDate.minusMonths(1).getMonth()
+                                .length(currentDate.minusMonths(1).isLeapYear()))})}">Last Month</a>
+
+                            <div class="page-title-right">
+                                <ol class="breadcrumb m-0">
+                                    <li class="breadcrumb-item"><a href="javascript: void(0);">AdsMetrika</a></li>
+                                    <li class="breadcrumb-item active">Dashboard</li>
+                                </ol>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- end page title -->
+
+                <div class="row">
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex">
+                                    <div class="flex-grow-1">
+                                        <p class="text-truncate font-size-14 mb-2">Total Sales</p>
+                                        <h4 th:text="${#numbers.formatDecimal(totalSpend, 1, 2)} + '$'" class="mb-2">total spend</h4>
+                                        <p class="text-muted mb-0"><span class="text-success fw-bold font-size-12 me-2"><i
+                                                class="ri-arrow-right-up-line me-1 align-middle"></i>9.23%</span>from
+                                            previous period</p>
+                                    </div>
+                                    <div class="avatar-sm">
+                                                <span class="avatar-title bg-light text-primary rounded-3">
+                                                    <i class="ri-shopping-cart-2-line font-size-24"></i>
+                                                </span>
+                                    </div>
+                                </div>
+                            </div><!-- end cardbody -->
+                        </div><!-- end card -->
+                    </div><!-- end col -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex">
+                                    <div class="flex-grow-1">
+                                        <p class="text-truncate font-size-14 mb-2">Total Revenue</p>
+                                        <h4 th:text="${#numbers.formatDecimal(totalRevenue, 1, 2)} + '$'" class="mb-2">total revenue</h4>
+                                        <p class="text-muted mb-0"><span
+                                                class="text-danger fw-bold font-size-12 me-2"><i
+                                                class="ri-arrow-right-down-line me-1 align-middle"></i>1.09%</span>from
+                                            previous period</p>
+                                    </div>
+                                    <div class="avatar-sm">
+                                                <span class="avatar-title bg-light text-success rounded-3">
+                                                    <i class="mdi mdi-currency-usd font-size-24"></i>
+                                                </span>
+                                    </div>
+                                </div>
+                            </div><!-- end cardbody -->
+                        </div><!-- end card -->
+                    </div><!-- end col -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex">
+                                    <div class="flex-grow-1">
+                                        <p class="text-truncate font-size-14 mb-2">Total approve orders</p>
+                                        <h4 th:text="${totalOrders}" class="mb-2">total orders</h4>
+                                        <p class="text-muted mb-0"><span class="text-success fw-bold font-size-12 me-2"><i
+                                                class="ri-arrow-right-up-line me-1 align-middle"></i>16.2%</span>from
+                                            previous period</p>
+                                    </div>
+                                    <div class="avatar-sm">
+                                                <span class="avatar-title bg-light text-primary rounded-3">
+                                                    <i class="ri-user-3-line font-size-24"></i>
+                                                </span>
+                                    </div>
+                                </div>
+                            </div><!-- end cardbody -->
+                        </div><!-- end card -->
+                    </div><!-- end col -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex">
+                                    <div class="flex-grow-1">
+                                        <p class="text-truncate font-size-14 mb-2">Total Clicks</p>
+                                        <h4 th:text="${totalClicks}" class="mb-2">total clicks</h4>
+                                        <p class="text-muted mb-0"><span class="text-success fw-bold font-size-12 me-2"><i
+                                                class="ri-arrow-right-up-line me-1 align-middle"></i>11.7%</span>from
+                                            previous period</p>
+                                    </div>
+                                    <div class="avatar-sm">
+                                                <span class="avatar-title bg-light text-success rounded-3">
+                                                    <i class="mdi mdi-currency-btc font-size-24"></i>
+                                                </span>
+                                    </div>
+                                </div>
+                            </div><!-- end cardbody -->
+                        </div><!-- end card -->
+                    </div><!-- end col -->
+                </div><!-- end row -->
+
+                <div class="row">
+
+                    <!-- end col -->
+                    <div class="col-xl-6">
+                        <div class="card">
+                            <div class="card-body pb-0">
+                                <h4 class="card-title mb-4">Revenue</h4>
+
+                                <div class="text-center pt-3">
+                                    <div class="row">
+                                        <div class="col-sm-4 mb-3 mb-sm-0">
+                                            <div>
+                                                <h5 th:text="${#numbers.formatDecimal(monthlyTotal.getSpend(), 1, 2)} + '$'">Spend</h5>
+                                                <p class="text-muted text-truncate mb-0">Total Spend</p>
+                                            </div>
+                                        </div><!-- end col -->
+                                        <div class="col-sm-4 mb-3 mb-sm-0">
+                                            <div>
+                                                <h5 th:text="${#numbers.formatDecimal(monthlyTotal.getRevenue(), 1, 2)} + '$'">Revenue</h5>
+                                                <p class="text-muted text-truncate mb-0">Total Revenue</p>
+                                            </div>
+                                        </div><!-- end col -->
+                                        <div class="col-sm-4">
+                                            <div>
+                                                <h5 th:text="${costs.size()}">Days count</h5>
+                                                <p class="text-muted text-truncate mb-0">Days count</p>
+                                            </div>
+                                        </div><!-- end col -->
+                                    </div><!-- end row -->
+                                </div>
+                            </div>
+                            <div class="card-body py-0 px-2">
+                                <div id="column_line_chart" class="apex-charts" dir="ltr"></div>
+                            </div>
+                        </div><!-- end card -->
+                    </div>
+
+                    <div class="col-xl-6">
+                        <div class="card" style="padding-bottom:24px;">
+                            <div class="card-body">
+                                <h4 class="card-title mb-4">Comparing networks sales</h4>
+
+                                <div class="row">
+                                    <div th:each="network : ${totalSpendByNetwork.keySet()}" class="col-6">
+                                        <div class="text-center mt-4">
+                                            <h5 th:text="${#numbers.formatDecimal(totalSpendByNetwork.get(network), 1, 2)} + '$'">spend count</h5>
+                                            <p th:text="${network.getFullName()}" class="mb-2 text-truncate">Network</p>
+                                        </div>
+                                    </div>
+                                    <!-- end col -->
+                                </div>
+                                <!-- end row -->
+
+                                <div class="mt-4">
+                                    <div id="donut-chart" class="apex-charts"></div>
+                                </div>
+                            </div>
+                        </div><!-- end card -->
+                    </div><!-- end col -->
+                    <!-- end col -->
+                </div>
+                <!-- end row -->
+
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="dropdown float-end">
+                                    <a href="#" class="dropdown-toggle arrow-none card-drop" data-bs-toggle="dropdown"
+                                       aria-expanded="false">
+                                        <i class="mdi mdi-dots-vertical"></i>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-end">
+                                        <!-- item-->
+                                        <a href="javascript:void(0);" class="dropdown-item">Copy to ClipBoard</a>
+
+                                    </div>
+                                </div>
+
+
+                                <div th:each="statistic : ${statistics}" class="table-responsive">
+                                    <h4 th:text="${statistic.key.getFullName()} + ' Offers'" class="card-title mb-4">
+                                        Offers Statistics</h4>
+                                    <table class="table table-centered mb-0 align-middle table-hover table-nowrap">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th>№</th>
+                                            <th>Offer</th>
+                                            <th>Clicks</th>
+                                            <th>Cost</th>
+                                            <th>Hold</th>
+                                            <th>Approve</th>
+                                            <th>Approve $</th>
+                                            <th>Profit $</th>
+                                            <th style="width: 120px;">ROI %</th>
+                                        </tr>
+                                        </thead><!-- end thead -->
+                                        <tbody>
+                                        <tr th:style="${offer.getProfit() < 0 ? 'color: red;' : 'color: green;'}"
+                                            th:each="offer : ${statistic.value}">
+                                            <td><h6 th:text="${offer.getCampaignId()}" class="mb-0">campaign id</h6></td>
+                                            <td th:text="${offer.getCampaignName()}">Campaign name</td>
+                                            <td th:text="${offer.getClicks()}">clicks</td>
+                                            <td th:text="${#numbers.formatDecimal(offer.getCost(), 1, 2)} + '$'">cost</td>
+                                            <td th:text="${offer.getHoldCost()}">hold cost</td>
+                                            <td th:text="${offer.getApproveCount()}">approve count</td>
+                                            <td th:text="${offer.getApproveCost()} + '$'">approve cost</td>
+                                            <td th:text="${#numbers.formatDecimal(offer.getProfit(), 1, 2)} + '$'">profit</td>
+                                            <td th:text="${offer.getROI()} + '%'">roi</td>
+                                        </tr>
+                                        </tbody><!-- end tbody -->
+                                    </table> <!-- end table -->
+                                </div>
+                            </div><!-- end card -->
+                        </div><!-- end card -->
+                    </div>
+                    <!-- end col -->
+
+                </div>
+                <!-- end row -->
+            </div>
+
+        </div>
+        <!-- End Page-content -->
+
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <script>document.write(new Date().getFullYear())</script>
+                        © AdsMetrika.
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-sm-end d-none d-sm-block">
+                            Crafted with <i class="mdi mdi-heart text-danger"></i> by Themesdesign
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+    <!-- end main content-->
+
+</div>
+<!-- END layout-wrapper -->
+
+<!-- Right Sidebar -->
+<div class="right-bar">
+    <div data-simplebar class="h-100">
+        <div class="rightbar-title d-flex align-items-center px-3 py-4">
+
+            <h5 class="m-0 me-2">Settings</h5>
+
+            <a href="javascript:void(0);" class="right-bar-toggle ms-auto">
+                <i class="mdi mdi-close noti-icon"></i>
+            </a>
+        </div>
+
+        <!-- Settings -->
+        <hr class="mt-0"/>
+        <h6 class="text-center mb-0">Choose Layouts</h6>
+
+        <div class="p-4">
+            <div class="mb-2">
+                <img src="assets/images/layouts/layout-1.jpg" class="img-fluid img-thumbnail" alt="layout-1">
+            </div>
+
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input theme-choice" type="checkbox" id="light-mode-switch" checked>
+                <label class="form-check-label" for="light-mode-switch">Light Mode</label>
+            </div>
+
+            <div class="mb-2">
+                <img src="assets/images/layouts/layout-2.jpg" class="img-fluid img-thumbnail" alt="layout-2">
+            </div>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input theme-choice" type="checkbox" id="dark-mode-switch"
+                       data-bsStyle="assets/css/bootstrap-dark.min.css" data-appStyle="assets/css/app-dark.min.css">
+                <label class="form-check-label" for="dark-mode-switch">Dark Mode</label>
+            </div>
+
+        </div>
+
+    </div> <!-- end slimscroll-menu-->
+</div>
+<!-- /Right-bar -->
+
+<!-- Right bar overlay-->
+<div class="rightbar-overlay"></div>
+
+<!-- JAVASCRIPT -->
+<script src="assets/libs/jquery/jquery.min.js"></script>
+<script src="assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="assets/libs/metismenu/metisMenu.min.js"></script>
+<script src="assets/libs/simplebar/simplebar.min.js"></script>
+<script src="assets/libs/node-waves/waves.min.js"></script>
+
+
+<!-- apexcharts -->
+<script src="assets/libs/apexcharts/apexcharts.min.js"></script>
+
+<!-- jquery.vectormap map -->
+<script src="assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js"></script>
+<script src="assets/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js"></script>
+
+<!-- Required datatable js -->
+<script src="assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+
+<!-- Responsive examples -->
+<script src="assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+<script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+
+
+<script th:inline="javascript">
+
+    var options = {
+        series: [{
+            name: "Costs",
+            type: "column",
+            data: [[${costs}]]
+        }, {
+            name: "Revenue",
+            type: "line",
+            data: [[${revenue}]]
+        }],
+        chart: {
+            height: 350,
+            type: "line",
+            toolbar: {
+                show: !1
+            }
+        },
+        stroke: {
+            width: [0, 2.3],
+            curve: "straight"
+        },
+        plotOptions: {
+            bar: {
+                horizontal: !1,
+                columnWidth: "34%"
+            }
+        },
+        dataLabels: {
+            enabled: !1
+        },
+        markers: {
+            size: [0, 3.5],
+            colors: ["#6fd088"],
+            strokeWidth: 2,
+            strokeColors: "#6fd088",
+            hover: {
+                size: 4
+            }
+        },
+        legend: {
+            show: !1
+        },
+        yaxis: {
+            labels: {
+                formatter: function (e) {
+                    return e + "k"
+                }
+            },
+            tickAmount: 5,
+            min: 0,
+            max: 50
+        },
+        colors: ["#0f9cf3", "#6fd088"],
+        labels: [[${dates}]]
+    };
+    (chart = new ApexCharts(document.querySelector("#column_line_chart"), options)).render();
+
+    options = {
+        series: [[${totalSpendByNetwork.values()}]],
+        chart: {
+            height: 286,
+            type: "donut"
+        },
+        labels: [[${totalSpendByNetwork.keySet()}]],
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: "73%",
+                    labels: {
+                        show: !0,
+                        name: {
+                            show: !0,
+                            fontSize: "18px",
+                            offsetY: 5
+                        },
+                        value: {
+                            show: !1,
+                            fontSize: "20px",
+                            color: "#343a40",
+                            offsetY: 8
+                        },
+                        total: {
+                            show: !0,
+                            fontSize: "17px",
+                            label: "Comparing",
+                            color: "#6c757d",
+                            fontWeight: 600
+                        }
+                    }
+                }
+            }
+        },
+        dataLabels: {
+            enabled: !1
+        },
+        legend: {
+            show: !1
+        },
+        colors: ["#0f9cf3", "#6fd088"]
+    };
+    (chart = new ApexCharts(document.querySelector("#donut-chart"), options)).render();
+
+</script>
+<!-- App js -->
+<script src="assets/js/app.js"></script>
+</body>
+
+</html>
