@@ -5,9 +5,7 @@ public enum Network {
     EXO ("exo", "ExoClick"),
     TF ("tf", "Traffic Factory");
     private final String name;
-
     private final String fullName;
-
 
     Network(String name, String fullName) {
         this.name = name;

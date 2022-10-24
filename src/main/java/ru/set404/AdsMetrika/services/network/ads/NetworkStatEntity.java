@@ -1,4 +1,4 @@
-package ru.set404.AdsMetrika.services.network.adsnetworks;
+package ru.set404.AdsMetrika.services.network.ads;
 
 public class NetworkStatEntity {
     private int clicks;

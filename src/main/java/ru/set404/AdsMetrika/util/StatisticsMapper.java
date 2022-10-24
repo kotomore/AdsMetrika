@@ -1,16 +1,16 @@
 package ru.set404.AdsMetrika.util;
 
 
-import ru.set404.AdsMetrika.services.network.adsnetworks.NetworkStatEntity;
-import ru.set404.AdsMetrika.services.network.cpanetworks.AdcomboStatsEntity;
-import ru.set404.AdsMetrika.to.StatsEntity;
+import ru.set404.AdsMetrika.services.network.ads.NetworkStatEntity;
+import ru.set404.AdsMetrika.services.network.cpa.AdcomboStatsEntity;
+import ru.set404.AdsMetrika.dto.StatDTO;
 
 import java.util.Map;
 
 public class StatisticsMapper {
-    public static StatsEntity map(int offerId, Map<Integer, NetworkStatEntity> networkStats,
-                                  Map<Integer, AdcomboStatsEntity> adcomboStats) {
-        return new StatsEntity(
+    public static StatDTO createStatsDTO(int offerId, Map<Integer, NetworkStatEntity> networkStats,
+                                         Map<Integer, AdcomboStatsEntity> adcomboStats) {
+        return new StatDTO(
                 adcomboStats.get(offerId).getCampaignId(),
                 adcomboStats.get(offerId).getCampaignName(),
                 networkStats.get(offerId).getClicks(),

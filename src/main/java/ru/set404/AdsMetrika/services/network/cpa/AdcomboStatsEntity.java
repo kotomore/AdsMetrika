@@ -1,4 +1,4 @@
-package ru.set404.AdsMetrika.services.network.cpanetworks;
+package ru.set404.AdsMetrika.services.network.cpa;
 
 
 import lombok.Getter;

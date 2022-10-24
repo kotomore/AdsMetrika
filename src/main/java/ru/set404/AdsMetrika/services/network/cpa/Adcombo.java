@@ -1,4 +1,4 @@
-package ru.set404.AdsMetrika.services.network.cpanetworks;
+package ru.set404.AdsMetrika.services.network.cpa;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,12 +23,14 @@ import java.util.Map;
 @Service
 public class Adcombo {
     private final CredentialsRepository credentialsRepository;
+    private final ObjectMapper objectMapper;
     public static Connection.Response responseConnection = null;
 
     @Autowired
-    public Adcombo(CredentialsRepository credentialsRepository) {
+    public Adcombo(CredentialsRepository credentialsRepository, ObjectMapper objectMapper) {
         this.credentialsRepository = credentialsRepository;
 
+        this.objectMapper = objectMapper;
     }
 
     private void getAuthResponse() throws IOException {
@@ -106,8 +108,8 @@ public class Adcombo {
         if (network == Network.EXO) {
             timeZone = "-04:00";
         }
-        long timeStart = dateStart.toEpochSecond(LocalTime.MIN, ZoneOffset.of(timeZone));
-        long timeEnd = dateEnd.toEpochSecond(LocalTime.MIN, ZoneOffset.of(timeZone)) - 1;
+        long timeStart = dateStart.plusDays(1).toEpochSecond(LocalTime.MIN, ZoneOffset.of(timeZone));
+        long timeEnd = dateEnd.plusDays(1).toEpochSecond(LocalTime.MIN, ZoneOffset.of(timeZone)) - 1;
         responseConnection = Jsoup
                 .connect("https://my.adcombo.com/api/stats?page=1&count=100&order=desc&sorting=group_by" +
                         "&stat_type=pp_stat&ts=" + timeStart + "&te=" + timeEnd +
@@ -124,8 +126,7 @@ public class Adcombo {
                 .maxBodySize(0)
                 .execute();
 
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode adcomboStat = mapper.readTree(responseConnection.body());
+        JsonNode adcomboStat = objectMapper.readTree(responseConnection.body());
 
         Map<Integer, AdcomboStatsEntity> stats = new HashMap<>();
 

@@ -1,12 +1,13 @@
-package ru.set404.AdsMetrika.to;
+package ru.set404.AdsMetrika.dto;
 
 
 import lombok.Getter;
 import lombok.Setter;
 
+
 @Getter
 @Setter
-public class StatsEntity {
+public class StatDTO {
 
     private int campaignId;
     private String campaignName;
@@ -16,7 +17,7 @@ public class StatsEntity {
     private int approveCount;
     private double approveCost;
 
-    public StatsEntity(int campaignId, String campaignName, int clicks, double cost, double holdCost, int approveCount, double approveCost) {
+    public StatDTO(int campaignId, String campaignName, int clicks, double cost, double holdCost, int approveCount, double approveCost) {
         this.campaignId = campaignId;
         this.campaignName = campaignName;
         this.clicks = clicks;
@@ -25,10 +26,12 @@ public class StatsEntity {
         this.approveCount = approveCount;
         this.approveCost = approveCost;
     }
-    public boolean isLosing() {
-        return (cost-approveCost) > 0;
+
+    public double getProfit() {
+        return approveCost - cost;
     }
+
     public int getROI() {
-        return (int) (((approveCost-cost)/cost) * 100);
+        return (int) (((approveCost - cost) / cost) * 100);
     }
 }

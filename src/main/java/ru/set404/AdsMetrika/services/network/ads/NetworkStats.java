@@ -1,10 +1,9 @@
-package ru.set404.AdsMetrika.services.network.adsnetworks;
+package ru.set404.AdsMetrika.services.network.ads;
 
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 
 @Service

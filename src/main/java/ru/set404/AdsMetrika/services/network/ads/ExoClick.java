@@ -1,5 +1,6 @@
-package ru.set404.AdsMetrika.services.network.adsnetworks;
+package ru.set404.AdsMetrika.services.network.ads;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jsoup.Connection;
@@ -23,18 +24,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class ExoClick implements NetworkStats{
+public class ExoClick implements NetworkStats {
 
     private final CredentialsRepository credentialsRepository;
+    private final ObjectMapper objectMapper;
     private static String authToken = null;
 
     @Autowired
-    public ExoClick(CredentialsRepository credentialsRepository) {
+    public ExoClick(CredentialsRepository credentialsRepository, ObjectMapper objectMapper) throws IOException {
         this.credentialsRepository = credentialsRepository;
+        this.objectMapper = objectMapper;
     }
 
-    private void getAuthToken() throws IOException {
-
+    private void connectToExoClick() throws IOException {
         if (authToken == null) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Credentials credentials = credentialsRepository.
@@ -59,56 +61,62 @@ public class ExoClick implements NetworkStats{
                     .requestBody(jsonBody)
                     .execute();
 
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode token = mapper.readTree(response.body()).get("token");
+            JsonNode token = objectMapper.readTree(response.body()).get("token");
             if (token.isNull())
                 throw new AccessException("Could not connect to ExoClick");
             authToken = token.asText();
         }
     }
 
-    public Map<Integer, NetworkStatEntity> getStat(Map<Integer, String> networkOffer, LocalDate dateStart,
-                                                   LocalDate dateEnd)
-            throws IOException, InterruptedException {
-        getAuthToken();
-        Map<Integer, NetworkStatEntity> stat = new HashMap<>();
-        String token = authToken;
-
-        ExecutorService service = Executors.newFixedThreadPool(6);
-        for (Integer offerId : networkOffer.keySet()) {
-            String groupId = networkOffer.get(offerId);
-            service.execute(() -> {
-                try {
-                    stat.put(offerId, parse(groupId, token, dateStart, dateEnd));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
+    public Map<Integer, NetworkStatEntity> getStat(Map<Integer, String> networkOffers, LocalDate dateStart,
+                                                   LocalDate dateEnd) throws InterruptedException {
+        try {
+            connectToExoClick();
+        } catch (IOException e) {
+            throw new RuntimeException("Could not connect to ExoClick" + e.getMessage());
         }
-        service.shutdown();
-        if (!service.awaitTermination(1, TimeUnit.MINUTES)) {
+
+        Map<Integer, NetworkStatEntity> stat = new HashMap<>();
+
+        ExecutorService pool = Executors.newFixedThreadPool(6);
+        for (Map.Entry<Integer, String> networkOffer : networkOffers.entrySet()) {
+            pool.execute(() ->
+                    stat.put(networkOffer.getKey(), parseNetwork(networkOffer.getValue(), dateStart, dateEnd)));
+        }
+        pool.shutdown();
+        if (!pool.awaitTermination(1, TimeUnit.MINUTES)) {
             System.out.println("Parse ExoClick timed out error");
         }
         return stat;
     }
 
-    private NetworkStatEntity parse(String group, String token, LocalDate dateStart, LocalDate dateEnd) throws IOException {
+    private NetworkStatEntity parseNetwork(String group, LocalDate dateStart, LocalDate dateEnd) {
         System.out.println("Parse group - " + group);
-        Connection.Response response = Jsoup
-                .connect("https://api.exoclick.com/v2/statistics/a/campaign?groupid="
-                        + group
-                        + "&date-to="
-                        + dateStart + "&date-from="
-                        + dateEnd.minusDays(1)
-                        + "&include=totals&detailed=false")
-                .method(Connection.Method.GET)
-                .ignoreContentType(true)
-                .header("Accept", "application/json")
-                .header("Authorization", "Bearer " + token)
-                .execute();
+        Connection.Response response;
+        try {
+            response = Jsoup
+                    .connect("https://api.exoclick.com/v2/statistics/a/campaign?groupid="
+                            + group
+                            + "&date-to="
+                            + dateStart.plusDays(1) + "&date-from="
+                            + dateEnd
+                            + "&include=totals&detailed=false")
+                    .method(Connection.Method.GET)
+                    .ignoreContentType(true)
+                    .header("Accept", "application/json")
+                    .header("Authorization", "Bearer " + authToken)
+                    .execute();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode node = mapper.readTree(response.body());
+        JsonNode node = null;
+        try {
+            node = mapper.readTree(response.body());
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
         int clicks = 0;
         double cost = 0;

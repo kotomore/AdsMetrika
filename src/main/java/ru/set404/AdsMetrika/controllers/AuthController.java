@@ -5,6 +5,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -30,31 +31,26 @@ public class AuthController {
     }
 
     @GetMapping("/login")
-    public String loginPage() {
+    public String loginPage(@ModelAttribute("person") User user) {
         if (isAuthenticated()) {
             return "redirect:/statistics";
         }
         return "auth/login";
     }
 
-    @GetMapping("/registration")
-    public String regPage(@ModelAttribute("person") User person) {
+    @PostMapping("/login")
+    public String performReg(@ModelAttribute("person") @Valid User user, BindingResult bindingResult, Model model) {
         if (isAuthenticated()) {
             return "redirect:/statistics";
         }
-        return "auth/registration";
-    }
-
-    @PostMapping("/registration")
-    public String performReg(@ModelAttribute("person") @Valid User person, BindingResult bindingResult) {
-        if (isAuthenticated()) {
-            return "redirect:/statistics";
+        userValidator.validate(user, bindingResult);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("hasError",true);
+            return "auth/login";
         }
-        userValidator.validate(person, bindingResult);
-        if (bindingResult.hasErrors())
-            return "auth/registration";
-        registrationService.register(person);
-        return "redirect:/auth/login";
+        registrationService.register(user);
+        model.addAttribute("success", true);
+        return "auth/login";
     }
 
     private boolean isAuthenticated() {

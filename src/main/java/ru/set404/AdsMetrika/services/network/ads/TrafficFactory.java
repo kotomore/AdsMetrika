@@ -1,5 +1,6 @@
-package ru.set404.AdsMetrika.services.network.adsnetworks;
+package ru.set404.AdsMetrika.services.network.ads;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -16,7 +17,6 @@ import ru.set404.AdsMetrika.services.network.Network;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -65,7 +65,7 @@ public class TrafficFactory implements NetworkStats {
         }
     }
 
-    public Map<Integer, NetworkStatEntity> getStat(Map<Integer, String> networkOffer, LocalDate dateStart,
+    public Map<Integer, NetworkStatEntity> getStat(Map<Integer, String> networkOffers, LocalDate dateStart,
                                                    LocalDate dateEnd)
             throws IOException, InterruptedException {
 
@@ -73,17 +73,9 @@ public class TrafficFactory implements NetworkStats {
         Map<Integer, NetworkStatEntity> stat = new HashMap<>();
 
         ExecutorService service = Executors.newFixedThreadPool(4);
-        for (Integer offerId : networkOffer.keySet()) {
-
-            Connection.Response responseLoop = response;
-            String groupName = networkOffer.get(offerId);
-            service.execute(() -> {
-                try {
-                    stat.put(offerId, parse(responseLoop, groupName, dateStart, dateEnd));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
+        for (Map.Entry<Integer, String> networkOffer : networkOffers.entrySet()) {
+            service.execute(() ->
+                    stat.put(networkOffer.getKey(), parseNetwork(networkOffer.getValue(), dateStart, dateEnd)));
 
         }
         service.shutdown();
@@ -93,18 +85,26 @@ public class TrafficFactory implements NetworkStats {
         return stat;
     }
 
-    private NetworkStatEntity parse(Connection.Response response, String offerId, LocalDate dateStart, LocalDate dateEnd)
-            throws IOException {
+    private NetworkStatEntity parseNetwork(String offerId, LocalDate dateStart, LocalDate dateEnd) {
         System.out.println("Parse offer - " + offerId);
-        response = Jsoup
-                .connect("https://main.trafficfactory.biz/stats/campaigns/"
-                        + dateStart + "-00-00/"
-                        + dateEnd.minusDays(1) + "-23-59?campaign_name="
-                        + offerId)
-                .cookies(response.cookies())
-                .execute();
+        try {
+            response = Jsoup
+                    .connect("https://main.trafficfactory.biz/stats/campaigns/"
+                            + dateStart + "-00-00/"
+                            + dateEnd + "-23-59?campaign_name="
+                            + offerId)
+                    .cookies(response.cookies())
+                    .execute();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-        Element elem = response.parse().select("[class=\"hg-admin-row hg-admin-row-total\"]").first();
+        Element elem = null;
+        try {
+            elem = response.parse().select("[class=\"hg-admin-row hg-admin-row-total\"]").first();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         int clicks = 0;
         double cost = 0;
         if (elem != null) {
