@@ -98,7 +98,7 @@ public class ExoClick implements NetworkStats {
                     .connect("https://api.exoclick.com/v2/statistics/a/campaign?groupid="
                             + group
                             + "&date-to="
-                            + dateStart.plusDays(1) + "&date-from="
+                            + dateStart + "&date-from="
                             + dateEnd
                             + "&include=totals&detailed=false")
                     .method(Connection.Method.GET)

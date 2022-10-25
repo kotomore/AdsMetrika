@@ -16,10 +16,10 @@
     <!--
     favicon
     -->
-    <link rel="apple-touch-icon" sizes="180x180" th:href="@{assets/images/favicon/apple-touch-icon.png}">
-    <link rel="icon" type="image/png" sizes="32x32" th:href="@{assets/images/favicon/favicon-32x32.png}">
-    <link rel="icon" type="image/png" sizes="16x16" th:href="@{assets/images/favicon/favicon-16x16.png}">
-    <link rel="manifest" th:href="@{assets/images/favicon/site.webmanifest}">
+
+    <link rel="icon" type="image/x-icon" th:href="@{../assets/favicon.ico}">
+
+    <link rel="manifest" th:href="@{../assets/images/favicon/site.webmanifest}">
 
     <!--
     stylesheets
@@ -40,16 +40,39 @@
 
     <div class="main-wrapper">
 
+        <div class="preloader">
+            <div class="preloader-wrapper">
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                     viewBox="0 0 200 200">
+                    <g class="pre load6">
+                        <path fill="#1B1A1C" d="M124.5,57L124.5,57c0,3.9-3.1,7-7,7h-36c-3.9,0-7-3.1-7-7v0c0-3.9,3.1-7,7-7h36
+                C121.4,50,124.5,53.1,124.5,57z"/>
+                        <path fill="#1B1A1C" d="M147.7,86.9L147.7,86.9c-2.7,2.7-7.2,2.7-9.9,0l-25.5-25.5c-2.7-2.7-2.7-7.2,0-9.9l0,0
+                c2.7-2.7,7.2-2.7,9.9,0L147.7,77C150.5,79.8,150.5,84.2,147.7,86.9z"/>
+                        <path fill="#1B1A1C" d="M143,74.5L143,74.5c3.9,0,7,3.1,7,7v36c0,3.9-3.1,7-7,7l0,0c-3.9,0-7-3.1-7-7v-36
+                C136,77.6,139.1,74.5,143,74.5z"/>
+                        <path fill="#1B1A1C" d="M148.4,112.4L148.4,112.4c2.7,2.7,2.7,7.2,0,9.9L123,147.7c-2.7,2.7-7.2,2.7-9.9,0h0c-2.7-2.7-2.7-7.2,0-9.9
+                l25.5-25.5C141.3,109.6,145.7,109.6,148.4,112.4z"/>
+                        <path fill="#1B1A1C" d="M125.5,143L125.5,143c0,3.9-3.1,7-7,7h-36c-3.9,0-7-3.1-7-7l0,0c0-3.9,3.1-7,7-7h36 C122.4,136,125.5,139.1,125.5,143z"/>
+                        <path fill="#1B1A1C" d="M52.3,113.1L52.3,113.1c2.7-2.7,7.2-2.7,9.9,0l25.5,25.5c2.7,2.7,2.7,7.2,0,9.9h0c-2.7,2.7-7.2,2.7-9.9,0
+                L52.3,123C49.5,120.2,49.5,115.8,52.3,113.1z"/>
+                        <path fill="#1B1A1C" d="M57,75.5L57,75.5c3.9,0,7,3.1,7,7v36c0,3.9-3.1,7-7,7h0c-3.9,0-7-3.1-7-7v-36C50,78.6,53.1,75.5,57,75.5z"/>
+                        <path fill="#1B1A1C" d="M86.9,52.3L86.9,52.3c2.7,2.7,2.7,7.2,0,9.9L61.5,87.6c-2.7,2.7-7.2,2.7-9.9,0l0,0c-2.7-2.7-2.7-7.2,0-9.9
+                L77,52.3C79.8,49.5,84.2,49.5,86.9,52.3z"/>
+                    </g>
+                </svg>
+            </div>
+        </div>
     <!--
     navigation - start
     -->
     <div class="navigation">
         <div class="navigation-wrapper">
             <div class="container">
-                <div class="navigation-inner">
+                <div style="height:20px;" class="navigation-inner">
                     <div class="navigation-logo">
                         <a href="index.html">
-                            <img th:src="@{../assets/images/logo.png}" alt="orions-logo">
+                            <img style="height: 40px" th:src="@{../assets/images/logo.png}" alt="orions-logo">
                         </a>
                     </div>
                     <div class="navigation-menu">
@@ -67,12 +90,12 @@
                         </div>
                         <ul class="parent">
                             <li>
-                                <a href="#login" onclick="document.querySelector('.navigation').classList.remove('shown');" class="link-underline link-underline-1">
+                                <a id="datepicker" href="#login" onclick="document.querySelector('.navigation').classList.remove('shown');" class="link-underline link-underline-1">
                                     <span>Login</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="#reg" onclick="document.querySelector('.navigation').classList.remove('shown');" class="link-underline link-underline-1">
+                                <a id="datepicker" href="#reg" onclick="document.querySelector('.navigation').classList.remove('shown');" class="link-underline link-underline-1">
                                     <span>Registration</span>
                                 </a>
                             </li>
@@ -130,14 +153,13 @@
                     <div class="row">
                         <div class="col-lg-6 offset-lg-0 order-lg-1 col-10 offset-1 order-2">
                             <div id="login" class="hero-content">
-                                <h1 class="c-dark">Software solutions in your hands.</h1>
-                                <p class="large c-grey">Orions is a universal app that helps you setup your apps in
-                                    a beautiful and effective way to get more downloads across
-                                    <b>Android</b> and <b>iOS</b> platforms.</p>
+                                <h1 class="c-dark"> end-to-end analytics service</h1>
+                                <p class="large c-grey">To track, analyze, optimize and scale online advertising campaigns and affiliate programs in real-time.
+                                    Supports <b>ExoClick.com</b> and <b>TrafficFactory.com</b> ad networks.</p>
 
                             <div th:if="${success}">
                                 <br><br>
-                                <p class="large" style="color: #2dc26b">Аккаунт готов, Вы можете войти.</p>
+                                <p class="large" style="color: #2dc26b">Your account has been activated successfully. You can now login.</p>
                             </div>
                             <form name="f" method="post" action="/process_login">
                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
@@ -152,9 +174,9 @@
                                 </div>
                                 <br/>
                                 <p class="large" th:if="${param.error}" style="color: red">
-                                    Неправильные имя или пароль
+                                    Wrong username or password
                                 </p>
-                                <button type="submit" class="button button-3">
+                                <button type="submit" onclick="document.querySelector('.preloader').classList.remove('loaded');" class="button button-3">
                                        <span class="button-inner">
                                            <span class="button-content">
                                                <span class="text">Login</span>
@@ -192,16 +214,17 @@
                         <div class="section-heading center width-64">
                             <div class="sub-heading c-blue upper ls-1">
                                 <i class="las la-cog"></i>
-                                <h5>app features</h5>
+                                <h5>Features</h5>
                             </div>
                             <div class="main-heading c-dark">
-                                <h1>Get surprised by amazing features.</h1>
+                                <h1>What tasks AdsMetrika end-to-end analytics solves?
+                                </h1>
                             </div>
                         </div>
                     </div>
                 </div>
-                <p class="large c-grey">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                </p>
+                <p class="large c-grey">
+                    Tracking statistics is the main job of a CPA marketer. Many advertising networks and affiliate programs do not provide an API for connecting third-party trackers. To do this, the Ads Metrika service has been created, combining statistics from advertising platforms - trafficfactory.com and exoclick.com with an affiliate network Adcombo.com                </p>
             </div>
         </div>
     </div>
@@ -221,25 +244,22 @@
                     <div class="col-lg-7 offset-lg-0 order-lg-1 col-md-8 offset-md-2 col-10 offset-1 order-2">
                         <div class="feature-section-content">
                             <div class="section-heading">
-                                <div class="sub-heading c-blue upper ls-1">
-                                    <i class="las la-cog"></i>
-                                    <h5>app features</h5>
-                                </div>
+
                                 <div class="main-heading c-dark">
-                                    <h1>Rich and full of features.</h1>
+                                    <h1>Combine your statistics. </h1>
                                 </div>
                             </div>
-                            <p class="c-grey">Seed doesn't he dry, male creepeth god them their in which by firmament to days two deep yielding darkness bring likeness.</p>
+                            <p class="c-grey">You get complete data on any of your campaigns in real time</p>
                             <div class="icon-text-group">
                                 <div class="icon-text">
                                     <i class="las la-server"></i>
-                                    <h4 class="c-dark">Unlimited Storage</h4>
-                                    <p class="c-grey">Heat multiply is second divided fowl there isn't man cattle.</p>
+                                    <h4 class="c-dark">Shows the effectiveness of ads</h4>
+                                    <p class="c-grey">You will discover ads that are paying off and making you money, but not just leads and clicks.</p>
                                 </div>
                                 <div class="icon-text">
                                     <i class="las la-user-shield"></i>
-                                    <h4 class="c-dark">Data Protection</h4>
-                                    <p class="c-grey">Heat multiply is second divided fowl there isn't man cattle.</p>
+                                    <h4 class="c-dark">Collects data in the same interface</h4>
+                                    <p class="c-grey">Track the most important for your business metrics in one easy-to-understand report.</p>
                                 </div>
                             </div>
                             <a href="contact.html" class="button button-2">
@@ -253,7 +273,7 @@
                     </div>
                     <div class="col-lg-5 offset-lg-0 order-lg-2 col-10 offset-1 order-1">
                         <div class="feature-section-image">
-                            <img th:src="@{../assets/images/feature-section-1-img.jpg}" class="image" alt="image">
+                            <img th:src="@{../assets/images/feature-section-1-img.png}" class="image" alt="image">
                             <img th:src="@{../assets/images/feature-section-1-phone.png}" class="phone" alt="phone">
                             <div class="background-pattern background-pattern-radius">
                                 <div class="background-pattern-img background-loop" style="background-image: url(assets/images/patterns/pattern.jpg);"></div>
@@ -278,7 +298,7 @@
                 <div class="row gx-5">
                     <div class="col-lg-5 offset-lg-0 col-10 offset-1">
                         <div class="feature-section-image">
-                            <img th:src="@{../assets/images/feature-section-2-img.jpg}" class="image" alt="image">
+                            <img th:src="@{../assets/images/feature-section-2-img.png}" class="image" alt="image">
                             <img th:src="@{../assets/images/feature-section-2-phone.png}" class="phone" alt="phone">
                             <div class="background-pattern background-pattern-radius-reverse">
                                 <div class="background-pattern-img background-loop" style="background-image: url(assets/images/patterns/pattern.jpg);"></div>
@@ -301,22 +321,22 @@
                                 <div class="icon-text-1">
                                     <i class="las la-comments"></i>
                                     <div>
-                                        <h4 class="c-dark">Video calls</h4>
-                                        <p class="c-grey">He saw lesser whales man air. Seasons void fly replenish man divided open fifth own fruitful.</p>
+                                        <h4 class="c-dark">Responsive design</h4>
+                                        <p class="c-grey">Track the indicators both in the desktop version and in the mobile version</p>
                                     </div>
                                 </div>
                                 <div class="icon-text-1">
                                     <i class="las la-headset"></i>
                                     <div>
-                                        <h4 class="c-dark">Private groups</h4>
-                                        <p class="c-grey">Give whales creeping sixth. Blessed itself created dry they're firmament face whose face lesser spirit day dry.</p>
+                                        <h4 class="c-dark">Track</h4>
+                                        <p class="c-grey">Keep track of income and expenses</p>
                                     </div>
                                 </div>
                                 <div class="icon-text-1">
                                     <i class="las la-photo-video"></i>
                                     <div>
-                                        <h4 class="c-dark">Cloud storage</h4>
-                                        <p class="c-grey">Waters seasons of place likeness good day let they're evening replenish years of over that.</p>
+                                        <h4 class="c-dark">Optimize</h4>
+                                        <p class="c-grey">Look at the ROI and profit indicators of your campaigns</p>
                                     </div>
                                 </div>
                             </div>
@@ -351,7 +371,7 @@
                                 <h5>discover</h5>
                             </div>
                             <div class="main-heading c-dark">
-                                <h1>Some frequently asked questions</h1>
+                                <h1>Some questions</h1>
                             </div>
                         </div>
                     </div>
@@ -372,7 +392,7 @@
                                       data-bs-target="#faq-collapse-1"
                                       aria-expanded="true"
                                       aria-controls="faq-collapse-1">
-                                        <span>Can I try Orions before I buy?</span>
+                                        <span>Can I try AdsMetrika before I buy?</span>
                                       </button>
                                     </div>
                                     <div
@@ -381,9 +401,7 @@
                                     aria-labelledby="faq-1"
                                     data-bs-parent="#faq-accordion">
                                       <div class="accordion-body">
-                                        <p>Prepare questions that the patient should answer when registering for an online
-                                            there consultation. We will send them to him before the visit in the form of survey
-                                            to which he will also be able to attach his research results.</p>
+                                        <p>This is a free service</p>
                                       </div>
                                     </div>
                                 </div>
@@ -402,7 +420,7 @@
                                       data-bs-target="#faq-collapse-2"
                                       aria-expanded="true"
                                       aria-controls="faq-collapse-2">
-                                        <span>What's your cancellation policy?</span>
+                                        <span>Will new networks be added?</span>
                                       </button>
                                     </div>
                                     <div
@@ -411,105 +429,11 @@
                                     aria-labelledby="faq-2"
                                     data-bs-parent="#faq-accordion">
                                       <div class="accordion-body">
-                                        <p>Prepare questions that the patient should answer when registering for an online
-                                            there consultation. We will send them to him before the visit in the form of survey
-                                            to which he will also be able to attach his research results.</p>
+                                        <p>Maybe</p>
                                       </div>
                                     </div>
                                 </div>
-                                <!--
-                                accordion item - end
-                                -->
-                                <!--
-                                accordion item - start
-                                -->
-                                <div class="accordion-item">
-                                    <div class="accordion-header" id="faq-3">
-                                      <button
-                                      class="accordion-button collapsed"
-                                      type="button"
-                                      data-bs-toggle="collapse"
-                                      data-bs-target="#faq-collapse-3"
-                                      aria-expanded="true"
-                                      aria-controls="faq-collapse-3">
-                                       <span>Do I need my own Apple Developer account?</span>
-                                      </button>
-                                    </div>
-                                    <div
-                                    id="faq-collapse-3"
-                                    class="accordion-collapse collapse"
-                                    aria-labelledby="faq-3"
-                                    data-bs-parent="#faq-accordion">
-                                      <div class="accordion-body">
-                                        <p>Prepare questions that the patient should answer when registering for an online
-                                            there consultation. We will send them to him before the visit in the form of survey
-                                            to which he will also be able to attach his research results.</p>
-                                      </div>
-                                    </div>
-                                </div>
-                                <!--
-                                accordion item - end
-                                -->
-                                <!--
-                                accordion item - start
-                                -->
-                                <div class="accordion-item">
-                                    <div class="accordion-header" id="faq-4">
-                                      <button
-                                      class="accordion-button collapsed"
-                                      type="button"
-                                      data-bs-toggle="collapse"
-                                      data-bs-target="#faq-collapse-4"
-                                      aria-expanded="true"
-                                      aria-controls="faq-collapse-4">
-                                        <span>Is there Orions branding in my app?</span>
-                                      </button>
-                                    </div>
-                                    <div
-                                    id="faq-collapse-4"
-                                    class="accordion-collapse collapse"
-                                    aria-labelledby="faq-4"
-                                    data-bs-parent="#faq-accordion">
-                                      <div class="accordion-body">
-                                        <p>Prepare questions that the patient should answer when registering for an online
-                                            there consultation. We will send them to him before the visit in the form of survey
-                                            to which he will also be able to attach his research results.</p>
-                                      </div>
-                                    </div>
-                                </div>
-                                <!--
-                                accordion item - end
-                                -->
-                                <!--
-                                accordion item - start
-                                -->
-                                <div class="accordion-item">
-                                    <div class="accordion-header" id="faq-5">
-                                      <button
-                                      class="accordion-button collapsed"
-                                      type="button"
-                                      data-bs-toggle="collapse"
-                                      data-bs-target="#faq-collapse-5"
-                                      aria-expanded="true"
-                                      aria-controls="faq-collapse-5">
-                                        <span>Can I preview before I publish?</span>
-                                      </button>
-                                    </div>
-                                    <div
-                                    id="faq-collapse-5"
-                                    class="accordion-collapse collapse"
-                                    aria-labelledby="faq-5"
-                                    data-bs-parent="#faq-accordion">
-                                      <div class="accordion-body">
-                                        <p>Prepare questions that the patient should answer when registering for an online
-                                            there consultation. We will send them to him before the visit in the form of survey
-                                            to which he will also be able to attach his research results.</p>
-                                      </div>
-                                    </div>
-                                </div>
-                                <!--
-                                accordion item - end
-                                -->
+                                <!-- End block -->
                             </div>
                         </div>
                     </div>
@@ -593,13 +517,13 @@
                                 <a href="#">
                                     <img th:src="@{../assets/images/logo.png}" alt="footer-logo">
                                 </a>
-                                <p class="c-grey-1">Orions is a universal app template that was designed to cater to most of the modern app landing page designs requirements.</p>
+                                <p class="c-grey-1"></p>
                                 <div class="links">
                                     <a class="link-underline" href="mailto:hello@orions.com">
-                                        <span>hello@orions.com</span>
+                                        <span>89992008819@mail.ru</span>
                                     </a>
-                                    <a class="link-underline" href="tel:+1-234-567-890">
-                                        <span>+1 234 567 890</span>
+                                    <a class="link-underline" href="tel:+79992008819">
+                                        <span>8 (999) 200-88-19</span>
                                     </a>
                                 </div>
                             </div>
@@ -608,26 +532,14 @@
                                 <ul>
                                     <li class="twitter">
                                         <a href="#" class="link-underline">
-                                            <i class="fab fa-twitter"></i>
-                                            <span>Twitter</span>
+                                            <i class="fab fa-github"></i>
+                                            <span>Github</span>
                                         </a>
                                     </li>
                                     <li class="facebook">
                                         <a href="#" class="link-underline">
                                             <i class="fab fa-facebook"></i>
                                             <span>Facebook</span>
-                                        </a>
-                                    </li>
-                                    <li class="linkedin">
-                                        <a href="#" class="link-underline">
-                                            <i class="fab fa-linkedin-in"></i>
-                                            <span>Linkedin</span>
-                                        </a>
-                                    </li>
-                                    <li class="youtube">
-                                        <a href="#" class="link-underline">
-                                            <i class="fab fa-youtube"></i>
-                                            <span>Youtube</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -669,5 +581,6 @@
     <script th:src="@{../assets/js/overlay-scrollbars.min.js}"></script>
     <script th:src="@{../assets/js/gsap.min.js}"></script>
     <script th:src="@{../assets/js/main.js}"></script>
+
 </body>
 </html>

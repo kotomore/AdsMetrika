@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
 
 <head>
 
@@ -9,7 +9,7 @@
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description"/>
     <meta content="Themesdesign" name="author"/>
     <!-- App favicon -->
-    <link rel="shortcut icon" th:href="@{assets/images/favicon.ico}">
+    <link rel="icon" type="image/x-icon" th:href="@{../assets/favicon.ico}">
 
     <!-- jquery.vectormap css -->
     <link th:href="@{assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css}" rel="stylesheet"
@@ -55,19 +55,19 @@
                 <div class="navbar-brand-box">
                     <a th:href="@{/statistics}" class="logo logo-dark">
                                 <span class="logo-sm">
-                                    <img src="assets/images/logo-sm.png" alt="logo-sm" height="22">
+                                    <img src="assets/images/logo-sm.png" alt="logo-sm" height="36">
                                 </span>
-                        <span class="logo-lg">
-                                    <img src="assets/images/logo-dark.png" alt="logo-dark" height="20">
+                        <span style="height: 36px;"  class="logo-lg">
+                                    <img src="assets/images/logo-dark.png" alt="logo-dark" height="36">
                                 </span>
                     </a>
 
                     <a th:href="@{/statistics}" class="logo logo-light">
                                 <span class="logo-sm">
-                                    <img src="assets/images/logo-sm.png" alt="logo-sm-light" height="22">
+                                    <img src="assets/images/logo-sm.png" alt="logo-sm-light" height="36">
                                 </span>
                         <span class="logo-lg">
-                                    <img src="assets/images/logo-light.png" alt="logo-light" height="20">
+                                    <img src="assets/images/logo-light.png" alt="logo-light" height="36">
                                 </span>
                     </a>
                 </div>
@@ -169,6 +169,22 @@
 
                     <li>
                         <a href="calendar.html" class=" waves-effect">
+                            <i class="ri-table-2"></i>
+                            <span>Weekly Report</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="calendar.html" class=" waves-effect">
+                            <i class="ri-table-2"></i>
+                            <span>Monthly Report</span>
+                        </a>
+                    </li>
+
+                    <li class="menu-title">Settings</li>
+
+                    <li>
+                        <a href="calendar.html" class=" waves-effect">
                             <i class="ri-calendar-2-line"></i>
                             <span>Offers</span>
                         </a>
@@ -176,7 +192,7 @@
 
                     <li>
                         <a href="calendar.html" class=" waves-effect">
-                            <i class="ri-calendar-2-line"></i>
+                            <i class="ri-account-circle-line"></i>
                             <span>Credentials</span>
                         </a>
                     </li>
@@ -233,11 +249,18 @@
                             <div class="card-body">
                                 <div class="d-flex">
                                     <div class="flex-grow-1">
-                                        <p class="text-truncate font-size-14 mb-2">Total Sales</p>
-                                        <h4 th:text="${#numbers.formatDecimal(totalSpend, 1, 2)} + '$'" class="mb-2">total spend</h4>
-                                        <p class="text-muted mb-0"><span class="text-success fw-bold font-size-12 me-2"><i
-                                                class="ri-arrow-right-up-line me-1 align-middle"></i>9.23%</span>from
-                                            previous period</p>
+                                        <p class="text-truncate font-size-14 mb-2">Total Spend</p>
+                                        <h4 th:text="${#numbers.formatDecimal(combinedStats.getTotalSpend(), 1, 2)}+'$'" class="mb-2">total spend</h4>
+                                        <p th:if="${chartDates.contains(currentDate.minusDays(1))}"  class="text-muted mb-0">
+                                            <span th:if="${(combinedStats.getTotalSpend()/chartCosts.get(1)*100)}>=100"  class="text-success fw-bold font-size-12 me-2">
+                                            <i class="ri-arrow-right-up-line me-1 align-middle"></i>
+                                                <span th:text="${#numbers.formatDecimal(100-combinedStats.getTotalSpend()/chartCosts.get(1)*100, 1, 2)}+'%'"></span>
+                                            </span>
+                                            <span th:if="${(combinedStats.getTotalSpend()/chartCosts.get(1)*100)}<100" class="text-danger fw-bold font-size-12 me-2">
+                                            <i class="ri-arrow-right-down-line me-1 align-middle"></i>
+                                                <span th:text="${#numbers.formatDecimal(100-combinedStats.getTotalSpend()/chartCosts.get(1)*100, 1, 2)}+'%'"></span>
+                                            </span>
+                                            from yesterday</p>
                                     </div>
                                     <div class="avatar-sm">
                                                 <span class="avatar-title bg-light text-primary rounded-3">
@@ -254,11 +277,17 @@
                                 <div class="d-flex">
                                     <div class="flex-grow-1">
                                         <p class="text-truncate font-size-14 mb-2">Total Revenue</p>
-                                        <h4 th:text="${#numbers.formatDecimal(totalRevenue, 1, 2)} + '$'" class="mb-2">total revenue</h4>
-                                        <p class="text-muted mb-0"><span
-                                                class="text-danger fw-bold font-size-12 me-2"><i
-                                                class="ri-arrow-right-down-line me-1 align-middle"></i>1.09%</span>from
-                                            previous period</p>
+                                        <h4 th:text="${combinedStats.getTotalRevenue()}" class="mb-2">total revenue</h4>
+                                        <p th:if="${chartDates.contains(currentDate.minusDays(1))}"  class="text-muted mb-0">
+                                            <span th:if="${(combinedStats.getTotalRevenue()/chartRevenue.get(1)*100)}>=100"  class="text-success fw-bold font-size-12 me-2">
+                                            <i class="ri-arrow-right-up-line me-1 align-middle"></i>
+                                                <span th:text="${#numbers.formatDecimal(100-combinedStats.getTotalRevenue()/chartRevenue.get(1)*100, 1, 2)}+'%'"></span>
+                                            </span>
+                                            <span th:if="${(combinedStats.getTotalSpend()/chartCosts.get(1)*100)}<100" class="text-danger fw-bold font-size-12 me-2">
+                                            <i class="ri-arrow-right-down-line me-1 align-middle"></i>
+                                                <span th:text="${#numbers.formatDecimal(100-combinedStats.getTotalRevenue()/chartRevenue.get(1)*100, 1, 2)}+'%'"></span>
+                                            </span>
+                                            from yesterday</p>
                                     </div>
                                     <div class="avatar-sm">
                                                 <span class="avatar-title bg-light text-success rounded-3">
@@ -270,15 +299,12 @@
                         </div><!-- end card -->
                     </div><!-- end col -->
                     <div class="col-xl-3 col-md-6">
-                        <div class="card">
+                        <div class="card" style="padding-bottom:23px;">
                             <div class="card-body">
                                 <div class="d-flex">
                                     <div class="flex-grow-1">
                                         <p class="text-truncate font-size-14 mb-2">Total approve orders</p>
-                                        <h4 th:text="${totalOrders}" class="mb-2">total orders</h4>
-                                        <p class="text-muted mb-0"><span class="text-success fw-bold font-size-12 me-2"><i
-                                                class="ri-arrow-right-up-line me-1 align-middle"></i>16.2%</span>from
-                                            previous period</p>
+                                        <h4 th:text="${combinedStats.getTotalApproveCount()}" class="mb-2">total orders</h4>
                                     </div>
                                     <div class="avatar-sm">
                                                 <span class="avatar-title bg-light text-primary rounded-3">
@@ -290,15 +316,12 @@
                         </div><!-- end card -->
                     </div><!-- end col -->
                     <div class="col-xl-3 col-md-6">
-                        <div class="card">
+                        <div class="card" style="padding-bottom:23px;">
                             <div class="card-body">
                                 <div class="d-flex">
                                     <div class="flex-grow-1">
                                         <p class="text-truncate font-size-14 mb-2">Total Clicks</p>
-                                        <h4 th:text="${totalClicks}" class="mb-2">total clicks</h4>
-                                        <p class="text-muted mb-0"><span class="text-success fw-bold font-size-12 me-2"><i
-                                                class="ri-arrow-right-up-line me-1 align-middle"></i>11.7%</span>from
-                                            previous period</p>
+                                        <h4 th:text="${combinedStats.getTotalClicks()}" class="mb-2">total clicks</h4>
                                     </div>
                                     <div class="avatar-sm">
                                                 <span class="avatar-title bg-light text-success rounded-3">
@@ -323,19 +346,19 @@
                                     <div class="row">
                                         <div class="col-sm-4 mb-3 mb-sm-0">
                                             <div>
-                                                <h5 th:text="${#numbers.formatDecimal(monthlyTotal.getSpend(), 1, 2)} + '$'">Spend</h5>
+                                                <h5 th:text="${#numbers.formatDecimal(chartTotal.getSpend(), 1, 2)} + '$'">Spend</h5>
                                                 <p class="text-muted text-truncate mb-0">Total Spend</p>
                                             </div>
                                         </div><!-- end col -->
                                         <div class="col-sm-4 mb-3 mb-sm-0">
                                             <div>
-                                                <h5 th:text="${#numbers.formatDecimal(monthlyTotal.getRevenue(), 1, 2)} + '$'">Revenue</h5>
+                                                <h5 th:text="${#numbers.formatDecimal(chartTotal.getRevenue(), 1, 2)} + '$'">Revenue</h5>
                                                 <p class="text-muted text-truncate mb-0">Total Revenue</p>
                                             </div>
                                         </div><!-- end col -->
                                         <div class="col-sm-4">
                                             <div>
-                                                <h5 th:text="${costs.size()}">Days count</h5>
+                                                <h5 th:text="${chartDates.size()}">Days count</h5>
                                                 <p class="text-muted text-truncate mb-0">Days count</p>
                                             </div>
                                         </div><!-- end col -->
@@ -391,8 +414,8 @@
                                 </div>
 
 
-                                <div th:each="statistic : ${statistics}" class="table-responsive">
-                                    <h4 th:text="${statistic.key.getFullName()} + ' Offers'" class="card-title mb-4">
+                                <div style="margin-bottom: 50px;" th:each="statistic : ${statistics}" class="table-responsive">
+                                    <h4 th:text="${statistic.getNetwork().getFullName()} + ' Offers'" class="card-title mb-4">
                                         Offers Statistics</h4>
                                     <table class="table table-centered mb-0 align-middle table-hover table-nowrap">
                                         <thead class="table-light">
@@ -410,16 +433,95 @@
                                         </thead><!-- end thead -->
                                         <tbody>
                                         <tr th:style="${offer.getProfit() < 0 ? 'color: red;' : 'color: green;'}"
-                                            th:each="offer : ${statistic.value}">
+                                            th:each="offer : ${statistic.getCurrentStats()}">
                                             <td><h6 th:text="${offer.getCampaignId()}" class="mb-0">campaign id</h6></td>
                                             <td th:text="${offer.getCampaignName()}">Campaign name</td>
                                             <td th:text="${offer.getClicks()}">clicks</td>
-                                            <td th:text="${#numbers.formatDecimal(offer.getCost(), 1, 2)} + '$'">cost</td>
+                                            <td th:text="${#numbers.formatDecimal(offer.getSpend(), 1, 2)} + '$'">cost</td>
                                             <td th:text="${offer.getHoldCost()}">hold cost</td>
                                             <td th:text="${offer.getApproveCount()}">approve count</td>
-                                            <td th:text="${offer.getApproveCost()} + '$'">approve cost</td>
+                                            <td th:text="${offer.getRevenue()} + '$'">approve cost</td>
                                             <td th:text="${#numbers.formatDecimal(offer.getProfit(), 1, 2)} + '$'">profit</td>
                                             <td th:text="${offer.getROI()} + '%'">roi</td>
+                                        </tr>
+                                        <tr>
+                                            <td><h6 class="mb-0">Total</h6></td>
+                                            <td></td>
+                                            <td th:text="${statistic.getTotalClicks()}">clicks</td>
+                                            <td th:text="${#numbers.formatDecimal(statistic.getTotalSpend(), 1, 2)} + '$'">cost</td>
+                                            <td th:text="${statistic.getTotalHoldCost()}">hold cost</td>
+                                            <td th:text="${statistic.getTotalApproveCount()}">approve count</td>
+                                            <td th:text="${statistic.getTotalRevenue()} + '$'">approve cost</td>
+                                            <td th:text="${#numbers.formatDecimal(statistic.getTotalProfit(), 1, 2)} + '$'">profit</td>
+                                            <td th:text="${statistic.getTotalROI()} + '%'">roi</td>
+                                        </tr>
+                                        </tbody><!-- end tbody -->
+                                    </table> <!-- end table -->
+                                </div>
+                            </div><!-- end card -->
+                        </div><!-- end card -->
+                    </div>
+                    <!-- end col -->
+
+                </div>
+
+                <div th:if="${statistics.size()}>1" class="row">
+                    <div class="col-xl-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="dropdown float-end">
+                                    <a href="#" class="dropdown-toggle arrow-none card-drop" data-bs-toggle="dropdown"
+                                       aria-expanded="false">
+                                        <i class="mdi mdi-dots-vertical"></i>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-end">
+                                        <!-- item-->
+                                        <a href="javascript:void(0);" class="dropdown-item">Copy to ClipBoard</a>
+
+                                    </div>
+                                </div>
+
+
+                                <div style="margin-bottom: 50px;" class="table-responsive">
+                                    <h4 class="card-title mb-4">
+                                        Combined Offer Statistics</h4>
+                                    <table class="table table-centered mb-0 align-middle table-hover table-nowrap">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th>№</th>
+                                            <th>Offer</th>
+                                            <th>Clicks</th>
+                                            <th>Cost</th>
+                                            <th>Hold</th>
+                                            <th>Approve</th>
+                                            <th>Approve $</th>
+                                            <th>Profit $</th>
+                                            <th style="width: 120px;">ROI %</th>
+                                        </tr>
+                                        </thead><!-- end thead -->
+                                        <tbody>
+                                        <tr th:style="${offer.getProfit() < 0 ? 'color: red;' : 'color: green;'}"
+                                            th:each="offer : ${combinedStats.getCurrentStats()}">
+                                            <td><h6 th:text="${offer.getCampaignId()}" class="mb-0">campaign id</h6></td>
+                                            <td th:text="${offer.getCampaignName()}">Campaign name</td>
+                                            <td th:text="${offer.getClicks()}">clicks</td>
+                                            <td th:text="${#numbers.formatDecimal(offer.getSpend(), 1, 2)} + '$'">cost</td>
+                                            <td th:text="${offer.getHoldCost()}">hold cost</td>
+                                            <td th:text="${offer.getApproveCount()}">approve count</td>
+                                            <td th:text="${offer.getRevenue()} + '$'">approve cost</td>
+                                            <td th:text="${#numbers.formatDecimal(offer.getProfit(), 1, 2)} + '$'">profit</td>
+                                            <td th:text="${offer.getROI()} + '%'">roi</td>
+                                        </tr>
+                                        <tr>
+                                            <td><h6 class="mb-0">Total</h6></td>
+                                            <td></td>
+                                            <td th:text="${combinedStats.getTotalClicks()}">clicks</td>
+                                            <td th:text="${#numbers.formatDecimal(combinedStats.getTotalSpend(), 1, 2)} + '$'">cost</td>
+                                            <td th:text="${combinedStats.getTotalHoldCost()}">hold cost</td>
+                                            <td th:text="${combinedStats.getTotalApproveCount()}">approve count</td>
+                                            <td th:text="${combinedStats.getTotalRevenue()} + '$'">approve cost</td>
+                                            <td th:text="${#numbers.formatDecimal(combinedStats.getTotalProfit(), 1, 2)} + '$'">profit</td>
+                                            <td th:text="${combinedStats.getTotalROI()} + '%'">roi</td>
                                         </tr>
                                         </tbody><!-- end tbody -->
                                     </table> <!-- end table -->
@@ -525,18 +627,17 @@
 <script src="assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
 <script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
 
-
 <script th:inline="javascript">
 
     var options = {
         series: [{
             name: "Costs",
             type: "column",
-            data: [[${costs}]]
+            data: [[${chartCosts}]]
         }, {
             name: "Revenue",
             type: "line",
-            data: [[${revenue}]]
+            data: [[${chartRevenue}]]
         }],
         chart: {
             height: 350,
@@ -573,7 +674,7 @@
         yaxis: {
             labels: {
                 formatter: function (e) {
-                    return e + "k"
+                    return e.toFixed(2) + "$"
                 }
             },
             tickAmount: 5,
@@ -581,7 +682,7 @@
             max: 50
         },
         colors: ["#0f9cf3", "#6fd088"],
-        labels: [[${dates}]]
+        labels: [[${chartDates}]]
     };
     (chart = new ApexCharts(document.querySelector("#column_line_chart"), options)).render();
 

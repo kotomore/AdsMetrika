@@ -10,6 +10,12 @@
 <ul>
   <li th:each="user : ${users}" th:text="${user.getUsername()}"></li>
 </ul>
+<br><hr><br>
+
+<form th:action="@{admin/shutdown}" th:method="POST">
+  <input type="submit" value="shutdown ">
+</form>
+<br><br>
 <form th:action="@{/logout}" th:method="POST">
   <input type="submit" value="Logout ">
 </form>

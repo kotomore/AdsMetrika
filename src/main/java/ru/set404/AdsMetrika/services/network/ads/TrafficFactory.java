@@ -34,7 +34,6 @@ public class TrafficFactory implements NetworkStats {
     }
 
     private void getAuth() throws IOException {
-        if (response == null) {
             System.out.println("Authorization...");
             response = Jsoup
                     .connect("https://main.trafficfactory.biz/users/sign_in")
@@ -62,7 +61,6 @@ public class TrafficFactory implements NetworkStats {
                     .data("signin[_csrf_token]", token)
                     .cookies(response.cookies())
                     .execute();
-        }
     }
 
     public Map<Integer, NetworkStatEntity> getStat(Map<Integer, String> networkOffers, LocalDate dateStart,
@@ -94,6 +92,7 @@ public class TrafficFactory implements NetworkStats {
                             + dateEnd + "-23-59?campaign_name="
                             + offerId)
                     .cookies(response.cookies())
+                    .method(Connection.Method.GET)
                     .execute();
         } catch (IOException e) {
             throw new RuntimeException(e);

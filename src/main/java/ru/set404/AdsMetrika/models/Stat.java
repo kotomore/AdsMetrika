@@ -34,7 +34,7 @@ public class Stat {
     private int clicks;
 
     @Column(name = "cost", nullable = false)
-    private double cost;
+    private double spend;
 
     @Column(name = "hold_cost", nullable = false)
     private double holdCost;
@@ -43,7 +43,7 @@ public class Stat {
     private int approveCount;
 
     @Column(name = "approve_cost", nullable = false)
-    private int approveCost;
+    private int revenue;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "network_name", nullable = false)

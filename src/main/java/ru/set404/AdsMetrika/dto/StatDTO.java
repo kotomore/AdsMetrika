@@ -12,26 +12,28 @@ public class StatDTO {
     private int campaignId;
     private String campaignName;
     private int clicks;
-    private double cost;
+    private double spend;
     private double holdCost;
     private int approveCount;
-    private double approveCost;
+    private double revenue;
 
-    public StatDTO(int campaignId, String campaignName, int clicks, double cost, double holdCost, int approveCount, double approveCost) {
+    public StatDTO() {
+    }
+
+    public StatDTO(int campaignId, String campaignName, int clicks, double spend, double holdCost, int approveCount, double revenue) {
         this.campaignId = campaignId;
         this.campaignName = campaignName;
         this.clicks = clicks;
-        this.cost = cost;
+        this.spend = spend;
         this.holdCost = holdCost;
         this.approveCount = approveCount;
-        this.approveCost = approveCost;
+        this.revenue = revenue;
     }
-
     public double getProfit() {
-        return approveCost - cost;
+        return revenue - spend;
     }
 
     public int getROI() {
-        return (int) (((approveCost - cost) / cost) * 100);
+        return (int) (((revenue - spend) / spend) * 100);
     }
 }

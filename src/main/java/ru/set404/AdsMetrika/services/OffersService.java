@@ -12,7 +12,7 @@ import ru.set404.AdsMetrika.services.network.ads.NetworkStats;
 import ru.set404.AdsMetrika.services.network.ads.TrafficFactory;
 import ru.set404.AdsMetrika.services.network.cpa.Adcombo;
 import ru.set404.AdsMetrika.services.network.cpa.AdcomboStatsEntity;
-import ru.set404.AdsMetrika.util.StatisticsMapper;
+import ru.set404.AdsMetrika.util.StatisticsUtilities;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -52,7 +52,7 @@ public class OffersService {
 
         assert networkStats != null;
         Map<Integer, NetworkStatEntity> networkStatsMap = networkStats.getStat(userOffersFilteredByNetwork,
-                dateStart.minusDays(1), dateEnd);
+                dateStart, dateEnd);
 
         Map<Integer, AdcomboStatsEntity> adcomboStatsMap = adCombo.getStat(network,
                 dateStart.minusDays(1), dateEnd);
@@ -61,7 +61,7 @@ public class OffersService {
 
         for (int offerId : userOffersFilteredByNetwork.keySet()) {
             if (networkStatsMap.containsKey(offerId) && adcomboStatsMap.containsKey(offerId))
-                statsEntities.add(StatisticsMapper.createStatsDTO(offerId, networkStatsMap, adcomboStatsMap));
+                statsEntities.add(StatisticsUtilities.createStatsDTO(offerId, networkStatsMap, adcomboStatsMap));
         }
         return statsEntities;
     }
