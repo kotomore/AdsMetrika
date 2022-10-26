@@ -32,7 +32,7 @@ public class StatsService {
         return statsRepository.findAllByOwnerAndCreatedDateAfter(user, dateStart);
     }
 
-    public void saveStatDTO(List<StatDTO> statDTOList, User user, Network network, LocalDate date) {
+    public void saveStatDTOList(List<StatDTO> statDTOList, User user, Network network, LocalDate date) {
         for (StatDTO statDTO : statDTOList) {
             Stat stat = modelMapper.map(statDTO, Stat.class);
             stat.setNetworkName(network);

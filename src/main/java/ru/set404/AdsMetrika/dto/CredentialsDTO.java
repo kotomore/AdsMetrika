@@ -10,10 +10,9 @@ import javax.validation.constraints.NotEmpty;
 @Getter
 @Setter
 public class CredentialsDTO {
-    @NotEmpty(message = "Имя пользователя не может быть пустым")
-    private String username;
 
-    @NotEmpty(message = "Пароль не может быть пустым")
+    private int id;
+    private String username;
     private String password;
 
     @Enumerated(EnumType.STRING)

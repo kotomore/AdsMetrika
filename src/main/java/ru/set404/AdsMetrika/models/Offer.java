@@ -22,11 +22,10 @@ public class Offer {
     @JoinColumn(name = "person_id", referencedColumnName = "id")
     private User owner;
 
-    @NotEmpty(message = "Номер не может быть пустым")
     @Column(name = "adcombo_number", nullable = false)
     private int adcomboNumber;
 
-    @NotEmpty(message = "Имя не может быть пустым")
+    @NotEmpty
     @Column(name = "group_name", nullable = false)
     private String groupName;
 

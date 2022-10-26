@@ -10,12 +10,12 @@ import javax.validation.constraints.NotEmpty;
 @Getter
 @Setter
 public class OfferDTO {
-    @NotEmpty(message = "Номер не может быть пустым")
+    private int id;
     private int adcomboNumber;
-
-    @NotEmpty(message = "Имя не может быть пустым")
     private String groupName;
-
     @Enumerated(EnumType.STRING)
     private Network networkName;
+
+    public OfferDTO() {
+    }
 }

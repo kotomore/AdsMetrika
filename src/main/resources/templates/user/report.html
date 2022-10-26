@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
 
 <head>
 
     <meta charset="utf-8"/>
-    <title>Dashboard | AdsMetrika - End-to-End analytics service </title>
+    <title>Report | AdsMetrika - End-to-End analytics service </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description"/>
     <meta content="Themesdesign" name="author"/>
@@ -12,23 +12,23 @@
     <link rel="icon" type="image/x-icon" th:href="@{../assets/favicon.ico}">
 
     <!-- jquery.vectormap css -->
-    <link th:href="@{assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css}" rel="stylesheet"
+    <link th:href="@{../assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css}" rel="stylesheet"
           type="text/css"/>
 
     <!-- DataTables -->
-    <link th:href="@{assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css}" rel="stylesheet"
+    <link th:href="@{../assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css}" rel="stylesheet"
           type="text/css"/>
 
     <!-- Responsive datatable examples -->
-    <link th:href="@{assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css}" rel="stylesheet"
+    <link th:href="@{../assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css}" rel="stylesheet"
           type="text/css"/>
 
     <!-- Bootstrap Css -->
-    <link th:href="@{assets/css/bootstrap-dark.min.css}" id="bootstrap-style" rel="stylesheet" type="text/css"/>
+    <link th:href="@{../assets/css/bootstrap-dark.min.css}" id="bootstrap-style" rel="stylesheet" type="text/css"/>
     <!-- Icons Css -->
-    <link th:href="@{assets/css/icons.min.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{../assets/css/icons.min.css}" rel="stylesheet" type="text/css"/>
     <!-- App Css-->
-    <link th:href="@{assets/css/app.min.css}" id="app-style" rel="stylesheet" type="text/css"/>
+    <link th:href="@{../assets/css/app.min.css}" id="app-style" rel="stylesheet" type="text/css"/>
 
 </head>
 
@@ -230,24 +230,12 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                            <h4 class="mb-sm-0">Dashboard</h4>
-
-                            <a id="datepicker1" th:href="@{/statistics(ds=${currentDate}, de=${currentDate})}">Today</a>
-                            <a id="datepicker2" th:href="@{/statistics(ds=${currentDate.minusDays(1)}, de=${currentDate.minusDays(1)})}">Yesterday</a>
-                            <a id="datepicker3" th:href="@{/statistics(ds=${currentDate.minusDays(2)}, de=${currentDate})}">Last 3
-                                days</a>
-                            <a id="datepicker4" th:href="@{/statistics(ds=${currentDate.minusDays(6)}, de=${currentDate})}">Last 7
-                                days</a>
-                            <a id="datepicker5" th:href="@{/statistics(ds=${currentDate.withDayOfMonth(1)}, de=${currentDate})}">This
-                                Month</a>
-                            <a id="datepicker6" th:href="@{/statistics(ds=${currentDate.minusMonths(1).withDayOfMonth(1)},de=${currentDate.minusMonths(1)
-                                .withDayOfMonth(currentDate.minusMonths(1).getMonth()
-                                .length(currentDate.minusMonths(1).isLeapYear()))})}">Last Month</a>
+                            <h4 th:text="'Report ('+${dates}+')'" class="mb-sm-0">Report</h4>
 
                             <div class="page-title-right">
                                 <ol class="breadcrumb m-0">
-                                    <li class="breadcrumb-item"><a href="javascript: void(0);">AdsMetrika</a></li>
-                                    <li class="breadcrumb-item active">Dashboard</li>
+                                    <li class="breadcrumb-item"><a href="javascript: void(0);">Report</a></li>
+                                    <li class="breadcrumb-item active">AdsMetrika</li>
                                 </ol>
                             </div>
 
@@ -256,231 +244,8 @@
                 </div>
                 <!-- end page title -->
 
-                <div class="row">
-                    <div class="col-xl-3 col-md-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex">
-                                    <div class="flex-grow-1">
-                                        <p class="text-truncate font-size-14 mb-2">Total Spend</p>
-                                        <h4 th:text="${#numbers.formatDecimal(combinedStats.getTotalSpend(), 1, 2)}+'$'" class="mb-2">total spend</h4>
-                                        <p th:if="${chartDates.contains(currentDate.minusDays(1))}"  class="text-muted mb-0">
-                                            <span th:if="${(combinedStats.getTotalSpend()/chartCosts.get(1)*100)}>=100"  class="text-success fw-bold font-size-12 me-2">
-                                            <i class="ri-arrow-right-up-line me-1 align-middle"></i>
-                                                <span th:text="${#numbers.formatDecimal(100-combinedStats.getTotalSpend()/chartCosts.get(1)*100, 1, 2)}+'%'"></span>
-                                            </span>
-                                            <span th:if="${(combinedStats.getTotalSpend()/chartCosts.get(1)*100)}<100" class="text-danger fw-bold font-size-12 me-2">
-                                            <i class="ri-arrow-right-down-line me-1 align-middle"></i>
-                                                <span th:text="${#numbers.formatDecimal(100-combinedStats.getTotalSpend()/chartCosts.get(1)*100, 1, 2)}+'%'"></span>
-                                            </span>
-                                            from yesterday</p>
-                                    </div>
-                                    <div class="avatar-sm">
-                                                <span class="avatar-title bg-light text-primary rounded-3">
-                                                    <i class="ri-shopping-cart-2-line font-size-24"></i>
-                                                </span>
-                                    </div>
-                                </div>
-                            </div><!-- end cardbody -->
-                        </div><!-- end card -->
-                    </div><!-- end col -->
-                    <div class="col-xl-3 col-md-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex">
-                                    <div class="flex-grow-1">
-                                        <p class="text-truncate font-size-14 mb-2">Total Revenue</p>
-                                        <h4 th:text="${combinedStats.getTotalRevenue()}" class="mb-2">total revenue</h4>
-                                        <p th:if="${chartDates.contains(currentDate.minusDays(1))}"  class="text-muted mb-0">
-                                            <span th:if="${(combinedStats.getTotalRevenue()/chartRevenue.get(1)*100)}>=100"  class="text-success fw-bold font-size-12 me-2">
-                                            <i class="ri-arrow-right-up-line me-1 align-middle"></i>
-                                                <span th:text="${#numbers.formatDecimal(100-combinedStats.getTotalRevenue()/chartRevenue.get(1)*100, 1, 2)}+'%'"></span>
-                                            </span>
-                                            <span th:if="${(combinedStats.getTotalSpend()/chartCosts.get(1)*100)}<100" class="text-danger fw-bold font-size-12 me-2">
-                                            <i class="ri-arrow-right-down-line me-1 align-middle"></i>
-                                                <span th:text="${#numbers.formatDecimal(100-combinedStats.getTotalRevenue()/chartRevenue.get(1)*100, 1, 2)}+'%'"></span>
-                                            </span>
-                                            from yesterday</p>
-                                    </div>
-                                    <div class="avatar-sm">
-                                                <span class="avatar-title bg-light text-success rounded-3">
-                                                    <i class="mdi mdi-currency-usd font-size-24"></i>
-                                                </span>
-                                    </div>
-                                </div>
-                            </div><!-- end cardbody -->
-                        </div><!-- end card -->
-                    </div><!-- end col -->
-                    <div class="col-xl-3 col-md-6">
-                        <div class="card" style="padding-bottom:23px;">
-                            <div class="card-body">
-                                <div class="d-flex">
-                                    <div class="flex-grow-1">
-                                        <p class="text-truncate font-size-14 mb-2">Total approve orders</p>
-                                        <h4 th:text="${combinedStats.getTotalApproveCount()}" class="mb-2">total orders</h4>
-                                    </div>
-                                    <div class="avatar-sm">
-                                                <span class="avatar-title bg-light text-primary rounded-3">
-                                                    <i class="ri-user-3-line font-size-24"></i>
-                                                </span>
-                                    </div>
-                                </div>
-                            </div><!-- end cardbody -->
-                        </div><!-- end card -->
-                    </div><!-- end col -->
-                    <div class="col-xl-3 col-md-6">
-                        <div class="card" style="padding-bottom:23px;">
-                            <div class="card-body">
-                                <div class="d-flex">
-                                    <div class="flex-grow-1">
-                                        <p class="text-truncate font-size-14 mb-2">Total Clicks</p>
-                                        <h4 th:text="${combinedStats.getTotalClicks()}" class="mb-2">total clicks</h4>
-                                    </div>
-                                    <div class="avatar-sm">
-                                                <span class="avatar-title bg-light text-success rounded-3">
-                                                    <i class="mdi mdi-currency-btc font-size-24"></i>
-                                                </span>
-                                    </div>
-                                </div>
-                            </div><!-- end cardbody -->
-                        </div><!-- end card -->
-                    </div><!-- end col -->
-                </div><!-- end row -->
 
                 <div class="row">
-
-                    <!-- end col -->
-                    <div class="col-xl-6">
-                        <div class="card">
-                            <div class="card-body pb-0">
-                                <h4 class="card-title mb-4">Revenue</h4>
-
-                                <div class="text-center pt-3">
-                                    <div class="row">
-                                        <div class="col-sm-4 mb-3 mb-sm-0">
-                                            <div>
-                                                <h5 th:text="${#numbers.formatDecimal(chartTotal.getSpend(), 1, 2)} + '$'">Spend</h5>
-                                                <p class="text-muted text-truncate mb-0">Total Spend</p>
-                                            </div>
-                                        </div><!-- end col -->
-                                        <div class="col-sm-4 mb-3 mb-sm-0">
-                                            <div>
-                                                <h5 th:text="${#numbers.formatDecimal(chartTotal.getRevenue(), 1, 2)} + '$'">Revenue</h5>
-                                                <p class="text-muted text-truncate mb-0">Total Revenue</p>
-                                            </div>
-                                        </div><!-- end col -->
-                                        <div class="col-sm-4">
-                                            <div>
-                                                <h5 th:text="${chartDates.size()}">Days count</h5>
-                                                <p class="text-muted text-truncate mb-0">Days count</p>
-                                            </div>
-                                        </div><!-- end col -->
-                                    </div><!-- end row -->
-                                </div>
-                            </div>
-                            <div class="card-body py-0 px-2">
-                                <div id="column_line_chart" class="apex-charts" dir="ltr"></div>
-                            </div>
-                        </div><!-- end card -->
-                    </div>
-
-                    <div class="col-xl-6">
-                        <div class="card" style="padding-bottom:24px;">
-                            <div class="card-body">
-                                <h4 class="card-title mb-4">Comparing networks sales</h4>
-
-                                <div class="row">
-                                    <div th:each="network : ${totalSpendByNetwork.keySet()}" class="col-6">
-                                        <div class="text-center mt-4">
-                                            <h5 th:text="${#numbers.formatDecimal(totalSpendByNetwork.get(network), 1, 2)} + '$'">spend count</h5>
-                                            <p th:text="${network.getFullName()}" class="mb-2 text-truncate">Network</p>
-                                        </div>
-                                    </div>
-                                    <!-- end col -->
-                                </div>
-                                <!-- end row -->
-
-                                <div class="mt-4">
-                                    <div id="donut-chart" class="apex-charts"></div>
-                                </div>
-                            </div>
-                        </div><!-- end card -->
-                    </div><!-- end col -->
-                    <!-- end col -->
-                </div>
-                <!-- end row -->
-
-
-
-                <div class="row">
-                    <div class="col-xl-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="dropdown float-end">
-                                    <a href="#" class="dropdown-toggle arrow-none card-drop" data-bs-toggle="dropdown"
-                                       aria-expanded="false">
-                                        <i class="mdi mdi-dots-vertical"></i>
-                                    </a>
-                                    <div class="dropdown-menu dropdown-menu-end">
-                                        <!-- item-->
-                                        <a href="javascript:void(0);" class="dropdown-item">Copy to ClipBoard</a>
-
-                                    </div>
-                                </div>
-
-
-                                <div style="margin-bottom: 50px;" th:each="statistic : ${statistics}" class="table-responsive">
-                                    <h4 th:text="${statistic.getNetwork().getFullName()} + ' Offers'" class="card-title mb-4">
-                                        Offers Statistics</h4>
-                                    <table id="datatable" class="table table-centered mb-0 align-middle table-hover table-nowrap">
-                                        <thead class="table-light">
-                                        <tr>
-                                            <th>Campaign ID</th>
-                                            <th>Offer</th>
-                                            <th>Clicks</th>
-                                            <th>Cost $</th>
-                                            <th>Hold</th>
-                                            <th>Approve</th>
-                                            <th>Approve $</th>
-                                            <th>Profit $</th>
-                                            <th style="width: 120px;">ROI %</th>
-                                        </tr>
-                                        </thead><!-- end thead -->
-                                        <tbody>
-                                        <tr th:style="${offer.getProfit() < 0 ? 'color: red;' : 'color: green;'}"
-                                            th:each="offer : ${statistic.getCurrentStats()}">
-                                            <td><h6 th:text="${offer.getCampaignId()}" class="mb-0">campaign id</h6></td>
-                                            <td th:text="${offer.getCampaignName()}">Campaign name</td>
-                                            <td th:text="${offer.getClicks()}">clicks</td>
-                                            <td th:text="${#numbers.formatDecimal(offer.getSpend(), 1, 2)} + '$'">cost</td>
-                                            <td th:text="${offer.getHoldCost()}">hold cost</td>
-                                            <td th:text="${offer.getApproveCount()}">approve count</td>
-                                            <td th:text="${offer.getRevenue()} + '$'">approve cost</td>
-                                            <td th:text="${#numbers.formatDecimal(offer.getProfit(), 1, 2)} + '$'">profit</td>
-                                            <td th:text="${offer.getROI()} + '%'">roi</td>
-                                        </tr>
-                                        <tr>
-                                            <td><h6 class="mb-0">Total</h6></td>
-                                            <td></td>
-                                            <td th:text="${statistic.getTotalClicks()}">clicks</td>
-                                            <td th:text="${#numbers.formatDecimal(statistic.getTotalSpend(), 1, 2)} + '$'">cost</td>
-                                            <td th:text="${statistic.getTotalHoldCost()}">hold cost</td>
-                                            <td th:text="${statistic.getTotalApproveCount()}">approve count</td>
-                                            <td th:text="${statistic.getTotalRevenue()} + '$'">approve cost</td>
-                                            <td th:text="${#numbers.formatDecimal(statistic.getTotalProfit(), 1, 2)} + '$'">profit</td>
-                                            <td th:text="${statistic.getTotalROI()} + '%'">roi</td>
-                                        </tr>
-                                        </tbody><!-- end tbody -->
-                                    </table> <!-- end table -->
-                                </div>
-                            </div><!-- end card -->
-                        </div><!-- end card -->
-                    </div>
-                    <!-- end col -->
-
-                </div>
-
-                <div th:if="${statistics.size()}>1" class="row">
                     <div class="col-xl-12">
                         <div class="card">
                             <div class="card-body">
@@ -498,15 +263,13 @@
 
 
                                 <div style="margin-bottom: 50px;" class="table-responsive">
-                                    <h4 class="card-title mb-4">
-                                        Combined Offer Statistics</h4>
-                                    <table id="scroll-vertical-datatable" class="table table-centered mb-0 align-middle table-hover table-nowrap">
+                                    <table id="datatable-buttons" class="table table-centered mb-0 align-middle table-hover table-nowrap">
                                         <thead class="table-light">
                                         <tr>
                                             <th>Campaign ID</th>
                                             <th>Offer</th>
                                             <th>Clicks</th>
-                                            <th>Cost</th>
+                                            <th>Cost $</th>
                                             <th>Hold</th>
                                             <th>Approve</th>
                                             <th>Approve $</th>
@@ -547,7 +310,7 @@
                     <!-- end col -->
 
                 </div>
-
+                <!-- end row -->
                 <div class="row">
 
                     <div class="col-sm-6 col-md-4 col-xl-3">
@@ -560,29 +323,29 @@
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <form th:method="POST" th:action="@{/credentials/save}" th:object="${credentialsADCOMBO}">
-                                    <div class="modal-body">
-                                        <h5>Enter Network Credentials on Adcombo.com</h5>
-                                        <div class="row mb-3">
-                                            <input hidden th:field="${credentialsADCOMBO.id}" th:name="${credentialsADCOMBO.id}" th:value="${credentialsADCOMBO.getId()}"/>
+                                        <div class="modal-body">
+                                            <h5>Enter Network Credentials on Adcombo.com</h5>
+                                            <div class="row mb-3">
+                                                <input hidden th:field="${credentialsADCOMBO.id}" th:name="${credentialsADCOMBO.id}" th:value="${credentialsADCOMBO.getId()}"/>
 
-                                            <label for="example-text-input" class="col-sm-2 col-form-label">Username</label>
-                                            <div class="col-sm-10">
-                                                <input th:field="${credentialsADCOMBO.username}" th:name="${credentialsADCOMBO.username}" th:value="${credentialsADCOMBO.getUsername()}" class="form-control" type="text" id="example-text-input">
+                                                <label for="example-text-input" class="col-sm-2 col-form-label">Username</label>
+                                                <div class="col-sm-10">
+                                                    <input th:field="${credentialsADCOMBO.username}" th:name="${credentialsADCOMBO.username}" th:value="${credentialsADCOMBO.getUsername()}" class="form-control" type="text" id="example-text-input">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <label for="example-text-input" class="col-sm-2 col-form-label">Password</label>
+                                                <div class="col-sm-10">
+                                                    <input th:field="${credentialsADCOMBO.password}" th:name="${credentialsADCOMBO.password}" th:value="${credentialsADCOMBO.getPassword()}" class="form-control" type="text">
+                                                </div>
+                                                <input hidden name="networkName" value="ADCOMBO" />
+
                                             </div>
                                         </div>
-                                        <div class="row mb-3">
-                                            <label for="example-text-input" class="col-sm-2 col-form-label">Password</label>
-                                            <div class="col-sm-10">
-                                                <input th:field="${credentialsADCOMBO.password}" th:name="${credentialsADCOMBO.password}" th:value="${credentialsADCOMBO.getPassword()}" class="form-control" type="text">
-                                            </div>
-                                            <input hidden name="networkName" value="ADCOMBO" />
-
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-light waves-effect" data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary waves-effect waves-light">Save changes</button>
                                         </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-light waves-effect" data-bs-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-primary waves-effect waves-light">Save changes</button>
-                                    </div>
                                     </form>
 
                                 </div><!-- /.modal-content -->
@@ -670,8 +433,7 @@
                         </div><!-- /.modal -->
                     </div>
 
-                </div> <!-- end row -->
-                <!-- end row -->
+                </div>
             </div>
 
         </div>
@@ -740,142 +502,51 @@
 </div>
 <!-- /Right-bar -->
 
-
-
 <!-- Right bar overlay-->
 <div class="rightbar-overlay"></div>
 
 <!-- JAVASCRIPT -->
-<script src="assets/libs/jquery/jquery.min.js"></script>
-<script src="assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="assets/libs/metismenu/metisMenu.min.js"></script>
-<script src="assets/libs/simplebar/simplebar.min.js"></script>
-<script src="assets/libs/node-waves/waves.min.js"></script>
+<script th:src="@{../assets/libs/jquery/jquery.min.js}"></script>
+<script th:src="@{../assets/libs/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{../assets/libs/metismenu/metisMenu.min.js}"></script>
+<script th:src="@{../assets/libs/simplebar/simplebar.min.js}"></script>
+<script th:src="@{../assets/libs/node-waves/waves.min.js}"></script>
 
 
 <!-- apexcharts -->
-<script src="assets/libs/apexcharts/apexcharts.min.js"></script>
+<script th:src="@{../assets/libs/apexcharts/apexcharts.min.js}"></script>
 
 <!-- jquery.vectormap map -->
-<script src="assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js"></script>
-<script src="assets/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js"></script>
+<script th:src="@{../assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js}"></script>
+<script th:src="@{../assets/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js}"></script>
 
 <!-- Required datatable js -->
-<script src="assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
-<script src="assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script th:src="@{../assets/libs/datatables.net/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{../assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js}"></script>
 
 <!-- Responsive examples -->
-<script src="assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-<script src="assets/js/pages/datatables.init.js"></script>
-<script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+<!--<script th:src="@{../assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js}"></script>-->
+<!--<script th:src="@{../assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js}"></script>-->
 
-<script th:inline="javascript">
+<script th:src="@{../assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js}"></script>
+<script th:src="@{../assets/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js}"></script>
+<script th:src="@{../assets/libs/jszip/jszip.min.js}"></script>
+<script th:src="@{../assets/libs/pdfmake/build/pdfmake.min.js}"></script>
+<script th:src="@{../assets/libs/pdfmake/build/vfs_fonts.js}"></script>
+<script th:src="@{../assets/libs/datatables.net-buttons/js/buttons.html5.min.js}"></script>
+<script th:src="@{../assets/libs/datatables.net-buttons/js/buttons.print.min.js}"></script>
+<script th:src="@{../assets/libs/datatables.net-buttons/js/buttons.colVis.min.js}"></script>
 
-    var options = {
-        series: [{
-            name: "Costs",
-            type: "column",
-            data: [[${chartCosts}]]
-        }, {
-            name: "Revenue",
-            type: "line",
-            data: [[${chartRevenue}]]
-        }],
-        chart: {
-            height: 350,
-            type: "line",
-            toolbar: {
-                show: !1
-            }
-        },
-        stroke: {
-            width: [0, 2.3],
-            curve: "straight"
-        },
-        plotOptions: {
-            bar: {
-                horizontal: !1,
-                columnWidth: "34%"
-            }
-        },
-        dataLabels: {
-            enabled: !1
-        },
-        markers: {
-            size: [0, 3.5],
-            colors: ["#6fd088"],
-            strokeWidth: 2,
-            strokeColors: "#6fd088",
-            hover: {
-                size: 4
-            }
-        },
-        legend: {
-            show: !1
-        },
-        yaxis: {
-            labels: {
-                formatter: function (e) {
-                    return e.toFixed(2) + "$"
-                }
-            },
-            tickAmount: 5,
-            min: 0,
-            max: [[${chartCosts.get(0)*1.7}]]
-        },
-        colors: ["#0f9cf3", "#6fd088"],
-        labels: [[${chartDates}]]
-    };
-    (chart = new ApexCharts(document.querySelector("#column_line_chart"), options)).render();
+<script th:src="@{../assets/libs/datatables.net-keytable/js/dataTables.keyTable.min.js}"></script>
+<script th:src="@{../assets/libs/datatables.net-select/js/dataTables.select.min.js}"></script>
 
-    options = {
-        series: [[${totalSpendByNetwork.values()}]],
-        chart: {
-            height: 286,
-            type: "donut"
-        },
-        labels: [[${totalSpendByNetwork.keySet()}]],
-        plotOptions: {
-            pie: {
-                donut: {
-                    size: "73%",
-                    labels: {
-                        show: !0,
-                        name: {
-                            show: !0,
-                            fontSize: "18px",
-                            offsetY: 5
-                        },
-                        value: {
-                            show: !1,
-                            fontSize: "20px",
-                            color: "#343a40",
-                            offsetY: 8
-                        },
-                        total: {
-                            show: !0,
-                            fontSize: "17px",
-                            label: "Comparing",
-                            color: "#6c757d",
-                            fontWeight: 600
-                        }
-                    }
-                }
-            }
-        },
-        dataLabels: {
-            enabled: !1
-        },
-        legend: {
-            show: !1
-        },
-        colors: ["#0f9cf3", "#6fd088"]
-    };
-    (chart = new ApexCharts(document.querySelector("#donut-chart"), options)).render();
 
-</script>
+<script th:src="@{../assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js}"></script>
+<script th:src="@{../assets/js/pages/datatables.init.js}"></script>
+<script th:src="@{../assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js}"></script>
+
 <!-- App js -->
-<script src="assets/js/app.js"></script>
+<script th:src="@{../assets/js/app.js}"></script>
 </body>
 
 </html>
