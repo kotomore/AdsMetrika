@@ -1,5 +1,6 @@
 package ru.set404.AdsMetrika.services;
 
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import ru.set404.AdsMetrika.dto.StatDTO;
 import ru.set404.AdsMetrika.models.Offer;
@@ -32,7 +33,7 @@ public class NetworksService {
         this.offersRepository = offersRepository;
     }
 
-    public List<StatDTO> getNetworkStatisticsList(List<Offer> userOffers, Network network, LocalDate dateStart,
+    public List<StatDTO> getNetworkStatisticsListMock(List<Offer> userOffers, Network network, LocalDate dateStart,
                                                   LocalDate dateEnd) {
         List<StatDTO> statDTOS = new ArrayList<>();
         Random random = new Random();
@@ -47,32 +48,38 @@ public class NetworksService {
         }
         return statDTOS;
     }
-    public List<StatDTO> getNetworkStatisticsList1(List<Offer> userOffers, Network network, LocalDate dateStart,
+    public List<StatDTO> getNetworkStatisticsList(List<Offer> userOffers, Network network, LocalDate dateStart,
                                                    LocalDate dateEnd) throws IOException, InterruptedException {
 
-        Map<Integer, String> userOffersFilteredByNetwork = userOffers.stream()
-                .filter(offer -> offer.getNetworkName() == network)
-                .collect(Collectors.toMap(Offer::getAdcomboNumber, Offer::getGroupName));
+        try {
 
-        NetworkStats networkStats = null;
-        switch (network) {
-            case TF -> networkStats = trafficFactory;
-            case EXO -> networkStats = exoClick;
+
+            Map<Integer, String> userOffersFilteredByNetwork = userOffers.stream()
+                    .filter(offer -> offer.getNetworkName() == network)
+                    .collect(Collectors.toMap(Offer::getAdcomboNumber, Offer::getGroupName));
+
+            NetworkStats networkStats = null;
+            switch (network) {
+                case TF -> networkStats = trafficFactory;
+                case EXO -> networkStats = exoClick;
+            }
+
+            assert networkStats != null;
+            Map<Integer, NetworkStatEntity> networkStatsMap = networkStats.getStat(userOffersFilteredByNetwork,
+                    dateStart, dateEnd);
+
+            Map<Integer, AdcomboStatsEntity> adcomboStatsMap = adCombo.getStat(network,
+                    dateStart.minusDays(1), dateEnd);
+
+            List<StatDTO> statsEntities = new ArrayList<>();
+
+            for (int offerId : userOffersFilteredByNetwork.keySet()) {
+                if (networkStatsMap.containsKey(offerId) && adcomboStatsMap.containsKey(offerId))
+                    statsEntities.add(StatisticsUtilities.createStatsDTO(offerId, networkStatsMap, adcomboStatsMap));
+            }
+            return statsEntities;
+        } catch (BadCredentialsException e) {
+            return new ArrayList<>();
         }
-
-        assert networkStats != null;
-        Map<Integer, NetworkStatEntity> networkStatsMap = networkStats.getStat(userOffersFilteredByNetwork,
-                dateStart, dateEnd);
-
-        Map<Integer, AdcomboStatsEntity> adcomboStatsMap = adCombo.getStat(network,
-                dateStart.minusDays(1), dateEnd);
-
-        List<StatDTO> statsEntities = new ArrayList<>();
-
-        for (int offerId : userOffersFilteredByNetwork.keySet()) {
-            if (networkStatsMap.containsKey(offerId) && adcomboStatsMap.containsKey(offerId))
-                statsEntities.add(StatisticsUtilities.createStatsDTO(offerId, networkStatsMap, adcomboStatsMap));
-        }
-        return statsEntities;
     }
 }

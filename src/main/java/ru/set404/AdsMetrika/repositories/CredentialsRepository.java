@@ -7,11 +7,12 @@ import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.services.network.Network;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CredentialsRepository extends JpaRepository<Credentials, Integer> {
     List<Credentials> findByOwnerAndNetworkName(User user, String networkName);
 
     List<Credentials> findByOwner(User user);
-    Credentials findCredentialsByOwnerAndNetworkName(User user, Network network);
+    Optional<Credentials> findCredentialsByOwnerAndNetworkName(User user, Network network);
 }

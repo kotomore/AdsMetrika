@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -39,8 +40,9 @@ public class Adcombo {
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Credentials credentials = credentialsRepository.
-                    findCredentialsByOwnerAndNetworkName(((UserDetails) authentication.getPrincipal()).user(),
-                            Network.ADCOMBO);
+                    findCredentialsByOwnerAndNetworkName(((UserDetails) authentication.getPrincipal())
+                            .user(), Network.ADCOMBO)
+                    .orElseThrow(() -> new BadCredentialsException("Adcombo credentials doesn`t exist"));
 
             String email = credentials.getUsername();
             String password = credentials.getPassword();

@@ -6,6 +6,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -34,33 +35,34 @@ public class TrafficFactory implements NetworkStats {
     }
 
     private void getAuth() throws IOException {
-            System.out.println("Authorization...");
-            response = Jsoup
-                    .connect("https://main.trafficfactory.biz/users/sign_in")
-                    .execute();
-            System.out.println("Authorization complete.");
-            Document doc = response.parse();
-            Element meta = doc.select("[name=\"signin[_csrf_token]\"]").first();
-            assert meta != null;
-            String token = meta.attr("value");
+        System.out.println("Authorization...");
+        response = Jsoup
+                .connect("https://main.trafficfactory.biz/users/sign_in")
+                .execute();
+        System.out.println("Authorization complete.");
+        Document doc = response.parse();
+        Element meta = doc.select("[name=\"signin[_csrf_token]\"]").first();
+        assert meta != null;
+        String token = meta.attr("value");
 
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            Credentials credentials = credentialsRepository.
-                    findCredentialsByOwnerAndNetworkName(((UserDetails) authentication.getPrincipal()).user(),
-                            Network.TF);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Credentials credentials = credentialsRepository.
+                findCredentialsByOwnerAndNetworkName(((UserDetails) authentication.getPrincipal())
+                        .user(), Network.TF)
+                .orElseThrow(() -> new BadCredentialsException("Traffic Factory credentials doesn`t exist"));
 
-            String email = credentials.getUsername();
-            String password = credentials.getPassword();
+        String email = credentials.getUsername();
+        String password = credentials.getPassword();
 
-            //Authorization, get cookies
-            response = Jsoup
-                    .connect("https://main.trafficfactory.biz/users/sign_in")
-                    .method(Connection.Method.POST)
-                    .data("signin[login]", email)
-                    .data("signin[password]", password)
-                    .data("signin[_csrf_token]", token)
-                    .cookies(response.cookies())
-                    .execute();
+        //Authorization, get cookies
+        response = Jsoup
+                .connect("https://main.trafficfactory.biz/users/sign_in")
+                .method(Connection.Method.POST)
+                .data("signin[login]", email)
+                .data("signin[password]", password)
+                .data("signin[_csrf_token]", token)
+                .cookies(response.cookies())
+                .execute();
     }
 
     public Map<Integer, NetworkStatEntity> getStat(Map<Integer, String> networkOffers, LocalDate dateStart,

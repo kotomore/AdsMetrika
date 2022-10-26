@@ -769,7 +769,7 @@
 <script src="assets/js/pages/datatables.init.js"></script>
 <script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
 
-<script th:inline="javascript">
+<script th:if="${!chartCosts.isEmpty()}" th:inline="javascript">
 
     var options = {
         series: [{

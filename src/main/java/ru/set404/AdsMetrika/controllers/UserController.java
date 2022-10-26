@@ -51,7 +51,7 @@ public class UserController {
 
         List<Offer> userOffers = offersService.getUserOffersList(currentUser);
 
-        List<TableDTO> tableStats = getTableStats(dateStart, dateEnd, currentUser, userOffers);
+        List<TableDTO> tableStats = getTableStats(dateStart, dateEnd, userOffers);
 
         List<Stat> oldStats = statsService.getStatsList(currentUser, LocalDate.now().minusDays(30));
         List<ChartDTO> chartStats = StatisticsUtilities.getChartStats(oldStats);
@@ -60,7 +60,6 @@ public class UserController {
         model.addAttribute("credentialsADCOMBO", credentials.get(Network.ADCOMBO));
         model.addAttribute("credentialsEXO", credentials.get(Network.EXO));
         model.addAttribute("credentialsTF", credentials.get(Network.TF));
-
 
         model.addAttribute("username", currentUser.getUsername());
         model.addAttribute("currentDate", LocalDate.now());
@@ -88,13 +87,13 @@ public class UserController {
         if (type != null && type.equals("month")) {
             LocalDate firstDay = LocalDate.now().minusDays(1);
             LocalDate lastDay = LocalDate.now().minusDays(1);
-            List<TableDTO> tableStats = getTableStats(firstDay, lastDay, currentUser, userOffers);
+            List<TableDTO> tableStats = getTableStats(firstDay, lastDay, userOffers);
             combinedStats = StatisticsUtilities.getCombinedStats(tableStats);
             headerText = firstDay + " - " + lastDay;
         } else {
             LocalDate firstDay = LocalDate.now().minusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
             LocalDate lastDay = LocalDate.now().minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
-            List<TableDTO> tableStats = getTableStats(firstDay, lastDay, currentUser, userOffers);
+            List<TableDTO> tableStats = getTableStats(firstDay, lastDay, userOffers);
             combinedStats = StatisticsUtilities.getOneList(tableStats);
             headerText = firstDay.toString();
         }
@@ -163,15 +162,20 @@ public class UserController {
         return ((UserDetails) authentication.getPrincipal()).user();
     }
 
-    private List<TableDTO> getTableStats(LocalDate dateStart, LocalDate dateEnd, User currentUser, List<Offer> userOffers)
+    private List<TableDTO> getTableStats(LocalDate dateStart, LocalDate dateEnd, List<Offer> userOffers)
             throws IOException, InterruptedException {
 
         Set<Network> userNetworks = userOffers.stream().map(Offer::getNetworkName).collect(Collectors.toSet());
 
         List<TableDTO> tableStats = new ArrayList<>();
         for (Network network : userNetworks) {
-            List<StatDTO> currentNetworkStat = networksService.getNetworkStatisticsList(userOffers,
-                    network, dateStart, dateEnd);
+            List<StatDTO> currentNetworkStat;
+            if (getUser().getRole().equals("ROLE_GUEST"))
+                currentNetworkStat = networksService.getNetworkStatisticsListMock(userOffers,
+                        network, dateStart, dateEnd);
+            else
+                currentNetworkStat = networksService.getNetworkStatisticsList(userOffers,
+                        network, dateStart, dateEnd);
             tableStats.add(new TableDTO(currentNetworkStat, network));
 //            if (dateStart.equals(dateEnd))
 //                statsService.saveStatDTOList(currentNetworkStat, currentUser, network, dateStart);

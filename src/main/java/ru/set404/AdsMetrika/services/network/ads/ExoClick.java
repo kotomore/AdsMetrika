@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -40,8 +41,9 @@ public class ExoClick implements NetworkStats {
         if (authToken == null) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Credentials credentials = credentialsRepository.
-                    findCredentialsByOwnerAndNetworkName(((UserDetails) authentication.getPrincipal()).user(),
-                            Network.EXO);
+                    findCredentialsByOwnerAndNetworkName(((UserDetails) authentication.getPrincipal())
+                            .user(), Network.EXO)
+                    .orElseThrow(() -> new BadCredentialsException("ExoClick credentials doesn`t exist"));
 
             String userName = credentials.getUsername();
             String password = credentials.getPassword();
