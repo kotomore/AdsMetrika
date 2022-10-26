@@ -9,26 +9,26 @@
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description"/>
     <meta content="Themesdesign" name="author"/>
     <!-- App favicon -->
-    <link rel="icon" type="image/x-icon" th:href="@{../assets/favicon.ico}">
+    <link rel="icon" type="image/x-icon" href="../assets/favicon.ico}">
 
     <!-- jquery.vectormap css -->
-    <link th:href="@{../assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css}" rel="stylesheet"
+    <link href="../assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet"
           type="text/css"/>
 
     <!-- DataTables -->
-    <link th:href="@{../assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css}" rel="stylesheet"
+    <link href="../assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet"
           type="text/css"/>
 
     <!-- Responsive datatable examples -->
-    <link th:href="@{../assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css}" rel="stylesheet"
+    <link href="../assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet"
           type="text/css"/>
 
     <!-- Bootstrap Css -->
-    <link th:href="@{../assets/css/bootstrap-dark.min.css}" id="bootstrap-style" rel="stylesheet" type="text/css"/>
+    <link href="../assets/css/bootstrap-dark.min.css" id="bootstrap-style" rel="stylesheet" type="text/css"/>
     <!-- Icons Css -->
-    <link th:href="@{../assets/css/icons.min.css}" rel="stylesheet" type="text/css"/>
+    <link href="../assets/css/icons.min.css" rel="stylesheet" type="text/css"/>
     <!-- App Css-->
-    <link th:href="@{../assets/css/app.min.css}" id="app-style" rel="stylesheet" type="text/css"/>
+    <link href="../assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css"/>
 
 </head>
 
@@ -53,7 +53,7 @@
             <div class="d-flex">
                 <!-- LOGO -->
                 <div class="navbar-brand-box">
-                    <a th:href="@{/statistics}" class="logo logo-dark">
+                    <a href="/statistics" class="logo logo-dark">
                                 <span class="logo-sm">
                                     <img src="assets/images/logo-sm.png" alt="logo-sm" height="36">
                                 </span>
@@ -62,7 +62,7 @@
                                 </span>
                     </a>
 
-                    <a th:href="@{/statistics}" class="logo logo-light">
+                    <a href="/statistics" class="logo logo-light">
                                 <span class="logo-sm">
                                     <img src="assets/images/logo-sm.png" alt="logo-sm-light" height="36">
                                 </span>
@@ -127,7 +127,7 @@
                     </button>
                     <div class="dropdown-menu dropdown-menu-end">
                         <!-- item-->
-                        <a class="dropdown-item" th:href="@{/offers}"><i class="ri-user-line align-middle me-1"></i> Offers</a>
+                        <a class="dropdown-item" href="/offers}"><i class="ri-user-line align-middle me-1"></i> Offers</a>
                         <div class="dropdown-divider"></div>
 
                         <form th:action="@{/logout}" th:method="POST">
@@ -159,16 +159,16 @@
                     <li class="menu-title">Menu</li>
 
                     <li>
-                        <a id="datepicker7" th:href="@{/statistics}" class="active waves-effect">
+                        <a id="datepicker7" href="/statistics" class="active waves-effect">
                             <i class="ri-dashboard-line"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
 
                     <li>
-                        <a id="datepicker8" th:href="@{/report}" class=" waves-effect">
+                        <a id="datepicker8" href="/report" class=" waves-effect">
                             <i class="ri-table-2"></i>
-                            <span>Monthly Report</span>
+                            <span>Report</span>
                         </a>
                     </li>
 
@@ -176,7 +176,7 @@
                     <li class="menu-title">Settings</li>
 
                     <li>
-                        <a th:href="@{/offers}" class="waves-effect">
+                        <a href="/offers" class="waves-effect">
                             <i class="ri-calendar-2-line"></i>
                             <span>Offers</span>
                         </a>
@@ -231,6 +231,8 @@
                     <div class="col-12">
                         <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                             <h4 th:text="'Report ('+${dates}+')'" class="mb-sm-0">Report</h4>
+                            <a id="datepicker1" href="/report?type=daily">Daily report</a>
+                            <a id="datepicker2" href="/report?type=month">Monthly report</a>
 
                             <div class="page-title-right">
                                 <ol class="breadcrumb m-0">
@@ -263,43 +265,28 @@
 
 
                                 <div style="margin-bottom: 50px;" class="table-responsive">
-                                    <table id="datatable-buttons" class="table table-centered mb-0 align-middle table-hover table-nowrap">
+                                    <table data-order='[]' id="datatable-buttons" class="table mb-0">
                                         <thead class="table-light">
                                         <tr>
-                                            <th>Campaign ID</th>
-                                            <th>Offer</th>
+                                            <th>Offer name</th>
                                             <th>Clicks</th>
                                             <th>Cost $</th>
                                             <th>Hold</th>
-                                            <th>Approve</th>
-                                            <th>Approve $</th>
-                                            <th>Profit $</th>
-                                            <th style="width: 120px;">ROI %</th>
+                                            <th>Leads</th>
+                                            <th style="width: 120px;">Revenue $</th>
                                         </tr>
                                         </thead><!-- end thead -->
                                         <tbody>
                                         <tr th:style="${offer.getProfit() < 0 ? 'color: red;' : 'color: green;'}"
                                             th:each="offer : ${combinedStats.getCurrentStats()}">
-                                            <td><h6 th:text="${offer.getCampaignId()}" class="mb-0">campaign id</h6></td>
-                                            <td th:text="${offer.getCampaignName()}">Campaign name</td>
+                                            <td><h6 th:if="${offer.getCampaignId()!=null}" th:text="'['+${offer.getCampaignId()}+'] '+${offer.getCampaignName()}" class="mb-0">campaign name</h6>
+                                                <h6 th:unless="${offer.getCampaignId()!=null}" th:text="${offer.getCampaignName()}" class="mb-0">campaign name</h6>
+                                            </td>
                                             <td th:text="${offer.getClicks()}">clicks</td>
-                                            <td th:text="${#numbers.formatDecimal(offer.getSpend(), 1, 2)} + '$'">cost</td>
-                                            <td th:text="${offer.getHoldCost()}">hold cost</td>
+                                            <td th:text="${#numbers.formatDecimal(offer.getSpend(), 1, 2)}">cost</td>
+                                            <td th:text="${#numbers.formatDecimal(offer.getHoldCost(), 1, 2)}">hold cost</td>
                                             <td th:text="${offer.getApproveCount()}">approve count</td>
-                                            <td th:text="${offer.getRevenue()} + '$'">approve cost</td>
-                                            <td th:text="${#numbers.formatDecimal(offer.getProfit(), 1, 2)} + '$'">profit</td>
-                                            <td th:text="${offer.getROI()} + '%'">roi</td>
-                                        </tr>
-                                        <tr>
-                                            <td><h6 class="mb-0">Total</h6></td>
-                                            <td></td>
-                                            <td th:text="${combinedStats.getTotalClicks()}">clicks</td>
-                                            <td th:text="${#numbers.formatDecimal(combinedStats.getTotalSpend(), 1, 2)} + '$'">cost</td>
-                                            <td th:text="${combinedStats.getTotalHoldCost()}">hold cost</td>
-                                            <td th:text="${combinedStats.getTotalApproveCount()}">approve count</td>
-                                            <td th:text="${combinedStats.getTotalRevenue()} + '$'">approve cost</td>
-                                            <td th:text="${#numbers.formatDecimal(combinedStats.getTotalProfit(), 1, 2)} + '$'">profit</td>
-                                            <td th:text="${combinedStats.getTotalROI()} + '%'">roi</td>
+                                            <td th:text="${#numbers.formatDecimal(offer.getRevenue(), 1, 2)}">approve cost</td>
                                         </tr>
                                         </tbody><!-- end tbody -->
                                     </table> <!-- end table -->
@@ -506,47 +493,47 @@
 <div class="rightbar-overlay"></div>
 
 <!-- JAVASCRIPT -->
-<script th:src="@{../assets/libs/jquery/jquery.min.js}"></script>
-<script th:src="@{../assets/libs/bootstrap/js/bootstrap.bundle.min.js}"></script>
-<script th:src="@{../assets/libs/metismenu/metisMenu.min.js}"></script>
-<script th:src="@{../assets/libs/simplebar/simplebar.min.js}"></script>
-<script th:src="@{../assets/libs/node-waves/waves.min.js}"></script>
+<script src="../assets/libs/jquery/jquery.min.js"></script>
+<script src="../assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/libs/metismenu/metisMenu.min.js"></script>
+<script src="../assets/libs/simplebar/simplebar.min.js"></script>
+<script src="../assets/libs/node-waves/waves.min.js"></script>
 
 
 <!-- apexcharts -->
-<script th:src="@{../assets/libs/apexcharts/apexcharts.min.js}"></script>
+<script src="../assets/libs/apexcharts/apexcharts.min.js"></script>
 
 <!-- jquery.vectormap map -->
-<script th:src="@{../assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js}"></script>
-<script th:src="@{../assets/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js}"></script>
+<script src="../assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js"></script>
+<script src="../assets/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js"></script>
 
 <!-- Required datatable js -->
-<script th:src="@{../assets/libs/datatables.net/js/jquery.dataTables.min.js}"></script>
-<script th:src="@{../assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js}"></script>
+<script src="../assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="../assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
 
 <!-- Responsive examples -->
-<!--<script th:src="@{../assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js}"></script>-->
-<!--<script th:src="@{../assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js}"></script>-->
+<!--<script src="../assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>-->
+<!--<script src="../assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>-->
 
-<script th:src="@{../assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js}"></script>
-<script th:src="@{../assets/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js}"></script>
-<script th:src="@{../assets/libs/jszip/jszip.min.js}"></script>
-<script th:src="@{../assets/libs/pdfmake/build/pdfmake.min.js}"></script>
-<script th:src="@{../assets/libs/pdfmake/build/vfs_fonts.js}"></script>
-<script th:src="@{../assets/libs/datatables.net-buttons/js/buttons.html5.min.js}"></script>
-<script th:src="@{../assets/libs/datatables.net-buttons/js/buttons.print.min.js}"></script>
-<script th:src="@{../assets/libs/datatables.net-buttons/js/buttons.colVis.min.js}"></script>
+<script src="../assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+<script src="../assets/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+<script src="../assets/libs/jszip/jszip.min.js"></script>
+<script src="../assets/libs/pdfmake/build/pdfmake.min.js"></script>
+<script src="../assets/libs/pdfmake/build/vfs_fonts.js"></script>
+<script src="../assets/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
+<script src="../assets/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
+<script src="../assets/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
 
-<script th:src="@{../assets/libs/datatables.net-keytable/js/dataTables.keyTable.min.js}"></script>
-<script th:src="@{../assets/libs/datatables.net-select/js/dataTables.select.min.js}"></script>
+<script src="../assets/libs/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+<script src="../assets/libs/datatables.net-select/js/dataTables.select.min.js"></script>
 
 
-<script th:src="@{../assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js}"></script>
-<script th:src="@{../assets/js/pages/datatables.init.js}"></script>
-<script th:src="@{../assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js}"></script>
+<script src="../assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+<script src="../assets/js/pages/datatables.init.js"></script>
+<script src="../assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
 
 <!-- App js -->
-<script th:src="@{../assets/js/app.js}"></script>
+<script src="../assets/js/app.js"></script>
 </body>
 
 </html>

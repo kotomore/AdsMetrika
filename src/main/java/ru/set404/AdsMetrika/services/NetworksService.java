@@ -41,9 +41,9 @@ public class NetworksService {
                     "Offer "+i,
                     random.nextInt(1000),
                     random.nextDouble(100),
-                    random.nextInt(100),
+                    random.nextDouble(100),
                     random.nextInt(10),
-                    random.nextInt(100)));
+                    random.nextDouble(100)));
         }
         return statDTOS;
     }

@@ -9,18 +9,18 @@ import lombok.Setter;
 @Setter
 public class StatDTO {
 
-    private int campaignId;
+    private Integer campaignId;
     private String campaignName;
-    private int clicks;
-    private double spend;
-    private double holdCost;
-    private int approveCount;
-    private double revenue;
+    private Integer clicks;
+    private Double spend;
+    private Double holdCost;
+    private Integer approveCount;
+    private Double revenue;
 
     public StatDTO() {
     }
 
-    public StatDTO(int campaignId, String campaignName, int clicks, double spend, double holdCost, int approveCount, double revenue) {
+    public StatDTO(Integer campaignId, String campaignName, Integer clicks, Double spend, Double holdCost, Integer approveCount, Double revenue) {
         this.campaignId = campaignId;
         this.campaignName = campaignName;
         this.clicks = clicks;
@@ -29,11 +29,16 @@ public class StatDTO {
         this.approveCount = approveCount;
         this.revenue = revenue;
     }
+
     public double getProfit() {
-        return revenue - spend;
+        if (revenue != null && spend != null)
+            return revenue - spend;
+        return 0;
     }
 
     public int getROI() {
-        return (int) (((revenue - spend) / spend) * 100);
+        if (revenue != null && spend != null)
+            return (int) (((revenue - spend) / spend) * 100);
+        return 0;
     }
 }

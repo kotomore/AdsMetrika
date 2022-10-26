@@ -54,6 +54,20 @@ public class StatisticsUtilities {
         return new TableDTO(combinedStats.values().stream().toList(), null);
     }
 
+    public static TableDTO getOneList(List<TableDTO> tableStats) {
+        List<StatDTO> statDTOS = new ArrayList<>();
+        for (TableDTO table : tableStats) {
+            statDTOS.add(new StatDTO());
+            statDTOS.add(new StatDTO());
+            statDTOS.add(new StatDTO(null, table.getNetwork().getFullName(),
+                    null, null, null, null, null));
+            statDTOS.addAll(table.getCurrentStats());
+        }
+        statDTOS.remove(0);
+        statDTOS.remove(0);
+        return new TableDTO(statDTOS, null);
+    }
+
     public static ChartDTO getTotalChartStats(List<Stat> oldUserStats) {
         double totalSpend = oldUserStats.stream().mapToDouble(Stat::getSpend).sum();
         double totalRevenue = oldUserStats.stream().mapToDouble(Stat::getRevenue).sum();

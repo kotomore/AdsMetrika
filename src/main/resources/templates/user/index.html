@@ -168,7 +168,7 @@
                     <li>
                         <a id="datepicker8" th:href="@{/report}" class=" waves-effect">
                             <i class="ri-table-2"></i>
-                            <span>Monthly Report</span>
+                            <span>Report</span>
                         </a>
                     </li>
 
@@ -290,7 +290,7 @@
                                 <div class="d-flex">
                                     <div class="flex-grow-1">
                                         <p class="text-truncate font-size-14 mb-2">Total Revenue</p>
-                                        <h4 th:text="${combinedStats.getTotalRevenue()}" class="mb-2">total revenue</h4>
+                                        <h4 th:text="${#numbers.formatDecimal(combinedStats.getTotalRevenue(), 1, 2)}" class="mb-2">total revenue</h4>
                                         <p th:if="${chartDates.contains(currentDate.minusDays(1))}"  class="text-muted mb-0">
                                             <span th:if="${(combinedStats.getTotalRevenue()/chartRevenue.get(1)*100)}>=100"  class="text-success fw-bold font-size-12 me-2">
                                             <i class="ri-arrow-right-up-line me-1 align-middle"></i>
@@ -453,9 +453,9 @@
                                             <td th:text="${offer.getCampaignName()}">Campaign name</td>
                                             <td th:text="${offer.getClicks()}">clicks</td>
                                             <td th:text="${#numbers.formatDecimal(offer.getSpend(), 1, 2)} + '$'">cost</td>
-                                            <td th:text="${offer.getHoldCost()}">hold cost</td>
+                                            <td th:text="${#numbers.formatDecimal(offer.getHoldCost(), 1, 2)}">hold cost</td>
                                             <td th:text="${offer.getApproveCount()}">approve count</td>
-                                            <td th:text="${offer.getRevenue()} + '$'">approve cost</td>
+                                            <td th:text="${#numbers.formatDecimal(offer.getRevenue(), 1, 2)} + '$'">approve cost</td>
                                             <td th:text="${#numbers.formatDecimal(offer.getProfit(), 1, 2)} + '$'">profit</td>
                                             <td th:text="${offer.getROI()} + '%'">roi</td>
                                         </tr>
@@ -464,9 +464,9 @@
                                             <td></td>
                                             <td th:text="${statistic.getTotalClicks()}">clicks</td>
                                             <td th:text="${#numbers.formatDecimal(statistic.getTotalSpend(), 1, 2)} + '$'">cost</td>
-                                            <td th:text="${statistic.getTotalHoldCost()}">hold cost</td>
+                                            <td th:text="${#numbers.formatDecimal(statistic.getTotalHoldCost(), 1, 2)}">hold cost</td>
                                             <td th:text="${statistic.getTotalApproveCount()}">approve count</td>
-                                            <td th:text="${statistic.getTotalRevenue()} + '$'">approve cost</td>
+                                            <td th:text="${#numbers.formatDecimal(statistic.getTotalRevenue(), 1, 2)} + '$'">approve cost</td>
                                             <td th:text="${#numbers.formatDecimal(statistic.getTotalProfit(), 1, 2)} + '$'">profit</td>
                                             <td th:text="${statistic.getTotalROI()} + '%'">roi</td>
                                         </tr>
@@ -521,9 +521,9 @@
                                             <td th:text="${offer.getCampaignName()}">Campaign name</td>
                                             <td th:text="${offer.getClicks()}">clicks</td>
                                             <td th:text="${#numbers.formatDecimal(offer.getSpend(), 1, 2)} + '$'">cost</td>
-                                            <td th:text="${offer.getHoldCost()}">hold cost</td>
+                                            <td th:text="${#numbers.formatDecimal(offer.getHoldCost(), 1, 2)}">hold cost</td>
                                             <td th:text="${offer.getApproveCount()}">approve count</td>
-                                            <td th:text="${offer.getRevenue()} + '$'">approve cost</td>
+                                            <td th:text="${#numbers.formatDecimal(offer.getRevenue(), 1, 2)} + '$'">approve cost</td>
                                             <td th:text="${#numbers.formatDecimal(offer.getProfit(), 1, 2)} + '$'">profit</td>
                                             <td th:text="${offer.getROI()} + '%'">roi</td>
                                         </tr>
@@ -532,9 +532,9 @@
                                             <td></td>
                                             <td th:text="${combinedStats.getTotalClicks()}">clicks</td>
                                             <td th:text="${#numbers.formatDecimal(combinedStats.getTotalSpend(), 1, 2)} + '$'">cost</td>
-                                            <td th:text="${combinedStats.getTotalHoldCost()}">hold cost</td>
+                                            <td th:text="${#numbers.formatDecimal(combinedStats.getTotalHoldCost(), 1, 2)}">hold cost</td>
                                             <td th:text="${combinedStats.getTotalApproveCount()}">approve count</td>
-                                            <td th:text="${combinedStats.getTotalRevenue()} + '$'">approve cost</td>
+                                            <td th:text="${#numbers.formatDecimal(combinedStats.getTotalRevenue(), 1, 2)} + '$'">approve cost</td>
                                             <td th:text="${#numbers.formatDecimal(combinedStats.getTotalProfit(), 1, 2)} + '$'">profit</td>
                                             <td th:text="${combinedStats.getTotalROI()} + '%'">roi</td>
                                         </tr>

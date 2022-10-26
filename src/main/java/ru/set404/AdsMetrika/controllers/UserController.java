@@ -79,23 +79,35 @@ public class UserController {
     }
 
     @GetMapping("/report")
-    public String report(Model model) throws IOException, InterruptedException {
+    public String report(@RequestParam(value = "type", required = false) String type, Model model) throws IOException, InterruptedException {
         User currentUser = getUser();
         List<Offer> userOffers = offersService.getUserOffersList(currentUser);
 
-        LocalDate firstDay = LocalDate.now().minusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
-        LocalDate lastDay = LocalDate.now().minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
+        String headerText;
+        TableDTO combinedStats;
+        if (type != null && type.equals("month")) {
+            LocalDate firstDay = LocalDate.now().minusDays(1);
+            LocalDate lastDay = LocalDate.now().minusDays(1);
+            List<TableDTO> tableStats = getTableStats(firstDay, lastDay, currentUser, userOffers);
+            combinedStats = StatisticsUtilities.getCombinedStats(tableStats);
+            headerText = firstDay + " - " + lastDay;
+        } else {
+            LocalDate firstDay = LocalDate.now().minusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
+            LocalDate lastDay = LocalDate.now().minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
+            List<TableDTO> tableStats = getTableStats(firstDay, lastDay, currentUser, userOffers);
+            combinedStats = StatisticsUtilities.getOneList(tableStats);
+            headerText = firstDay.toString();
+        }
 
-        List<TableDTO> tableStats = getTableStats(firstDay, lastDay, currentUser, userOffers);
 
         Map<Network, CredentialsDTO> credentials = getNetworkCredentialsDTOMap();
         model.addAttribute("credentialsADCOMBO", credentials.get(Network.ADCOMBO));
         model.addAttribute("credentialsEXO", credentials.get(Network.EXO));
         model.addAttribute("credentialsTF", credentials.get(Network.TF));
 
-        model.addAttribute("dates", firstDay + " - " + lastDay);
+        model.addAttribute("dates", headerText);
         model.addAttribute("username", currentUser.getUsername());
-        model.addAttribute("combinedStats", StatisticsUtilities.getCombinedStats(tableStats));
+        model.addAttribute("combinedStats", combinedStats);
 
         return "user/report";
     }
@@ -104,7 +116,7 @@ public class UserController {
     public String offers(Model model) {
         OfferListDTO offerForm = new OfferListDTO();
 
-        for (int i = 1; i <= 3; i++) {
+        for (int i = 1; i <= 7; i++) {
             offerForm.addOffer(new OfferDTO());
         }
 

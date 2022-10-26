@@ -21,11 +21,11 @@ public class Credentials {
     @JoinColumn(name = "person_id", referencedColumnName = "id")
     private User owner;
 
-    @NotEmpty(message = "Имя пользователя не может быть пустым")
+    @NotEmpty(message = "Username empty")
     @Column(name = "username", nullable = false)
     private String username;
 
-    @NotEmpty(message = "Пароль не может быть пустым")
+    @NotEmpty(message = "Password empty")
     @Column(name = "password", nullable = false)
     private String password;
 

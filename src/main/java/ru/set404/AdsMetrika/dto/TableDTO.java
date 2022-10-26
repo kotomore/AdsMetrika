@@ -19,27 +19,39 @@ public class TableDTO {
     }
 
     public int getTotalClicks() {
-        return currentStats.stream().mapToInt(StatDTO::getClicks).sum();
+        if (currentStats != null)
+            return currentStats.stream().mapToInt(StatDTO::getClicks).sum();
+        return 0;
     }
 
     public double getTotalSpend() {
-        return currentStats.stream().mapToDouble(StatDTO::getSpend).sum();
+        if (currentStats != null)
+            return currentStats.stream().mapToDouble(StatDTO::getSpend).sum();
+        return 0;
     }
 
     public double getTotalHoldCost() {
-        return currentStats.stream().mapToDouble(StatDTO::getHoldCost).sum();
+        if (currentStats != null)
+            return currentStats.stream().mapToDouble(StatDTO::getHoldCost).sum();
+        return 0;
     }
 
     public int getTotalApproveCount() {
-        return currentStats.stream().mapToInt(StatDTO::getApproveCount).sum();
+        if (currentStats != null)
+            return currentStats.stream().mapToInt(StatDTO::getApproveCount).sum();
+        return 0;
     }
 
     public double getTotalRevenue() {
-        return currentStats.stream().mapToDouble(StatDTO::getRevenue).sum();
+        if (currentStats != null)
+            return currentStats.stream().mapToDouble(StatDTO::getRevenue).sum();
+        return 0;
     }
 
     public double getTotalProfit() {
-        return currentStats.stream().mapToDouble(StatDTO::getProfit).sum();
+        if (currentStats != null)
+            return currentStats.stream().mapToDouble(StatDTO::getProfit).sum();
+        return 0;
     }
 
     public double getTotalROI() {

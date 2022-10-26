@@ -24,13 +24,13 @@ public class User {
     @OneToMany(mappedBy = "owner")
     private List<Credentials> credentials;
 
-    @NotEmpty(message = "Введите имя")
-    @Size(min = 2, max = 100, message = "Имя должно быть от двух до ста символов")
+    @NotEmpty(message = "Username empty")
+    @Size(min = 2, max = 100, message = "2 chars and more")
     @Column(name = "username", unique = true)
     private String username;
 
 
-    @NotEmpty(message = "Пароль не может быть пустым")
+    @NotEmpty(message = "Password empty")
     @Column(name = "password")
     private String password;
 
