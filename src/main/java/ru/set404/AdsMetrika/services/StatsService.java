@@ -10,6 +10,7 @@ import ru.set404.AdsMetrika.repositories.StatsRepository;
 import ru.set404.AdsMetrika.services.network.Network;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,22 +24,20 @@ public class StatsService {
         this.modelMapper = modelMapper;
     }
 
-    public void save(Stat stat, User user, LocalDate localDate, int campaignId) {
-        statsRepository.deleteSimilar(user, localDate, campaignId);
-        statsRepository.save(stat);
-    }
-
     public List<Stat> getStatsList(User user, LocalDate dateStart) {
         return statsRepository.findAllByOwnerAndCreatedDateAfter(user, dateStart);
     }
 
     public void saveStatDTOList(List<StatDTO> statDTOList, User user, Network network, LocalDate date) {
+        List<Stat> statList = new ArrayList<>();
         for (StatDTO statDTO : statDTOList) {
             Stat stat = modelMapper.map(statDTO, Stat.class);
             stat.setNetworkName(network);
             stat.setOwner(user);
             stat.setCreatedDate(date);
-            save(stat, user, date, stat.getCampaignId());
+            stat.setId(statsRepository.findSimilar(user, stat.getCampaignName(), network, date).orElse(0));
+            statList.add(stat);
         }
+        statsRepository.saveAll(statList);
     }
 }

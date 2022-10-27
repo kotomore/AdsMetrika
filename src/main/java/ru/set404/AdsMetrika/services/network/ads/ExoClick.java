@@ -3,12 +3,15 @@ package ru.set404.AdsMetrika.services.network.ads;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ru.set404.AdsMetrika.models.Credentials;
 import ru.set404.AdsMetrika.repositories.CredentialsRepository;
@@ -24,11 +27,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-@Service
+@Component
 public class ExoClick implements NetworkStats {
 
     private final CredentialsRepository credentialsRepository;
     private final ObjectMapper objectMapper;
+    protected Log logger = LogFactory.getLog(this.getClass());
+
     private static String authToken = null;
 
     @Autowired
@@ -39,6 +44,7 @@ public class ExoClick implements NetworkStats {
 
     private void connectToExoClick() throws IOException {
         if (authToken == null) {
+            logger.debug("ExoClick authorization...");
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Credentials credentials = credentialsRepository.
                     findCredentialsByOwnerAndNetworkName(((UserDetails) authentication.getPrincipal())
@@ -87,13 +93,13 @@ public class ExoClick implements NetworkStats {
         }
         pool.shutdown();
         if (!pool.awaitTermination(1, TimeUnit.MINUTES)) {
-            System.out.println("Parse ExoClick timed out error");
+            logger.debug("Parse ExoClick timed out error");
         }
         return stat;
     }
 
     private NetworkStatEntity parseNetwork(String group, LocalDate dateStart, LocalDate dateEnd) {
-        System.out.println("Parse group - " + group);
+        logger.debug("Parse group - " + group);
         Connection.Response response;
         try {
             response = Jsoup

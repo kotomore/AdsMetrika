@@ -25,8 +25,7 @@ public class Credentials {
     @Column(name = "username", nullable = false)
     private String username;
 
-    @NotEmpty(message = "Password empty")
-    @Column(name = "password", nullable = false)
+    @Column(name = "password")
     private String password;
 
     @Enumerated(EnumType.STRING)

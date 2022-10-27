@@ -1,6 +1,7 @@
 package ru.set404.AdsMetrika.services.network.ads;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ru.set404.AdsMetrika.models.Credentials;
 import ru.set404.AdsMetrika.repositories.CredentialsRepository;
@@ -23,11 +25,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-@Service
+@Component
 public class TrafficFactory implements NetworkStats {
 
+    protected Log logger = LogFactory.getLog(this.getClass());
     private final CredentialsRepository credentialsRepository;
-    private static Connection.Response response = null;
+    private static Map<String, String> cookies;
 
     @Autowired
     public TrafficFactory(CredentialsRepository credentialsRepository) {
@@ -35,34 +38,37 @@ public class TrafficFactory implements NetworkStats {
     }
 
     private void getAuth() throws IOException {
-        System.out.println("Authorization...");
-        response = Jsoup
-                .connect("https://main.trafficfactory.biz/users/sign_in")
-                .execute();
-        System.out.println("Authorization complete.");
-        Document doc = response.parse();
-        Element meta = doc.select("[name=\"signin[_csrf_token]\"]").first();
-        assert meta != null;
-        String token = meta.attr("value");
+        if (cookies == null) {
+            logger.debug("Traffic Factory authorization...");
+            Connection.Response response = Jsoup
+                    .connect("https://main.trafficfactory.biz/users/sign_in")
+                    .execute();
+            logger.debug("Traffic Factory authorization complete.");
+            Document doc = response.parse();
+            Element meta = doc.select("[name=\"signin[_csrf_token]\"]").first();
+            assert meta != null;
+            String token = meta.attr("value");
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Credentials credentials = credentialsRepository.
-                findCredentialsByOwnerAndNetworkName(((UserDetails) authentication.getPrincipal())
-                        .user(), Network.TF)
-                .orElseThrow(() -> new BadCredentialsException("Traffic Factory credentials doesn`t exist"));
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Credentials credentials = credentialsRepository.
+                    findCredentialsByOwnerAndNetworkName(((UserDetails) authentication.getPrincipal())
+                            .user(), Network.TF)
+                    .orElseThrow(() -> new BadCredentialsException("Traffic Factory credentials doesn`t exist"));
 
-        String email = credentials.getUsername();
-        String password = credentials.getPassword();
+            String email = credentials.getUsername();
+            String password = credentials.getPassword();
 
-        //Authorization, get cookies
-        response = Jsoup
-                .connect("https://main.trafficfactory.biz/users/sign_in")
-                .method(Connection.Method.POST)
-                .data("signin[login]", email)
-                .data("signin[password]", password)
-                .data("signin[_csrf_token]", token)
-                .cookies(response.cookies())
-                .execute();
+            //Authorization, get cookies
+            response = Jsoup
+                    .connect("https://main.trafficfactory.biz/users/sign_in")
+                    .method(Connection.Method.POST)
+                    .data("signin[login]", email)
+                    .data("signin[password]", password)
+                    .data("signin[_csrf_token]", token)
+                    .cookies(response.cookies())
+                    .execute();
+            cookies = response.cookies();
+        }
     }
 
     public Map<Integer, NetworkStatEntity> getStat(Map<Integer, String> networkOffers, LocalDate dateStart,
@@ -86,15 +92,15 @@ public class TrafficFactory implements NetworkStats {
     }
 
     private NetworkStatEntity parseNetwork(String offerId, LocalDate dateStart, LocalDate dateEnd) {
-        System.out.println("Parse offer - " + offerId);
+        logger.debug("Parse offer - " + offerId);
+        Connection.Response response;
         try {
             response = Jsoup
                     .connect("https://main.trafficfactory.biz/stats/campaigns/"
                             + dateStart + "-00-00/"
                             + dateEnd + "-23-59?campaign_name="
                             + offerId)
-                    .cookies(response.cookies())
-                    .method(Connection.Method.GET)
+                    .cookies(cookies)
                     .execute();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -119,7 +125,7 @@ public class TrafficFactory implements NetworkStats {
                     .replace("$", "")
                     .replace(",", "."));
         } else {
-            System.out.println("Offer id - " + offerId + " not found");
+            logger.debug("Offer id - " + offerId + " not found");
         }
         return new NetworkStatEntity(clicks, cost);
     }

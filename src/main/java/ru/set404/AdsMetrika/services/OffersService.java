@@ -39,13 +39,16 @@ public class OffersService {
 
     public void saveOffersDTOList(OfferListDTO offerListDTO, User user) {
         for (OfferDTO offerDTO : offerListDTO.getOffers()) {
-            if (!offerDTO.getGroupName().isEmpty()) {
+            if (offerDTO.getGroupName() != null && !offerDTO.getGroupName().isEmpty()) {
                 Offer offer = modelMapper.map(offerDTO, Offer.class);
                 offer.setOwner(user);
+                offer.setId(offersRepository.findIdByParameters(user, offer.getAdcomboNumber(), offer.getGroupName(),
+                        offer.getNetworkName()).orElse(0));
                 offersRepository.save(offer);
             }
         }
     }
+
     public void deleteById(User user, int id) {
         if (offersRepository.existsOfferByOwnerAndId(user, id))
             offersRepository.deleteById(id);

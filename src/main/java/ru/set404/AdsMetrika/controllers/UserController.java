@@ -5,6 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.set404.AdsMetrika.dto.*;
 import ru.set404.AdsMetrika.models.Offer;
@@ -16,6 +17,7 @@ import ru.set404.AdsMetrika.services.NetworksService;
 import ru.set404.AdsMetrika.services.OffersService;
 import ru.set404.AdsMetrika.services.StatsService;
 import ru.set404.AdsMetrika.services.network.Network;
+import ru.set404.AdsMetrika.util.OfferListDTOValidator;
 import ru.set404.AdsMetrika.util.StatisticsUtilities;
 
 import java.io.IOException;
@@ -31,27 +33,35 @@ public class UserController {
     private final OffersService offersService;
     private final StatsService statsService;
     private final CredentialsService credentialsService;
+    private final OfferListDTOValidator offerListDTOValidator;
 
     @Autowired
-    public UserController(NetworksService networksService, OffersService offersService, StatsService statsService, CredentialsService credentialsService) {
+    public UserController(NetworksService networksService, OffersService offersService, StatsService statsService, CredentialsService credentialsService, OfferListDTOValidator offerListDTOValidator) {
         this.networksService = networksService;
         this.offersService = offersService;
         this.statsService = statsService;
         this.credentialsService = credentialsService;
+        this.offerListDTOValidator = offerListDTOValidator;
     }
 
     @GetMapping("/statistics")
-    public String index(@RequestParam(value = "ds", required = false,
-            defaultValue = "#{T(java.time.LocalDate).now()}") LocalDate dateStart,
-                        @RequestParam(value = "de", required = false,
-                                defaultValue = "#{T(java.time.LocalDate).now()}") LocalDate dateEnd, Model model)
-            throws IOException, InterruptedException {
+    public String index(@RequestParam(value = "ds", required = false) LocalDate dateStart,
+                        @RequestParam(value = "de", required = false) LocalDate dateEnd, Model model) {
+
 
         User currentUser = getUser();
 
         List<Offer> userOffers = offersService.getUserOffersList(currentUser);
 
-        List<TableDTO> tableStats = getTableStats(dateStart, dateEnd, userOffers);
+        List<TableDTO> tableStats = new ArrayList<>();
+        if (dateStart != null) {
+            try {
+                tableStats = getTableStats(dateStart, dateEnd, userOffers);
+            } catch (Exception e) {
+                return "redirect:/statistics?error";
+            }
+        }
+
 
         List<Stat> oldStats = statsService.getStatsList(currentUser, LocalDate.now().minusDays(30));
         List<ChartDTO> chartStats = StatisticsUtilities.getChartStats(oldStats);
@@ -74,27 +84,37 @@ public class UserController {
 
         //donut-chart
         model.addAttribute("totalSpendByNetwork", StatisticsUtilities.getTotalChartSpend(oldStats));
+
         return "user/index";
     }
 
     @GetMapping("/report")
-    public String report(@RequestParam(value = "type", required = false) String type, Model model) throws IOException, InterruptedException {
+    public String report(@RequestParam(value = "type", required = false) String type, Model model) {
         User currentUser = getUser();
         List<Offer> userOffers = offersService.getUserOffersList(currentUser);
 
         String headerText;
         TableDTO combinedStats;
         if (type != null && type.equals("month")) {
-            LocalDate firstDay = LocalDate.now().minusDays(1);
-            LocalDate lastDay = LocalDate.now().minusDays(1);
-            List<TableDTO> tableStats = getTableStats(firstDay, lastDay, userOffers);
-            combinedStats = StatisticsUtilities.getCombinedStats(tableStats);
-            headerText = firstDay + " - " + lastDay;
-        } else {
             LocalDate firstDay = LocalDate.now().minusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
             LocalDate lastDay = LocalDate.now().minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
-            List<TableDTO> tableStats = getTableStats(firstDay, lastDay, userOffers);
-            combinedStats = StatisticsUtilities.getOneList(tableStats);
+            try {
+                List<TableDTO> tableStats = getTableStats(firstDay, lastDay, userOffers);
+                combinedStats = StatisticsUtilities.getCombinedStats(tableStats);
+            } catch (Exception e) {
+                return "redirect:/report?error";
+            }
+
+            headerText = firstDay + " - " + lastDay;
+        } else {
+            LocalDate firstDay = LocalDate.now().minusDays(1);
+            LocalDate lastDay = LocalDate.now().minusDays(1);
+            try {
+                List<TableDTO> tableStats = getTableStats(firstDay, lastDay, userOffers);
+                combinedStats = StatisticsUtilities.getOneList(tableStats);
+            } catch (Exception e) {
+                return "redirect:/report?error";
+            }
             headerText = firstDay.toString();
         }
 
@@ -114,7 +134,6 @@ public class UserController {
     @GetMapping("/offers")
     public String offers(Model model) {
         OfferListDTO offerForm = new OfferListDTO();
-
         for (int i = 1; i <= 7; i++) {
             offerForm.addOffer(new OfferDTO());
         }
@@ -133,24 +152,33 @@ public class UserController {
     @GetMapping("/offers/{id}/delete")
     public String delete(@PathVariable("id") int id) {
         offersService.deleteById(getUser(), id);
-        return "redirect:/offers";
+        return "redirect:/offers?success";
     }
 
     @PostMapping("/offers/edit")
-    public String editOffers(@ModelAttribute("form") OfferListDTO offerDTOS) {
+    public String editOffers(@ModelAttribute("form") OfferListDTO offerDTOS, BindingResult bindingResult) {
+        offerListDTOValidator.validate(offerDTOS, bindingResult);
+        if (bindingResult.hasErrors())
+            return "redirect:/offers?error";
+
         offersService.saveOffersDTOList(offerDTOS, getUser());
-        return "redirect:/offers";
+        return "redirect:/offers?success";
     }
 
     @PostMapping("/offers/save")
-    public String saveOffers(@ModelAttribute("blankForm") OfferListDTO offerDTOS) {
+    public String saveOffers(@ModelAttribute("blankForm") OfferListDTO offerDTOS, BindingResult bindingResult) {
+        offerListDTOValidator.validate(offerDTOS, bindingResult);
+        if (bindingResult.hasErrors())
+            return "redirect:/offers?error";
+
         offersService.saveOffersDTOList(offerDTOS, getUser());
-        return "redirect:/offers";
+        return "redirect:/offers?success";
     }
 
     @PostMapping("/credentials/save")
     public String saveCredentials(@ModelAttribute("credentialsADCOMBO") CredentialsDTO credentialsDTO) {
-        if (credentialsDTO.getUsername().isEmpty() || credentialsDTO.getPassword().isEmpty())
+        if (credentialsDTO.getNetworkName() != Network.ADCOMBO &&
+                (credentialsDTO.getUsername().isEmpty() || credentialsDTO.getPassword().isEmpty()))
             credentialsService.deleteById(credentialsDTO.getId());
         else
             credentialsService.saveCredentialsDTO(credentialsDTO, getUser());
@@ -177,8 +205,8 @@ public class UserController {
                 currentNetworkStat = networksService.getNetworkStatisticsList(userOffers,
                         network, dateStart, dateEnd);
             tableStats.add(new TableDTO(currentNetworkStat, network));
-//            if (dateStart.equals(dateEnd))
-//                statsService.saveStatDTOList(currentNetworkStat, currentUser, network, dateStart);
+            if (dateStart.equals(dateEnd))
+                statsService.saveStatDTOList(currentNetworkStat, getUser(), network, dateStart);
         }
         return tableStats;
     }

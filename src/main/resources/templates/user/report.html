@@ -9,7 +9,9 @@
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description"/>
     <meta content="Themesdesign" name="author"/>
     <!-- App favicon -->
-    <link rel="icon" type="image/x-icon" href="../assets/favicon.ico}">
+    <link rel="icon" type="image/x-icon" href="../assets/favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="../assets/libs/toastr/build/toastr.min.css">
 
     <!-- jquery.vectormap css -->
     <link href="../assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet"
@@ -493,11 +495,21 @@
 <div class="rightbar-overlay"></div>
 
 <!-- JAVASCRIPT -->
+<script src="../assets/libs/toastr/build/toastr.min.js"></script>
+
+<!-- toastr init -->
+<script src="../assets/js/pages/toastr.init.js"></script>
+
+
+
+
 <script src="../assets/libs/jquery/jquery.min.js"></script>
 <script src="../assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="../assets/libs/metismenu/metisMenu.min.js"></script>
 <script src="../assets/libs/simplebar/simplebar.min.js"></script>
 <script src="../assets/libs/node-waves/waves.min.js"></script>
+
+
 
 
 <!-- apexcharts -->
@@ -532,6 +544,31 @@
 <script src="../assets/js/pages/datatables.init.js"></script>
 <script src="../assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
 
+<script src="../assets/libs/toastr/build/toastr.min.js"></script>
+
+<!-- toastr init -->
+<script src="../assets/js/pages/toastr.init.js"></script>
+
+<script th:if="${param.error}">
+    toastr["error"]("Something went wrong");
+    toastr.options = {
+        "closeButton": false,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": false,
+        "positionClass": "toast-top-center",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": 300,
+        "hideDuration": 1000,
+        "timeOut": 5000,
+        "extendedTimeOut": 1000,
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    }
+</script>
 <!-- App js -->
 <script src="../assets/js/app.js"></script>
 </body>

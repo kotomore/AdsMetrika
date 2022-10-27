@@ -10,7 +10,7 @@
     <meta content="Themesdesign" name="author"/>
     <!-- App favicon -->
     <link rel="icon" type="image/x-icon" th:href="@{../assets/favicon.ico}">
-
+    <link rel="stylesheet" type="text/css" href="assets/libs/toastr/build/toastr.min.css">
     <!-- jquery.vectormap css -->
     <link th:href="@{assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css}" rel="stylesheet"
           type="text/css"/>
@@ -264,7 +264,7 @@
                                     <div class="flex-grow-1">
                                         <p class="text-truncate font-size-14 mb-2">Total Spend</p>
                                         <h4 th:text="${#numbers.formatDecimal(combinedStats.getTotalSpend(), 1, 2)}+'$'" class="mb-2">total spend</h4>
-                                        <p th:if="${chartDates.contains(currentDate.minusDays(1))}"  class="text-muted mb-0">
+                                        <p th:if="${chartDates.contains(currentDate.minusDays(1)) && chartCosts.size()>1}"  class="text-muted mb-0">
                                             <span th:if="${(combinedStats.getTotalSpend()/chartCosts.get(1)*100)}>=100"  class="text-success fw-bold font-size-12 me-2">
                                             <i class="ri-arrow-right-up-line me-1 align-middle"></i>
                                                 <span th:text="${#numbers.formatDecimal(100-combinedStats.getTotalSpend()/chartCosts.get(1)*100, 1, 2)}+'%'"></span>
@@ -291,7 +291,7 @@
                                     <div class="flex-grow-1">
                                         <p class="text-truncate font-size-14 mb-2">Total Revenue</p>
                                         <h4 th:text="${#numbers.formatDecimal(combinedStats.getTotalRevenue(), 1, 2)}" class="mb-2">total revenue</h4>
-                                        <p th:if="${chartDates.contains(currentDate.minusDays(1))}"  class="text-muted mb-0">
+                                        <p th:if="${chartDates.contains(currentDate.minusDays(1)) && chartCosts.size()>1}" class="text-muted mb-0">
                                             <span th:if="${(combinedStats.getTotalRevenue()/chartRevenue.get(1)*100)}>=100"  class="text-success fw-bold font-size-12 me-2">
                                             <i class="ri-arrow-right-up-line me-1 align-middle"></i>
                                                 <span th:text="${#numbers.formatDecimal(100-combinedStats.getTotalRevenue()/chartRevenue.get(1)*100, 1, 2)}+'%'"></span>
@@ -565,18 +565,11 @@
                                         <div class="row mb-3">
                                             <input hidden th:field="${credentialsADCOMBO.id}" th:name="${credentialsADCOMBO.id}" th:value="${credentialsADCOMBO.getId()}"/>
 
-                                            <label for="example-text-input" class="col-sm-2 col-form-label">Username</label>
+                                            <label for="example-text-input" class="col-sm-2 col-form-label">API-token</label>
                                             <div class="col-sm-10">
                                                 <input th:field="${credentialsADCOMBO.username}" th:name="${credentialsADCOMBO.username}" th:value="${credentialsADCOMBO.getUsername()}" class="form-control" type="text" id="example-text-input">
                                             </div>
-                                        </div>
-                                        <div class="row mb-3">
-                                            <label for="example-text-input" class="col-sm-2 col-form-label">Password</label>
-                                            <div class="col-sm-10">
-                                                <input th:field="${credentialsADCOMBO.password}" th:name="${credentialsADCOMBO.password}" th:value="${credentialsADCOMBO.getPassword()}" class="form-control" type="text">
-                                            </div>
                                             <input hidden name="networkName" value="ADCOMBO" />
-
                                         </div>
                                     </div>
                                     <div class="modal-footer">
@@ -741,7 +734,6 @@
 <!-- /Right-bar -->
 
 
-
 <!-- Right bar overlay-->
 <div class="rightbar-overlay"></div>
 
@@ -768,6 +760,34 @@
 <script src="assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
 <script src="assets/js/pages/datatables.init.js"></script>
 <script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+
+<script src="assets/libs/toastr/build/toastr.min.js"></script>
+
+<!-- toastr init -->
+<script src="assets/js/pages/toastr.init.js"></script>
+
+<script th:if="${param.error}">
+    toastr["error"]("Something went wrong");
+
+    toastr.options = {
+        "closeButton": false,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": false,
+        "positionClass": "toast-top-center",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": 300,
+        "hideDuration": 1000,
+        "timeOut": 5000,
+        "extendedTimeOut": 1000,
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    }
+</script>
+
 
 <script th:if="${!chartCosts.isEmpty()}" th:inline="javascript">
 

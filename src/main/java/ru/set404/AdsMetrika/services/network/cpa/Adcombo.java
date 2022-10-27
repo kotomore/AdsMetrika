@@ -2,12 +2,15 @@ package ru.set404.AdsMetrika.services.network.cpa;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ru.set404.AdsMetrika.models.Credentials;
 import ru.set404.AdsMetrika.repositories.CredentialsRepository;
@@ -21,22 +24,22 @@ import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 
-@Service
+@Component
 public class Adcombo {
+    protected Log logger = LogFactory.getLog(this.getClass());
     private final CredentialsRepository credentialsRepository;
     private final ObjectMapper objectMapper;
-    public static Connection.Response responseConnection = null;
+    public Connection.Response responseConnection = null;
 
     @Autowired
     public Adcombo(CredentialsRepository credentialsRepository, ObjectMapper objectMapper) {
         this.credentialsRepository = credentialsRepository;
-
         this.objectMapper = objectMapper;
     }
 
     private void getAuthResponse() throws IOException {
         if (responseConnection == null) {
-            System.out.println("Authorization...");
+            logger.debug("Adcombo authorization...");
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Credentials credentials = credentialsRepository.
@@ -53,7 +56,7 @@ public class Adcombo {
                     .ignoreHttpErrors(true)
                     .ignoreContentType(true)
                     .execute();
-            System.out.println("Cookies get");
+            logger.debug("Cookies get");
 
             String token = response.cookies().get("X-CSRF-Token");
             String jsonBody = """
@@ -103,17 +106,20 @@ public class Adcombo {
 
     public Map<Integer, AdcomboStatsEntity> getStat(Network network, LocalDate dateStart, LocalDate dateEnd) throws IOException {
 
-        getAuthResponse();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Credentials credentials = credentialsRepository.
+                findCredentialsByOwnerAndNetworkName(((UserDetails) authentication.getPrincipal())
+                        .user(), Network.ADCOMBO).orElseThrow(() -> new BadCredentialsException("Api token not found"));
+        String apiKey = credentials.getUsername();
 
         String timeZone = "+03:00";
-
         if (network == Network.EXO) {
             timeZone = "-04:00";
         }
         long timeStart = dateStart.plusDays(1).toEpochSecond(LocalTime.MIN, ZoneOffset.of(timeZone));
         long timeEnd = dateEnd.plusDays(1).toEpochSecond(LocalTime.MIN, ZoneOffset.of(timeZone)) - 1;
         responseConnection = Jsoup
-                .connect("https://my.adcombo.com/api/stats?page=1&count=100&order=desc&sorting=group_by" +
+                .connect("https://api.adcombo.com/stats/data/?api_key=" + apiKey + "&page=1&count=100&order=desc&sorting=group_by" +
                         "&stat_type=pp_stat&ts=" + timeStart + "&te=" + timeEnd +
                         "&by_last_activity=false&percentage=false&normalize=false&comparing=false&group_by=offer_id" +
                         "&tz_offset=-10800&cols=uniq_traffic&cols=orders_confirmed&cols=orders_hold" +
@@ -121,9 +127,7 @@ public class Adcombo {
                         "&cols=cr_uniq&cols=ctr_uniq&cols=user_orders_confirmed_income&cols=user_total_hold_income" +
                         "&cols=user_total_income&utm_source=" + network.getName() +
                         "&utm_source=-2&epc_factor=0&force=true")
-
                 .method(Connection.Method.GET)
-                .cookies(responseConnection.cookies())
                 .ignoreContentType(true)
                 .maxBodySize(0)
                 .execute();
@@ -132,8 +136,8 @@ public class Adcombo {
 
         Map<Integer, AdcomboStatsEntity> stats = new HashMap<>();
 
-        if (adcomboStat.hasNonNull("objects")) {
-            for (JsonNode campaign : adcomboStat.get("objects")) {
+        if (adcomboStat.hasNonNull("data")) {
+            for (JsonNode campaign : adcomboStat.get("data").elements().next().get("rows")) {
                 stats.put(campaign.get("group_by").asInt(), new AdcomboStatsEntity(
                         campaign.get("group_by").asInt(),
                         campaign.get("key_for_groupping").asText(),
@@ -143,6 +147,7 @@ public class Adcombo {
                 );
             }
         }
+        logger.debug("Adcombo stats received");
         return stats;
 
     }

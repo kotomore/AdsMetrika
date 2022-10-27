@@ -9,7 +9,9 @@ import ru.set404.AdsMetrika.models.Offer;
 import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.services.network.Network;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OffersRepository extends JpaRepository<Offer, Integer> {
@@ -20,6 +22,11 @@ public interface OffersRepository extends JpaRepository<Offer, Integer> {
     @Modifying
     @Query("delete from Offer o where o.id = ?1")
     void deleteById(int id);
+
+    @Query("""
+            select o.id from Offer o
+            where o.owner = ?1 and o.adcomboNumber = ?2 and o.groupName = ?3 and o.networkName = ?4""")
+    Optional<Integer> findIdByParameters(User owner, int adcomboNumber, @NotEmpty String groupName, Network networkName);
     @Query("""
             select (count(o) > 0) from Offer o
             where o.owner = ?1 and o.adcomboNumber = ?2 and o.groupName = ?3 and o.networkName = ?4""")
