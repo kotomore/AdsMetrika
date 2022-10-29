@@ -11,7 +11,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import ru.set404.AdsMetrika.models.Credentials;
 import ru.set404.AdsMetrika.repositories.CredentialsRepository;
 import ru.set404.AdsMetrika.security.UserDetails;
@@ -30,7 +29,7 @@ public class TrafficFactory implements NetworkStats {
 
     protected Log logger = LogFactory.getLog(this.getClass());
     private final CredentialsRepository credentialsRepository;
-    private static Map<String, String> cookies;
+    private Map<String, String> cookies;
 
     @Autowired
     public TrafficFactory(CredentialsRepository credentialsRepository) {
@@ -38,7 +37,6 @@ public class TrafficFactory implements NetworkStats {
     }
 
     private void getAuth() throws IOException {
-        if (cookies == null) {
             logger.debug("Traffic Factory authorization...");
             Connection.Response response = Jsoup
                     .connect("https://main.trafficfactory.biz/users/sign_in")
@@ -68,7 +66,6 @@ public class TrafficFactory implements NetworkStats {
                     .cookies(response.cookies())
                     .execute();
             cookies = response.cookies();
-        }
     }
 
     public Map<Integer, NetworkStatEntity> getStat(Map<Integer, String> networkOffers, LocalDate dateStart,

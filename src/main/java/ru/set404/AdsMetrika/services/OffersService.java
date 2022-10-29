@@ -42,8 +42,9 @@ public class OffersService {
             if (offerDTO.getGroupName() != null && !offerDTO.getGroupName().isEmpty()) {
                 Offer offer = modelMapper.map(offerDTO, Offer.class);
                 offer.setOwner(user);
-                offer.setId(offersRepository.findIdByParameters(user, offer.getAdcomboNumber(), offer.getGroupName(),
-                        offer.getNetworkName()).orElse(0));
+                if (offer.getId() == 0)
+                    offer.setId(offersRepository.findIdByParameters(user, offer.getAdcomboNumber(), offer.getGroupName(),
+                            offer.getNetworkName()).orElse(0));
                 offersRepository.save(offer);
             }
         }

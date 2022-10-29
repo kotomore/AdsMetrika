@@ -28,7 +28,7 @@
     <!-- Icons Css -->
     <link th:href="@{../assets/css/icons.min.css}" rel="stylesheet" type="text/css"/>
     <!-- App Css-->
-    <link th:href="@{../assets/css/app.min.css}" id="app-style" rel="stylesheet" type="text/css"/>
+    <link th:href="@{../assets/css/app-dark.min.css}" id="app-style" rel="stylesheet" type="text/css"/>
 
 </head>
 
@@ -260,7 +260,8 @@
 
                                 <form th:method="POST" th:action="@{/offers/edit}" th:object="${form}">
                                 <div class="table-responsive">
-                                    <table id="datatable" class="table table-editable table-nowrap align-middle table-edits">
+                                    <table id="scroll-vertical-datatable" class="table table-editable table-nowrap w-100 align-middle table-edits">
+
                                         <thead>
                                         <tr >
                                             <th style="visibility: hidden; position: fixed;"></th>

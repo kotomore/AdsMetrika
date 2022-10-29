@@ -202,7 +202,7 @@ public class UserController {
                 currentNetworkStat = networksService.getNetworkStatisticsListMock(userOffers,
                         network, dateStart, dateEnd);
             else
-                currentNetworkStat = networksService.getNetworkStatisticsList(userOffers,
+                 currentNetworkStat = networksService.getNetworkStatisticsList(userOffers,
                         network, dateStart, dateEnd);
             tableStats.add(new TableDTO(currentNetworkStat, network));
             if (dateStart.equals(dateEnd))
