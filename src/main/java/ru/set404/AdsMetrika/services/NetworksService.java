@@ -4,12 +4,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import ru.set404.AdsMetrika.dto.StatDTO;
 import ru.set404.AdsMetrika.models.Offer;
-import ru.set404.AdsMetrika.repositories.OffersRepository;
 import ru.set404.AdsMetrika.services.network.Network;
-import ru.set404.AdsMetrika.services.network.ads.ExoClick;
-import ru.set404.AdsMetrika.services.network.ads.NetworkStatEntity;
-import ru.set404.AdsMetrika.services.network.ads.NetworkStats;
-import ru.set404.AdsMetrika.services.network.ads.TrafficFactory;
+import ru.set404.AdsMetrika.services.network.ads.*;
 import ru.set404.AdsMetrika.services.network.cpa.Adcombo;
 import ru.set404.AdsMetrika.services.network.cpa.AdcomboStatsEntity;
 import ru.set404.AdsMetrika.util.StatisticsUtilities;
@@ -23,14 +19,16 @@ import java.util.stream.Collectors;
 public class NetworksService {
     private final ExoClick exoClick;
     private final TrafficFactory trafficFactory;
-    private final Adcombo adCombo;
-    private final OffersRepository offersRepository;
 
-    public NetworksService(ExoClick exoClick, TrafficFactory trafficFactory, Adcombo adCombo, OffersRepository offersRepository) {
+    private final TrafficFactoryAPI trafficFactoryAPI;
+    private final Adcombo adCombo;
+
+    public NetworksService(ExoClick exoClick, TrafficFactory trafficFactory, TrafficFactoryAPI trafficFactoryAPI,
+                           Adcombo adCombo) {
         this.exoClick = exoClick;
         this.trafficFactory = trafficFactory;
+        this.trafficFactoryAPI = trafficFactoryAPI;
         this.adCombo = adCombo;
-        this.offersRepository = offersRepository;
     }
 
     public List<StatDTO> getNetworkStatisticsListMock(List<Offer> userOffers, Network network, LocalDate dateStart,
@@ -81,5 +79,19 @@ public class NetworksService {
         } catch (BadCredentialsException e) {
             return new ArrayList<>();
         }
+    }
+
+    public List<StatDTO> getCampaignStats(Network network, LocalDate dateStart,
+                                           LocalDate dateEnd) throws IOException {
+        Map<Integer, NetworkStatEntity> networkStatsMap = trafficFactoryAPI
+                .getCampaignStats(dateStart, dateEnd);
+        Map<Integer, AdcomboStatsEntity> adcomboStatsMap = adCombo.getCampaignStat(network, dateStart, dateEnd);
+
+        List<StatDTO> stats = new ArrayList<>();
+        for (int campaignId : networkStatsMap.keySet()) {
+            if (networkStatsMap.containsKey(campaignId) && adcomboStatsMap.containsKey(campaignId))
+                stats.add(StatisticsUtilities.createStatsDTO(campaignId, networkStatsMap, adcomboStatsMap));
+        }
+        return stats;
     }
 }

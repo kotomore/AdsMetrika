@@ -29,7 +29,7 @@ public class Adcombo {
     protected Log logger = LogFactory.getLog(this.getClass());
     private final CredentialsRepository credentialsRepository;
     private final ObjectMapper objectMapper;
-    public Connection.Response responseConnection = null;
+    private Connection.Response responseConnection = null;
 
     @Autowired
     public Adcombo(CredentialsRepository credentialsRepository, ObjectMapper objectMapper) {
@@ -149,6 +149,49 @@ public class Adcombo {
         }
         logger.debug("Adcombo stats received");
         return stats;
-
     }
+
+    public Map<Integer, AdcomboStatsEntity> getCampaignStat(Network network, LocalDate dateStart, LocalDate dateEnd) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Credentials credentials = credentialsRepository.
+                findCredentialsByOwnerAndNetworkName(((UserDetails) authentication.getPrincipal())
+                        .user(), Network.ADCOMBO).orElseThrow(() -> new BadCredentialsException("Api token not found"));
+        String apiKey = credentials.getUsername();
+
+        String timeZone = "+03:00";
+        if (network == Network.EXO) {
+            timeZone = "-04:00";
+        }
+        long timeStart = dateStart.plusDays(1).toEpochSecond(LocalTime.MIN, ZoneOffset.of(timeZone));
+        long timeEnd = dateEnd.plusDays(1).toEpochSecond(LocalTime.MIN, ZoneOffset.of(timeZone)) - 1;
+        Connection.Response responseConnection = Jsoup
+                .connect("https://api.adcombo.com/stats/data/?api_key=" + apiKey +
+                        "&order=desc&stat_type=pp_stat&ts=" + timeStart + "&te=" + timeEnd + "&by_last_activity=false" +
+                        "&percentage=false&normalize=false&comparing=false&group_by=subacc_4&tz_offset=-10800" +
+                        "&cols=uniq_traffic&cols=orders_confirmed&cols=orders_hold&cols=orders_rejected" +
+                        "&cols=orders_trashed&cols=orders_total&cols=approve_total&cols=cr_uniq&cols=ctr_uniq" +
+                        "&cols=user_orders_confirmed_income&cols=user_total_hold_income&utm_source=" + network.getName())
+                .method(Connection.Method.GET)
+                .ignoreContentType(true)
+                .maxBodySize(0)
+                .execute();
+
+        JsonNode adcomboStat = new ObjectMapper().readTree(responseConnection.body());
+
+        Map<Integer, AdcomboStatsEntity> stats = new HashMap<>();
+
+        if (adcomboStat.hasNonNull("data")) {
+            for (JsonNode campaign : adcomboStat.get("data").elements().next().get("rows")) {
+                stats.put(campaign.get("group_by").asInt(), new AdcomboStatsEntity(
+                        campaign.get("group_by").asInt(),
+                        "campaign",
+                        campaign.get("user_total_hold_income").asDouble(),
+                        campaign.get("orders_confirmed").asInt(),
+                        campaign.get("user_orders_confirmed_income").asDouble())
+                );
+            }
+        }
+        return stats;
+    }
+
 }

@@ -4,7 +4,7 @@
 <head>
 
     <meta charset="utf-8"/>
-    <title>Report | AdsMetrika - End-to-End analytics service </title>
+    <title>Campaigns | AdsMetrika - End-to-End analytics service </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description"/>
     <meta content="Themesdesign" name="author"/>
@@ -168,7 +168,7 @@
                     </li>
 
                     <li>
-                        <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <a href="javascript: void(0);" class="active has-arrow waves-effect">
                             <i class="ri-mail-send-line"></i>
                             <span>Statistics</span>
                         </a>
@@ -179,7 +179,7 @@
                     </li>
 
                     <li>
-                        <a id="datepicker8" href="/report" class="active waves-effect">
+                        <a id="datepicker8" href="/report" class=" waves-effect">
                             <i class="ri-table-2"></i>
                             <span>Report</span>
                         </a>
@@ -243,13 +243,22 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                            <h4 th:text="'Report ('+${dates}+')'" class="mb-sm-0">Report</h4>
-                            <a id="datepicker1" href="/report?type=daily">Daily report</a>
-                            <a id="datepicker2" href="/report?type=month">Monthly report</a>
+                            <h4 th:text="'Campaigns ('+${dates}+')'" class="mb-sm-0">Campaigns statistic</h4>
+                            <a id="datepicker1" th:href="@{/campaigns(ds=${currentDate}, de=${currentDate})}">Today</a>
+                            <a id="datepicker2" th:href="@{/campaigns(ds=${currentDate.minusDays(1)}, de=${currentDate.minusDays(1)})}">Yesterday</a>
+                            <a id="datepicker3" th:href="@{/campaigns(ds=${currentDate.minusDays(2)}, de=${currentDate})}">Last 3
+                                days</a>
+                            <a id="datepicker4" th:href="@{/campaigns(ds=${currentDate.minusDays(6)}, de=${currentDate})}">Last 7
+                                days</a>
+                            <a id="datepicker5" th:href="@{/campaigns(ds=${currentDate.withDayOfMonth(1)}, de=${currentDate})}">This
+                                Month</a>
+                            <a id="datepicker6" th:href="@{/campaigns(ds=${currentDate.minusMonths(1).withDayOfMonth(1)},de=${currentDate.minusMonths(1)
+                                .withDayOfMonth(currentDate.minusMonths(1).getMonth()
+                                .length(currentDate.minusMonths(1).isLeapYear()))})}">Last Month</a>
 
                             <div class="page-title-right">
                                 <ol class="breadcrumb m-0">
-                                    <li class="breadcrumb-item"><a href="javascript: void(0);">Report</a></li>
+                                    <li class="breadcrumb-item"><a href="javascript: void(0);">Campaigns</a></li>
                                     <li class="breadcrumb-item active">AdsMetrika</li>
                                 </ol>
                             </div>
@@ -281,7 +290,7 @@
                                     <table data-order='[]' id="datatable-buttons" class="table mb-0">
                                         <thead class="table-light">
                                         <tr>
-                                            <th>Offer name</th>
+                                            <th>Campaign ID</th>
                                             <th>Clicks</th>
                                             <th>Cost $</th>
                                             <th>Hold</th>
@@ -290,16 +299,15 @@
                                         </tr>
                                         </thead><!-- end thead -->
                                         <tbody>
-                                        <tr th:style="${offer.getProfit() < 0 ? 'color: red;' : 'color: green;'}"
-                                            th:each="offer : ${combinedStats.getCurrentStats()}">
-                                            <td><h6 th:if="${offer.getCampaignId()!=null}" th:text="'['+${offer.getCampaignId()}+'] '+${offer.getCampaignName()}" class="mb-0">campaign name</h6>
-                                                <h6 th:unless="${offer.getCampaignId()!=null}" th:text="${offer.getCampaignName()}" class="mb-0">campaign name</h6>
+                                        <tr th:style="${campaign.getProfit() < 0 ? 'color: red;' : 'color: green;'}"
+                                            th:each="campaign : ${combinedStats}">
+                                            <td><h6 th:if="${campaign.getCampaignId()!=null}" th:text="'['+${campaign.getCampaignId()}+'] '" class="mb-0">campaign name</h6>
                                             </td>
-                                            <td th:text="${offer.getClicks()}">clicks</td>
-                                            <td th:text="${#numbers.formatDecimal(offer.getSpend(), 1, 2)}">cost</td>
-                                            <td th:text="${#numbers.formatDecimal(offer.getHoldCost(), 1, 2)}">hold cost</td>
-                                            <td th:text="${offer.getApproveCount()}">approve count</td>
-                                            <td th:text="${#numbers.formatDecimal(offer.getRevenue(), 1, 2)}">approve cost</td>
+                                            <td th:text="${campaign.getClicks()}">clicks</td>
+                                            <td th:text="${#numbers.formatDecimal(campaign.getSpend(), 1, 2)}">cost</td>
+                                            <td th:text="${#numbers.formatDecimal(campaign.getHoldCost(), 1, 2)}">hold cost</td>
+                                            <td th:text="${campaign.getApproveCount()}">approve count</td>
+                                            <td th:text="${#numbers.formatDecimal(campaign.getRevenue(), 1, 2)}">approve cost</td>
                                         </tr>
                                         </tbody><!-- end tbody -->
                                     </table> <!-- end table -->

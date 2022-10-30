@@ -159,10 +159,21 @@
                     <li class="menu-title">Menu</li>
 
                     <li>
-                        <a id="datepicker7" th:href="@{/statistics}" class="active waves-effect">
+                        <a id="datepicker7" th:href="@{/statistics}" class=" waves-effect">
                             <i class="ri-dashboard-line"></i>
                             <span>Dashboard</span>
                         </a>
+                    </li>
+
+                    <li>
+                        <a href="javascript: void(0);" class="has-arrow waves-effect">
+                            <i class="ri-mail-send-line"></i>
+                            <span>Statistics</span>
+                        </a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li><a href="/campaigns">Traffic Factory</a></li>
+                            <li><a href="#">ExoClick</a></li>
+                        </ul>
                     </li>
 
                     <li>
@@ -176,7 +187,7 @@
                     <li class="menu-title">Settings</li>
 
                     <li>
-                        <a th:href="@{/offers}" class="waves-effect">
+                        <a th:href="@{/offers}" class="active waves-effect">
                             <i class="ri-calendar-2-line"></i>
                             <span>Offers</span>
                         </a>

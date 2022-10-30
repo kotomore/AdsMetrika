@@ -131,6 +131,37 @@ public class UserController {
         return "user/report";
     }
 
+    @GetMapping("/campaigns")
+    public String campaigns(@RequestParam(value = "ds", required = false) LocalDate dateStart,
+                            @RequestParam(value = "de", required = false) LocalDate dateEnd,
+                            Model model) {
+        User currentUser = getUser();
+        List<StatDTO> campaignStats = new ArrayList<>();
+        String headerText = "Choose a date";
+
+        try {
+            if (dateStart != null && dateEnd != null) {
+                campaignStats = networksService.getCampaignStats(Network.TF, dateStart, dateEnd);
+                headerText = dateStart + " - " + dateEnd;
+            }
+        } catch (Exception e) {
+            return "redirect:/campaigns?error";
+        }
+
+        Map<Network, CredentialsDTO> credentials = getNetworkCredentialsDTOMap();
+        model.addAttribute("credentialsADCOMBO", credentials.get(Network.ADCOMBO));
+        model.addAttribute("credentialsEXO", credentials.get(Network.EXO));
+        model.addAttribute("credentialsTF", credentials.get(Network.TF));
+
+        model.addAttribute("username", currentUser.getUsername());
+        model.addAttribute("dates", headerText);
+        model.addAttribute("currentDate", LocalDate.now());
+
+        model.addAttribute("combinedStats", campaignStats);
+
+        return "user/campaigns";
+    }
+
     @GetMapping("/offers")
     public String offers(Model model) {
         OfferListDTO offerForm = new OfferListDTO();
@@ -202,7 +233,7 @@ public class UserController {
                 currentNetworkStat = networksService.getNetworkStatisticsListMock(userOffers,
                         network, dateStart, dateEnd);
             else
-                 currentNetworkStat = networksService.getNetworkStatisticsList(userOffers,
+                currentNetworkStat = networksService.getNetworkStatisticsList(userOffers,
                         network, dateStart, dateEnd);
             tableStats.add(new TableDTO(currentNetworkStat, network));
             if (dateStart.equals(dateEnd))
