@@ -1,12 +1,13 @@
 package ru.set404.AdsMetrika.dto;
 
 import lombok.Getter;
-import ru.set404.AdsMetrika.services.network.Network;
+import ru.set404.AdsMetrika.network.Network;
 
 import java.util.List;
 
 @Getter
 public class TableDTO {
+
     Network network;
     List<StatDTO> currentStats;
 
@@ -16,6 +17,10 @@ public class TableDTO {
     public TableDTO(List<StatDTO> currentStats, Network network) {
         this.currentStats = currentStats;
         this.network = network;
+    }
+
+    public TableDTO(List<StatDTO> currentStats) {
+        this.currentStats = currentStats;
     }
 
     public int getTotalClicks() {

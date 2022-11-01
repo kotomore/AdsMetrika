@@ -8,7 +8,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.set404.AdsMetrika.dto.*;
-import ru.set404.AdsMetrika.models.Offer;
 import ru.set404.AdsMetrika.models.Stat;
 import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.security.UserDetails;
@@ -16,7 +15,7 @@ import ru.set404.AdsMetrika.services.CredentialsService;
 import ru.set404.AdsMetrika.services.NetworksService;
 import ru.set404.AdsMetrika.services.OffersService;
 import ru.set404.AdsMetrika.services.StatsService;
-import ru.set404.AdsMetrika.services.network.Network;
+import ru.set404.AdsMetrika.network.Network;
 import ru.set404.AdsMetrika.util.OfferListDTOValidator;
 import ru.set404.AdsMetrika.util.StatisticsUtilities;
 
@@ -36,7 +35,8 @@ public class UserController {
     private final OfferListDTOValidator offerListDTOValidator;
 
     @Autowired
-    public UserController(NetworksService networksService, OffersService offersService, StatsService statsService, CredentialsService credentialsService, OfferListDTOValidator offerListDTOValidator) {
+    public UserController(NetworksService networksService, OffersService offersService, StatsService statsService,
+                          CredentialsService credentialsService, OfferListDTOValidator offerListDTOValidator) {
         this.networksService = networksService;
         this.offersService = offersService;
         this.statsService = statsService;
@@ -47,37 +47,26 @@ public class UserController {
     @GetMapping("/statistics")
     public String index(@RequestParam(value = "ds", required = false) LocalDate dateStart,
                         @RequestParam(value = "de", required = false) LocalDate dateEnd, Model model) {
-
-
         User currentUser = getUser();
-
-        List<Offer> userOffers = offersService.getUserOffersList(currentUser);
-
         List<TableDTO> tableStats = new ArrayList<>();
         if (dateStart != null) {
             try {
-                tableStats = getTableStats(dateStart, dateEnd, userOffers);
+                tableStats = getTableStats(dateStart, dateEnd);
             } catch (Exception e) {
                 return "redirect:/statistics?error";
             }
         }
+        final int COUNT_DAYS_IN_CHART = 7;
+        List<Stat> oldStats = statsService.getStatsList(currentUser, LocalDate.now().minusDays(COUNT_DAYS_IN_CHART));
+        List<ChartDTO> chartStats = StatisticsUtilities.convertToChartDTOList(oldStats);
 
-
-        List<Stat> oldStats = statsService.getStatsList(currentUser, LocalDate.now().minusDays(30));
-        List<ChartDTO> chartStats = StatisticsUtilities.getChartStats(oldStats);
-
-        Map<Network, CredentialsDTO> credentials = getNetworkCredentialsDTOMap();
-        model.addAttribute("credentialsADCOMBO", credentials.get(Network.ADCOMBO));
-        model.addAttribute("credentialsEXO", credentials.get(Network.EXO));
-        model.addAttribute("credentialsTF", credentials.get(Network.TF));
-
-        model.addAttribute("username", currentUser.getUsername());
+        putCredentialsInModel(model);
         model.addAttribute("currentDate", LocalDate.now());
         model.addAttribute("statistics", tableStats);
-        model.addAttribute("combinedStats", StatisticsUtilities.getCombinedStats(tableStats));
+        model.addAttribute("combinedStats", StatisticsUtilities.combineTableDTO(tableStats));
 
         //column_line_chart
-        model.addAttribute("chartTotal", StatisticsUtilities.getTotalChartStats(oldStats));
+        model.addAttribute("chartTotal", StatisticsUtilities.getTotalChartDTO(oldStats));
         model.addAttribute("chartCosts", chartStats.stream().map(ChartDTO::getSpend).toList());
         model.addAttribute("chartRevenue", chartStats.stream().map(ChartDTO::getRevenue).toList());
         model.addAttribute("chartDates", chartStats.stream().map(ChartDTO::getCreatedDate).toList());
@@ -90,42 +79,32 @@ public class UserController {
 
     @GetMapping("/report")
     public String report(@RequestParam(value = "type", required = false) String type, Model model) {
-        User currentUser = getUser();
-        List<Offer> userOffers = offersService.getUserOffersList(currentUser);
-
-        String headerText;
-        TableDTO combinedStats;
+        String headerText = "Choose a date";
+        TableDTO combinedStats = new TableDTO();
         if (type != null && type.equals("month")) {
             LocalDate firstDay = LocalDate.now().minusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
             LocalDate lastDay = LocalDate.now().minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
             try {
-                List<TableDTO> tableStats = getTableStats(firstDay, lastDay, userOffers);
-                combinedStats = StatisticsUtilities.getCombinedStats(tableStats);
+                List<TableDTO> tableStats = getTableStats(firstDay, lastDay);
+                combinedStats = StatisticsUtilities.combineTableDTO(tableStats);
             } catch (Exception e) {
                 return "redirect:/report?error";
             }
 
             headerText = firstDay + " - " + lastDay;
-        } else {
+        } else if (type != null) {
             LocalDate firstDay = LocalDate.now().minusDays(1);
             LocalDate lastDay = LocalDate.now().minusDays(1);
             try {
-                List<TableDTO> tableStats = getTableStats(firstDay, lastDay, userOffers);
-                combinedStats = StatisticsUtilities.getOneList(tableStats);
+                List<TableDTO> tableStats = getTableStats(firstDay, lastDay);
+                combinedStats = StatisticsUtilities.convertForSingleTable(tableStats);
             } catch (Exception e) {
                 return "redirect:/report?error";
             }
             headerText = firstDay.toString();
         }
-
-
-        Map<Network, CredentialsDTO> credentials = getNetworkCredentialsDTOMap();
-        model.addAttribute("credentialsADCOMBO", credentials.get(Network.ADCOMBO));
-        model.addAttribute("credentialsEXO", credentials.get(Network.EXO));
-        model.addAttribute("credentialsTF", credentials.get(Network.TF));
-
+        putCredentialsInModel(model);
         model.addAttribute("dates", headerText);
-        model.addAttribute("username", currentUser.getUsername());
         model.addAttribute("combinedStats", combinedStats);
 
         return "user/report";
@@ -134,29 +113,23 @@ public class UserController {
     @GetMapping("/campaigns")
     public String campaigns(@RequestParam(value = "ds", required = false) LocalDate dateStart,
                             @RequestParam(value = "de", required = false) LocalDate dateEnd,
+                            @RequestParam(value = "network", required = false) Network network,
                             Model model) {
-        User currentUser = getUser();
         List<StatDTO> campaignStats = new ArrayList<>();
         String headerText = "Choose a date";
 
         try {
             if (dateStart != null && dateEnd != null) {
-                campaignStats = networksService.getCampaignStats(Network.TF, dateStart, dateEnd);
+                campaignStats = networksService.getCampaignStats(network, dateStart, dateEnd);
                 headerText = dateStart + " - " + dateEnd;
             }
         } catch (Exception e) {
             return "redirect:/campaigns?error";
         }
 
-        Map<Network, CredentialsDTO> credentials = getNetworkCredentialsDTOMap();
-        model.addAttribute("credentialsADCOMBO", credentials.get(Network.ADCOMBO));
-        model.addAttribute("credentialsEXO", credentials.get(Network.EXO));
-        model.addAttribute("credentialsTF", credentials.get(Network.TF));
-
-        model.addAttribute("username", currentUser.getUsername());
+        putCredentialsInModel(model);
         model.addAttribute("dates", headerText);
         model.addAttribute("currentDate", LocalDate.now());
-
         model.addAttribute("combinedStats", campaignStats);
 
         return "user/campaigns";
@@ -165,18 +138,14 @@ public class UserController {
     @GetMapping("/offers")
     public String offers(Model model) {
         OfferListDTO offerForm = new OfferListDTO();
-        for (int i = 1; i <= 7; i++) {
+        final int COUNT_EMPTY_FIELDS_FOR_OFFER = 7;
+        for (int i = 1; i <= COUNT_EMPTY_FIELDS_FOR_OFFER; i++) {
             offerForm.addOffer(new OfferDTO());
         }
 
-        Map<Network, CredentialsDTO> credentials = getNetworkCredentialsDTOMap();
-        model.addAttribute("credentialsADCOMBO", credentials.get(Network.ADCOMBO));
-        model.addAttribute("credentialsEXO", credentials.get(Network.EXO));
-        model.addAttribute("credentialsTF", credentials.get(Network.TF));
-
+        putCredentialsInModel(model);
         model.addAttribute("blankForm", offerForm);
         model.addAttribute("form", offersService.getOfferListDTO(getUser()));
-        model.addAttribute("username", getUser().getUsername());
         return "user/offers";
     }
 
@@ -209,7 +178,7 @@ public class UserController {
     @PostMapping("/credentials/save")
     public String saveCredentials(@ModelAttribute("credentialsADCOMBO") CredentialsDTO credentialsDTO) {
         if (credentialsDTO.getNetworkName() != Network.ADCOMBO &&
-                (credentialsDTO.getUsername().isEmpty() || credentialsDTO.getPassword().isEmpty()))
+                (credentialsDTO.getUsername().isEmpty()))
             credentialsService.deleteById(credentialsDTO.getId());
         else
             credentialsService.saveCredentialsDTO(credentialsDTO, getUser());
@@ -221,20 +190,18 @@ public class UserController {
         return ((UserDetails) authentication.getPrincipal()).user();
     }
 
-    private List<TableDTO> getTableStats(LocalDate dateStart, LocalDate dateEnd, List<Offer> userOffers)
-            throws IOException, InterruptedException {
+    private List<TableDTO> getTableStats(LocalDate dateStart, LocalDate dateEnd)
+            throws IOException {
 
-        Set<Network> userNetworks = userOffers.stream().map(Offer::getNetworkName).collect(Collectors.toSet());
+        Set<Network> userNetworks = credentialsService.userNetworks(getUser());
 
         List<TableDTO> tableStats = new ArrayList<>();
         for (Network network : userNetworks) {
             List<StatDTO> currentNetworkStat;
             if (getUser().getRole().equals("ROLE_GUEST"))
-                currentNetworkStat = networksService.getNetworkStatisticsListMock(userOffers,
-                        network, dateStart, dateEnd);
+                currentNetworkStat = networksService.getNetworkStatisticsListMock();
             else
-                currentNetworkStat = networksService.getNetworkStatisticsList(userOffers,
-                        network, dateStart, dateEnd);
+                currentNetworkStat = networksService.getNetworkStatisticsList(network, dateStart, dateEnd);
             tableStats.add(new TableDTO(currentNetworkStat, network));
             if (dateStart.equals(dateEnd))
                 statsService.saveStatDTOList(currentNetworkStat, getUser(), network, dateStart);
@@ -242,12 +209,16 @@ public class UserController {
         return tableStats;
     }
 
-    private Map<Network, CredentialsDTO> getNetworkCredentialsDTOMap() {
+    private void putCredentialsInModel(Model model) {
         Map<Network, CredentialsDTO> credentials = credentialsService.getUserCredentialsList(getUser()).stream()
                 .collect(Collectors.toMap(CredentialsDTO::getNetworkName, Function.identity()));
         credentials.putIfAbsent(Network.ADCOMBO, new CredentialsDTO());
         credentials.putIfAbsent(Network.EXO, new CredentialsDTO());
         credentials.putIfAbsent(Network.TF, new CredentialsDTO());
-        return credentials;
+
+        model.addAttribute("credentialsADCOMBO", credentials.get(Network.ADCOMBO));
+        model.addAttribute("credentialsEXO", credentials.get(Network.EXO));
+        model.addAttribute("credentialsTF", credentials.get(Network.TF));
+        model.addAttribute("username", getUser().getUsername());
     }
 }

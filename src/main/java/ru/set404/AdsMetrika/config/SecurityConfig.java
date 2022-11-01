@@ -30,7 +30,6 @@ public class SecurityConfig {
         http.authorizeRequests()
                 .antMatchers("/admin").hasRole("ADMIN")
                 .antMatchers("/auth/login", "/error", "/assets/**").permitAll()
-                .antMatchers("/statistics").hasAnyRole("USER", "ADMIN", "GUEST")
                 .antMatchers("/admin/list").hasRole("ADMIN")
                 .anyRequest().hasAnyRole("USER", "ADMIN", "GUEST")
                 .and()
@@ -56,12 +55,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder getPasswordEncoder(){
+    public PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public AuthenticationSuccessHandler getAuthenticationSuccessHandler(){
+    public AuthenticationSuccessHandler getAuthenticationSuccessHandler() {
         return new CustomUrlAuthenticationSuccessHandler();
     }
 }

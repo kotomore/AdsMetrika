@@ -8,6 +8,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class ChartDTO {
+
     private LocalDate createdDate;
     private double spend;
     private double revenue;
@@ -18,14 +19,8 @@ public class ChartDTO {
         this.revenue = revenue;
     }
 
-    public ChartDTO() {
-    }
-
-    public double getProfit() {
-        return revenue - spend;
-    }
-
-    public int getROI() {
-        return (int) (((revenue - spend) / spend) * 100);
+    public ChartDTO(double spend, double revenue) {
+        this.spend = spend;
+        this.revenue = revenue;
     }
 }

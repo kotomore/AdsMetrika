@@ -7,8 +7,11 @@ import ru.set404.AdsMetrika.dto.CredentialsDTO;
 import ru.set404.AdsMetrika.models.Credentials;
 import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.repositories.CredentialsRepository;
+import ru.set404.AdsMetrika.network.Network;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class CredentialsService {
@@ -19,6 +22,13 @@ public class CredentialsService {
     public CredentialsService(CredentialsRepository credentialsRepository, ModelMapper modelMapper) {
         this.credentialsRepository = credentialsRepository;
         this.modelMapper = modelMapper;
+    }
+
+    public Set<Network> userNetworks(User user) {
+        Set<Network> networks = credentialsRepository.findByOwner(user).stream()
+                .collect(Collectors.groupingBy(Credentials::getNetworkName)).keySet();
+        networks.remove(Network.ADCOMBO);
+        return networks;
     }
 
     public void deleteById(int id) {
@@ -34,5 +44,6 @@ public class CredentialsService {
         Credentials credentials = modelMapper.map(credentialsDTO, Credentials.class);
         credentials.setOwner(user);
         credentialsRepository.save(credentials);
+
     }
 }

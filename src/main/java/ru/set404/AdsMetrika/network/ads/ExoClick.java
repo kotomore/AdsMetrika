@@ -1,6 +1,5 @@
-package ru.set404.AdsMetrika.services.network.ads;
+package ru.set404.AdsMetrika.network.ads;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
@@ -12,23 +11,24 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import ru.set404.AdsMetrika.models.Credentials;
+import ru.set404.AdsMetrika.network.Network;
 import ru.set404.AdsMetrika.repositories.CredentialsRepository;
 import ru.set404.AdsMetrika.security.UserDetails;
-import ru.set404.AdsMetrika.services.network.Network;
 
 import java.io.IOException;
 import java.rmi.AccessException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class ExoClick implements NetworkStats {
+public class ExoClick implements AffiliateNetwork {
 
     private final CredentialsRepository credentialsRepository;
     private final ObjectMapper objectMapper;
@@ -42,7 +42,18 @@ public class ExoClick implements NetworkStats {
         this.objectMapper = objectMapper;
     }
 
-    private void connectToExoClick() throws IOException {
+
+    private List<Integer> campaignList() throws IOException {
+        authorization();
+        List<Integer> campaigns = new ArrayList<>();
+        String url = "https://api.exoclick.com/v2/campaigns?status=1";
+        for (JsonNode node : objectMapper.readTree(parseNetwork(url).body()).get("result")) {
+            campaigns.add(node.get("id").asInt());
+        }
+        return campaigns;
+    }
+
+    private void authorization() throws IOException {
         if (authToken == null) {
             logger.debug("ExoClick authorization...");
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -51,15 +62,13 @@ public class ExoClick implements NetworkStats {
                             .user(), Network.EXO)
                     .orElseThrow(() -> new BadCredentialsException("ExoClick credentials doesn`t exist"));
 
-            String userName = credentials.getUsername();
-            String password = credentials.getPassword();
+            String apiToken = credentials.getUsername();
 
             String jsonBody = """
                     {
-                    "password": "%s",
-                    "username": "%s"
+                    "api_token": "%s"
                     }
-                    """.formatted(password, userName);
+                    """.formatted(apiToken);
 
             Connection.Response response = Jsoup
                     .connect("https://api.exoclick.com/v2/login")
@@ -76,39 +85,69 @@ public class ExoClick implements NetworkStats {
         }
     }
 
-    public Map<Integer, NetworkStatEntity> getStat(Map<Integer, String> networkOffers, LocalDate dateStart,
-                                                   LocalDate dateEnd) throws InterruptedException {
+    public Map<Integer, NetworkStats> getCampaignStatsMap(LocalDate dateStart, LocalDate dateEnd) {
         try {
-            connectToExoClick();
+            authorization();
         } catch (IOException e) {
             throw new RuntimeException("Could not connect to ExoClick" + e.getMessage());
         }
 
-        Map<Integer, NetworkStatEntity> stat = new HashMap<>();
+        Map<Integer, NetworkStats> stat = new HashMap<>();
 
         ExecutorService pool = Executors.newFixedThreadPool(6);
-        for (Map.Entry<Integer, String> networkOffer : networkOffers.entrySet()) {
-            pool.execute(() ->
-                    stat.put(networkOffer.getKey(), parseNetwork(networkOffer.getValue(), dateStart, dateEnd)));
+        try {
+            for (Integer campaign : campaignList()) {
+                pool.execute(() ->
+                {
+                    try {
+                        stat.put(campaign, getNetworkStatEntity(campaignList(), dateStart, dateEnd));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         pool.shutdown();
-        if (!pool.awaitTermination(1, TimeUnit.MINUTES)) {
-            logger.debug("Parse ExoClick timed out error");
+        try {
+            if (!pool.awaitTermination(1, TimeUnit.MINUTES)) {
+                logger.debug("Parse ExoClick timed out error");
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
         return stat;
     }
 
-    private NetworkStatEntity parseNetwork(String group, LocalDate dateStart, LocalDate dateEnd) {
-        logger.debug("Parse group - " + group);
+    public NetworkStats getNetworkStatEntity(List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd)
+            throws IOException {
+
+        authorization();
+        String url = "";
+        int clicks = 0;
+        double cost = 0;
+
+        for (Integer campaign : campaigns) {
+            url = "https://api.exoclick.com/v2/statistics/a/campaign?campaignid=" + campaign
+                    + "&date-to=" + dateStart
+                    + "&date-from=" + dateEnd
+                    + "&include=totals&detailed=false";
+            JsonNode node = objectMapper.readTree(parseNetwork(url).body());
+            if (node.hasNonNull("resultTotal")) {
+                JsonNode resultTotal = node.get("resultTotal");
+                clicks += resultTotal.get("clicks").asInt();
+                cost += resultTotal.get("cost").asDouble();
+            }
+        }
+        return new NetworkStats(clicks, cost);
+    }
+
+    private Connection.Response parseNetwork(String url) {
         Connection.Response response;
         try {
             response = Jsoup
-                    .connect("https://api.exoclick.com/v2/statistics/a/campaign?groupid="
-                            + group
-                            + "&date-to="
-                            + dateStart + "&date-from="
-                            + dateEnd
-                            + "&include=totals&detailed=false")
+                    .connect(url)
                     .method(Connection.Method.GET)
                     .ignoreContentType(true)
                     .header("Accept", "application/json")
@@ -118,23 +157,7 @@ public class ExoClick implements NetworkStats {
             throw new RuntimeException(e);
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode node = null;
-        try {
-            node = mapper.readTree(response.body());
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
-        int clicks = 0;
-        double cost = 0;
-
-        if (node.hasNonNull("resultTotal")) {
-            JsonNode resultTotal = node.get("resultTotal");
-            clicks = resultTotal.get("clicks").asInt();
-            cost = resultTotal.get("cost").asDouble();
-        }
-        return new NetworkStatEntity(clicks, cost);
+        return response;
     }
 
 }

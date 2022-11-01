@@ -7,6 +7,7 @@ import java.util.List;
 
 @Getter
 public class OfferListDTO {
+
     private List<OfferDTO> offers = new ArrayList<>();
 
     public OfferListDTO(List<OfferDTO> offers) {
@@ -18,7 +19,7 @@ public class OfferListDTO {
 
     public void addOffer(OfferDTO offerDTO) {
         this.offers.add(offerDTO);
-    };
+    }
 }
 
 

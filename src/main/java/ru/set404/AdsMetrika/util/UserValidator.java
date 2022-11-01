@@ -28,6 +28,6 @@ public class UserValidator implements Validator {
     public void validate(Object target, Errors errors) {
         User person = (User) target;
         if (usersService.loadUserByUsername(person.getUsername()).isPresent())
-            errors.rejectValue("username", "", "Имя пользователя уже существует");
+            errors.rejectValue("username", "", "Name is exists");
     }
 }

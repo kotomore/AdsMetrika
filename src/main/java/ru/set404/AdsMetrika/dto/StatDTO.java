@@ -30,6 +30,10 @@ public class StatDTO {
         this.revenue = revenue;
     }
 
+    public StatDTO(String campaignName) {
+        this.campaignName = campaignName;
+    }
+
     public double getProfit() {
         if (revenue != null && spend != null)
             return revenue - spend;

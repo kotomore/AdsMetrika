@@ -171,8 +171,8 @@
                             <span>Statistics</span>
                         </a>
                         <ul class="sub-menu" aria-expanded="false">
-                            <li><a href="/campaigns">Traffic Factory</a></li>
-                            <li><a href="#">ExoClick</a></li>
+                            <li><a href="/campaigns?network=TF">Traffic Factory</a></li>
+                            <li><a href="/campaigns?network=EXO">ExoClick</a></li>
                         </ul>
                     </li>
 
@@ -368,22 +368,17 @@
                                     </div>
                                     <form th:method="POST" th:action="@{/credentials/save}" th:object="${credentialsADCOMBO}">
                                         <div class="modal-body">
-                                            <h5>Enter Network Credentials on Adcombo.com</h5>
-                                            <div class="row mb-3">
+                                            <h5>Enter Network Credentials from Adcombo.com</h5>
+
+                                            <p>You can get it - <strong>(User Profile - Account settings - API key)</strong></p>
+                                            <div class="row mb-4">
                                                 <input hidden th:field="${credentialsADCOMBO.id}" th:name="${credentialsADCOMBO.id}" th:value="${credentialsADCOMBO.getId()}"/>
 
-                                                <label for="example-text-input" class="col-sm-2 col-form-label">Username</label>
-                                                <div class="col-sm-10">
+                                                <label style="margin-right: -40px" for="example-text-input" class="col-sm-3 col-form-label">API-token</label>
+                                                <div class="col-sm-9">
                                                     <input th:field="${credentialsADCOMBO.username}" th:name="${credentialsADCOMBO.username}" th:value="${credentialsADCOMBO.getUsername()}" class="form-control" type="text" id="example-text-input">
                                                 </div>
-                                            </div>
-                                            <div class="row mb-3">
-                                                <label for="example-text-input" class="col-sm-2 col-form-label">Password</label>
-                                                <div class="col-sm-10">
-                                                    <input th:field="${credentialsADCOMBO.password}" th:name="${credentialsADCOMBO.password}" th:value="${credentialsADCOMBO.getPassword()}" class="form-control" type="text">
-                                                </div>
                                                 <input hidden name="networkName" value="ADCOMBO" />
-
                                             </div>
                                         </div>
                                         <div class="modal-footer">
@@ -408,18 +403,20 @@
                                     </div>
                                     <form th:method="POST" th:action="@{/credentials/save}" th:object="${credentialsTF}">
                                         <div class="modal-body">
-                                            <h5>Enter Network Credentials on TrafficFactory.com</h5>
-                                            <div class="row mb-3">
+                                            <h5>Enter Network Credentials from TrafficFactory.com</h5>
+
+                                            <p>You can get it - <strong>(Help - API - Create API key)</strong></p>
+                                            <div class="row mb-4">
                                                 <input hidden th:field="${credentialsTF.id}" th:name="${credentialsTF.id}" th:value="${credentialsTF.getId()}"/>
 
-                                                <label for="example-text-input" class="col-sm-2 col-form-label">Username</label>
-                                                <div class="col-sm-10">
+                                                <label for="example-text-input" class="col-sm-2 col-form-label">API token</label>
+                                                <div class="col-sm-9">
                                                     <input th:field="${credentialsTF.username}" th:name="${credentialsTF.username}" th:value="${credentialsTF.getUsername()}" class="form-control" type="text" id="example-text-input">
                                                 </div>
                                             </div>
-                                            <div class="row mb-3">
-                                                <label for="example-text-input" class="col-sm-2 col-form-label">Password</label>
-                                                <div class="col-sm-10">
+                                            <div class="row mb-4">
+                                                <label for="example-text-input" class="col-sm-2 col-form-label">Token password</label>
+                                                <div class="col-sm-9">
                                                     <input th:field="${credentialsTF.password}" th:name="${credentialsTF.password}" th:value="${credentialsTF.getPassword()}" class="form-control" type="text">
                                                 </div>
                                                 <input hidden name="networkName" value="TF" />
@@ -448,23 +445,18 @@
                                     </div>
                                     <form th:method="POST" th:action="@{/credentials/save}" th:object="${credentialsEXO}">
                                         <div class="modal-body">
-                                            <h5>Enter Network Credentials on ExoClick.com</h5>
-                                            <div class="row mb-3">
+                                            <h5>Enter Network Credentials from ExoClick.com</h5>
+
+                                            <p>You can get it - <strong>(User Profile - API token - New API token)</strong></p>
+                                            <div class="row mb-4">
                                                 <input hidden th:field="${credentialsEXO.id}" th:name="${credentialsEXO.id}" th:value="${credentialsEXO.getId()}"/>
 
-                                                <label for="example-text-input" class="col-sm-2 col-form-label">Username</label>
-                                                <div class="col-sm-10">
+                                                <label style="margin-right: -40px" for="example-text-input" class="col-sm-3 col-form-label">Api-token</label>
+                                                <div class="col-sm-9">
                                                     <input th:field="${credentialsEXO.username}" th:name="${credentialsEXO.username}" th:value="${credentialsEXO.getUsername()}" class="form-control" type="text" id="example-text-input">
                                                 </div>
                                             </div>
-                                            <div class="row mb-3">
-                                                <label for="example-text-input" class="col-sm-2 col-form-label">Password</label>
-                                                <div class="col-sm-10">
-                                                    <input th:field="${credentialsEXO.password}" th:name="${credentialsEXO.password}" th:value="${credentialsEXO.getPassword()}" class="form-control" type="text">
-                                                </div>
-                                                <input hidden name="networkName" value="EXO" />
-
-                                            </div>
+                                            <input hidden name="networkName" value="EXO" />
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-light waves-effect" data-bs-dismiss="modal">Close</button>
@@ -477,7 +469,7 @@
                         </div><!-- /.modal -->
                     </div>
 
-                </div>
+                </div> <!-- end row -->
 
             </div> <!-- container-fluid -->
         </div>

@@ -45,7 +45,7 @@ public class AuthController {
         }
         userValidator.validate(user, bindingResult);
         if (bindingResult.hasErrors()) {
-            model.addAttribute("hasError",true);
+            model.addAttribute("hasError", true);
             return "auth/login";
         }
         registrationService.register(user);

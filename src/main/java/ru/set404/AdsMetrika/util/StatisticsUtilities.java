@@ -4,9 +4,9 @@ package ru.set404.AdsMetrika.util;
 import ru.set404.AdsMetrika.dto.ChartDTO;
 import ru.set404.AdsMetrika.dto.TableDTO;
 import ru.set404.AdsMetrika.models.Stat;
-import ru.set404.AdsMetrika.services.network.Network;
-import ru.set404.AdsMetrika.services.network.ads.NetworkStatEntity;
-import ru.set404.AdsMetrika.services.network.cpa.AdcomboStatsEntity;
+import ru.set404.AdsMetrika.network.Network;
+import ru.set404.AdsMetrika.network.ads.NetworkStats;
+import ru.set404.AdsMetrika.network.cpa.AdcomboStats;
 import ru.set404.AdsMetrika.dto.StatDTO;
 
 import java.time.LocalDate;
@@ -17,11 +17,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class StatisticsUtilities {
-    public static StatDTO createStatsDTO(int offerId, Map<Integer, NetworkStatEntity> networkStats,
-                                         Map<Integer, AdcomboStatsEntity> adcomboStats) {
+    public static StatDTO createStatsDTO(int offerId, Map<Integer, NetworkStats> networkStats,
+                                         Map<Integer, AdcomboStats> adcomboStats) {
         return new StatDTO(
-                adcomboStats.get(offerId).getCampaignId(),
-                adcomboStats.get(offerId).getCampaignName(),
+                adcomboStats.get(offerId).getOfferId(),
+                adcomboStats.get(offerId).getOfferName(),
                 networkStats.get(offerId).getClicks(),
                 networkStats.get(offerId).getCost(),
                 adcomboStats.get(offerId).getHoldCost(),
@@ -30,7 +30,20 @@ public class StatisticsUtilities {
         );
     }
 
-    public static StatDTO stackStatDTO(StatDTO statDTO1, StatDTO statDTO2) {
+    public static StatDTO createStatsDTO(int offerId, NetworkStats networkStats,
+                                         Map<Integer, AdcomboStats> adcomboStats) {
+        return new StatDTO(
+                adcomboStats.get(offerId).getOfferId(),
+                adcomboStats.get(offerId).getOfferName(),
+                networkStats.getClicks(),
+                networkStats.getCost(),
+                adcomboStats.get(offerId).getHoldCost(),
+                adcomboStats.get(offerId).getConfirmedCount(),
+                adcomboStats.get(offerId).getCost()
+        );
+    }
+
+    public static StatDTO sumStatDTO(StatDTO statDTO1, StatDTO statDTO2) {
         return new StatDTO(
                 statDTO1.getCampaignId(),
                 statDTO1.getCampaignName(),
@@ -42,40 +55,40 @@ public class StatisticsUtilities {
         );
     }
 
-    public static TableDTO getCombinedStats(List<TableDTO> tableStats) {
+    public static TableDTO combineTableDTO(List<TableDTO> tableStats) {
         Map<Integer, StatDTO> combinedStats = new HashMap<>();
         for (TableDTO table : tableStats) {
             for (StatDTO statDTO : table.getCurrentStats()) {
                 combinedStats.computeIfPresent(statDTO.getCampaignId(),
-                        (key, val) -> StatisticsUtilities.stackStatDTO(val, statDTO));
+                        (key, val) -> StatisticsUtilities.sumStatDTO(val, statDTO));
                 combinedStats.putIfAbsent(statDTO.getCampaignId(), statDTO);
             }
         }
-        return new TableDTO(combinedStats.values().stream().toList(), null);
+        return new TableDTO(combinedStats.values().stream().toList());
     }
 
-    public static TableDTO getOneList(List<TableDTO> tableStats) {
+    public static TableDTO convertForSingleTable(List<TableDTO> tableStats) {
         List<StatDTO> statDTOS = new ArrayList<>();
         for (TableDTO table : tableStats) {
+            //For empty columns in table
             statDTOS.add(new StatDTO());
             statDTOS.add(new StatDTO());
-            statDTOS.add(new StatDTO(null, table.getNetwork().getFullName(),
-                    null, null, null, null, null));
+            statDTOS.add(new StatDTO(table.getNetwork().getFullName()));
             statDTOS.addAll(table.getCurrentStats());
         }
+        //For empty columns in table
         statDTOS.remove(0);
         statDTOS.remove(0);
-        return new TableDTO(statDTOS, null);
+        return new TableDTO(statDTOS);
     }
 
-    public static ChartDTO getTotalChartStats(List<Stat> oldUserStats) {
-        double totalSpend = oldUserStats.stream().mapToDouble(Stat::getSpend).sum();
-        double totalRevenue = oldUserStats.stream().mapToDouble(Stat::getRevenue).sum();
-
-        return new ChartDTO(null, totalSpend, totalRevenue);
+    public static ChartDTO getTotalChartDTO(List<Stat> oldStats) {
+        double totalSpend = oldStats.stream().mapToDouble(Stat::getSpend).sum();
+        double totalRevenue = oldStats.stream().mapToDouble(Stat::getRevenue).sum();
+        return new ChartDTO(totalSpend, totalRevenue);
     }
 
-    public static List<ChartDTO> getChartStats(List<Stat> userStats) {
+    public static List<ChartDTO> convertToChartDTOList(List<Stat> userStats) {
         Map<LocalDate, Double> groupedSpend = userStats.stream()
                 .collect(Collectors.groupingBy(Stat::getCreatedDate, Collectors.summingDouble(Stat::getSpend)));
         Map<LocalDate, Double> groupedRevenue = userStats.stream()
