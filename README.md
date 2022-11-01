@@ -5,7 +5,7 @@ End-to-end analytics service for media buyers. Combines statistics from advertis
 with a partner network <a href="https://adcombo.com">adcombo.com</a>
 
 # Example
-<a href="http://146.19.170.159:8080/">AdsMetrika link</a>
+<a target="_blank" href="http://146.19.170.159:8080/">AdsMetrika link</a>
 <p><strong>Credentials:</strong>
 <br>Username: guest
 <br>Password: 123
