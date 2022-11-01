@@ -54,11 +54,10 @@ public class TrafficFactory implements AffiliateNetwork {
 
     public Map<Integer, NetworkStats> getCampaignStatsMap(LocalDate dateStart, LocalDate dateEnd) {
         authorization();
-        List<Integer> campaigns = null;
         Map<Integer, NetworkStats> campaignStats = new HashMap<>();
 
         try {
-            campaigns = getCampaignList();
+            List<Integer> campaigns = getCampaignList();
             ExecutorService pool = Executors.newFixedThreadPool(6);
             for (Integer campaign : campaigns) {
                 if (campaign > 0) {
@@ -72,8 +71,10 @@ public class TrafficFactory implements AffiliateNetwork {
                     campaignStats.put(campaign, new NetworkStats(deliveries, total));
                 }
             }
-        } catch (Exception ignore) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
 
         return campaignStats;
     }

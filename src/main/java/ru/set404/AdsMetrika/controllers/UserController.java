@@ -120,11 +120,14 @@ public class UserController {
 
         try {
             if (dateStart != null && dateEnd != null) {
-                campaignStats = networksService.getCampaignStats(network, dateStart, dateEnd);
+                if (getUser().getRole().equals("ROLE_GUEST"))
+                    campaignStats = networksService.getNetworkStatisticsListMock();
+                else
+                    campaignStats = networksService.getCampaignStats(network, dateStart, dateEnd);
                 headerText = dateStart + " - " + dateEnd;
             }
         } catch (Exception e) {
-            return "redirect:/campaigns?error";
+            return "redirect:/campaigns?network=" + network + "&error";
         }
 
         putCredentialsInModel(model);

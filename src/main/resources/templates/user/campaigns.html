@@ -277,17 +277,21 @@
                                     <table data-order='[]' id="datatable-buttons" class="table mb-0">
                                         <thead class="table-light">
                                         <tr>
-                                            <th>Campaign ID</th>
-                                            <th>Clicks</th>
-                                            <th>Cost $</th>
-                                            <th>Hold</th>
-                                            <th>Leads</th>
-                                            <th style="width: 120px;">Revenue $</th>
+                                            <th style="width: 100px">Offer name</th>
+                                            <th style="width: 60px">Campaign ID</th>
+                                            <th style="width: 30px">Clicks</th>
+                                            <th style="width: 30px">Cost $</th>
+                                            <th style="width: 30px">Hold $</th>
+                                            <th style="width: 30px">Leads</th>
+                                            <th style="width: 30px">Revenue $</th>
+                                            <th style="width: 30px">Profit $</th>
+                                            <th style="width: 30px;">ROI %</th>
                                         </tr>
                                         </thead><!-- end thead -->
                                         <tbody>
                                         <tr th:style="${campaign.getProfit() < 0 ? 'color: red;' : 'color: green;'}"
                                             th:each="campaign : ${combinedStats}">
+                                            <td th:text="${campaign.getCampaignName()}">offer name</td>
                                             <td><h6 th:if="${campaign.getCampaignId()!=null}" th:text="'['+${campaign.getCampaignId()}+'] '" class="mb-0">campaign name</h6>
                                             </td>
                                             <td th:text="${campaign.getClicks()}">clicks</td>
@@ -295,6 +299,9 @@
                                             <td th:text="${#numbers.formatDecimal(campaign.getHoldCost(), 1, 2)}">hold cost</td>
                                             <td th:text="${campaign.getApproveCount()}">approve count</td>
                                             <td th:text="${#numbers.formatDecimal(campaign.getRevenue(), 1, 2)}">approve cost</td>
+                                            <td th:text="${#numbers.formatDecimal(campaign.getProfit(), 1, 2)}">profit</td>
+                                            <td th:text="${campaign.getROI()}">roi</td>
+
                                         </tr>
                                         </tbody><!-- end tbody -->
                                     </table> <!-- end table -->

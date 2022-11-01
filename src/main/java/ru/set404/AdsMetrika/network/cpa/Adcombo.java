@@ -77,7 +77,7 @@ public class Adcombo {
         authorization();
         String url = "https://api.adcombo.com/stats/data/?api_key=%s" +
                 "&ts=%s&te=%s" +
-                "&group_by=subacc_4&tz_offset=%s" +
+                "&group_by=subacc_4&group_by=offer_id&tz_offset=%s" +
                 "&cols=orders_confirmed&cols=uniq_traffic" +
                 "&cols=user_orders_confirmed_income&cols=user_total_hold_income&utm_source=%s";
 
@@ -86,7 +86,7 @@ public class Adcombo {
             if (campaign.get("uniq_traffic").asInt(-1) > 10) {
                 stats.put(campaign.get("group_by").asInt(), new AdcomboStats(
                         campaign.get("group_by").asInt(),
-                        "campaign",
+                        campaign.get("sub_groups").elements().next().get("key_for_groupping").asText(),
                         campaign.get("user_total_hold_income").asDouble(),
                         campaign.get("orders_confirmed").asInt(),
                         campaign.get("user_orders_confirmed_income").asDouble())

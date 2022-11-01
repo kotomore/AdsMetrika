@@ -55,7 +55,6 @@ public class NetworksService {
         Map<Integer, AdcomboStats> adcomboStatsMap = adCombo.getNetworkStatMap(network,
                 dateStart.minusDays(1), dateEnd);
 
-
         List<StatDTO> statsEntities = new ArrayList<>();
 
         for (int offerId : adcomboStatsMap.keySet()) {
