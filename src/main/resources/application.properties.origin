@@ -8,3 +8,7 @@ spring.jpa.properties.hibernate.show_sql=true
 spring.jpa.open-in-view=true
 
 spring.mvc.format.date=yyyy-MM-dd
+spring.mvc.hiddenmethod.filter.enabled=true
+
+server.error.path=/error
+
