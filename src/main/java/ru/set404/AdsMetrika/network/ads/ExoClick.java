@@ -23,9 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 @Component
 public class ExoClick implements AffiliateNetwork {
@@ -37,7 +35,7 @@ public class ExoClick implements AffiliateNetwork {
     private static String authToken = null;
 
     @Autowired
-    public ExoClick(CredentialsRepository credentialsRepository, ObjectMapper objectMapper) throws IOException {
+    public ExoClick(CredentialsRepository credentialsRepository, ObjectMapper objectMapper) {
         this.credentialsRepository = credentialsRepository;
         this.objectMapper = objectMapper;
     }
@@ -85,7 +83,7 @@ public class ExoClick implements AffiliateNetwork {
         }
     }
 
-    public Map<Integer, NetworkStats> getCampaignStatsMap(LocalDate dateStart, LocalDate dateEnd) {
+    public Map<Integer, NetworkStats> getCampaignStatsMap(LocalDate dateStart, LocalDate dateEnd)  {
         try {
             authorization();
         } catch (IOException e) {
@@ -93,53 +91,82 @@ public class ExoClick implements AffiliateNetwork {
         }
 
         Map<Integer, NetworkStats> stat = new HashMap<>();
+        Map<Integer, Future<JsonNode>> statFuture = new HashMap<>();
 
-        ExecutorService pool = Executors.newFixedThreadPool(6);
+        Future<JsonNode> networkStatsJson;
+        ExecutorService executor = Executors.newFixedThreadPool(9);
         try {
             for (Integer campaign : campaignList()) {
-                pool.execute(() ->
+                networkStatsJson = executor.submit(() ->
                 {
-                    try {
-                        stat.put(campaign, getNetworkStatEntity(campaignList(), dateStart, dateEnd));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    String url = "https://api.exoclick.com/v2/statistics/a/campaign?campaignid=" + campaign
+                            + "&date-to=" + dateStart
+                            + "&date-from=" + dateEnd
+                            + "&include=totals&detailed=false";
+                    return objectMapper.readTree(parseNetwork(url).body());
                 });
+
+                statFuture.put(campaign, networkStatsJson);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        pool.shutdown();
-        try {
-            if (!pool.awaitTermination(1, TimeUnit.MINUTES)) {
-                logger.debug("Parse ExoClick timed out error");
+
+            executor.shutdown();
+            try {
+                if (!executor.awaitTermination(1, TimeUnit.MINUTES)) {
+                    logger.debug("Parse ExoClick timed out error");
+                    executor.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                executor.shutdownNow();
             }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+            for (Integer campaign : statFuture.keySet()) {
+                int clicks = 0;
+                double cost = 0;
+                for (JsonNode node : statFuture.get(campaign).get()) {
+                    if (node.hasNonNull("clicks")) {
+                        clicks += node.get("clicks").asInt();
+                        cost += node.get("cost").asDouble();
+                    }
+                }
+                stat.put(campaign, new NetworkStats(clicks, cost));
+            }
+        } catch (Exception ignore) {}
+
         return stat;
     }
 
-    public NetworkStats getNetworkStatEntity(List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd)
-            throws IOException {
+    public NetworkStats getNetworkStatEntity(List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
 
-        authorization();
-        String url = "";
+        try {
+            authorization();
+        } catch (IOException e) {
+            throw new RuntimeException("Could not connect to ExoClick" + e.getMessage());
+        }
         int clicks = 0;
         double cost = 0;
 
-        for (Integer campaign : campaigns) {
-            url = "https://api.exoclick.com/v2/statistics/a/campaign?campaignid=" + campaign
-                    + "&date-to=" + dateStart
-                    + "&date-from=" + dateEnd
-                    + "&include=totals&detailed=false";
-            JsonNode node = objectMapper.readTree(parseNetwork(url).body());
-            if (node.hasNonNull("resultTotal")) {
-                JsonNode resultTotal = node.get("resultTotal");
-                clicks += resultTotal.get("clicks").asInt();
-                cost += resultTotal.get("cost").asDouble();
+        List<Future<JsonNode>> statFuture = new ArrayList<>();
+        Future<JsonNode> networkStatsJson;
+        ExecutorService executor = Executors.newFixedThreadPool(9);
+
+        try {
+            for (Integer campaign : campaigns) {
+                networkStatsJson = executor.submit(() -> {
+                    String url = "https://api.exoclick.com/v2/statistics/a/campaign?campaignid=" + campaign
+                            + "&date-to=" + dateStart
+                            + "&date-from=" + dateEnd
+                            + "&include=totals&detailed=false";
+                    return objectMapper.readTree(parseNetwork(url).body());
+                });
+                statFuture.add(networkStatsJson);
             }
-        }
+            for (Future<JsonNode> node : statFuture) {
+                if (node.get().hasNonNull("resultTotal")) {
+                    JsonNode resultTotal = node.get().get("resultTotal");
+                    clicks += resultTotal.get("clicks").asInt();
+                    cost += resultTotal.get("cost").asDouble();
+                }
+            }
+        } catch (Exception ignore) {}
         return new NetworkStats(clicks, cost);
     }
 

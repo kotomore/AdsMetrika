@@ -121,7 +121,7 @@ public class UserController {
         try {
             if (dateStart != null && dateEnd != null) {
                 if (getUser().getRole().equals("ROLE_GUEST"))
-                    campaignStats = networksService.getNetworkStatisticsListMock();
+                    campaignStats = networksService.getNetworkStatisticsListMock(network);
                 else
                     campaignStats = networksService.getCampaignStats(network, dateStart, dateEnd);
                 headerText = dateStart + " - " + dateEnd;
@@ -202,7 +202,7 @@ public class UserController {
         for (Network network : userNetworks) {
             List<StatDTO> currentNetworkStat;
             if (getUser().getRole().equals("ROLE_GUEST"))
-                currentNetworkStat = networksService.getNetworkStatisticsListMock();
+                currentNetworkStat = networksService.getNetworkStatisticsListMock(network);
             else
                 currentNetworkStat = networksService.getNetworkStatisticsList(network, dateStart, dateEnd);
             tableStats.add(new TableDTO(currentNetworkStat, network));

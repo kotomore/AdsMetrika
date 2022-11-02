@@ -13,7 +13,7 @@ public class NotFoundPageController implements ErrorController {
     @RequestMapping("/error")
     public String handleError() {
         if (isAuthenticated())
-            return "redirect:/statistics?error";
+            return "redirect:/statistics";
         else
             return "redirect:/auth/login";
     }

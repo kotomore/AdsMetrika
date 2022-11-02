@@ -1,6 +1,5 @@
 package ru.set404.AdsMetrika.network.ads;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jsoup.Connection;
@@ -25,6 +24,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class TrafficFactory implements AffiliateNetwork {
@@ -40,7 +40,6 @@ public class TrafficFactory implements AffiliateNetwork {
         this.objectMapper = objectMapper;
     }
 
-
     private List<Integer> getCampaignList() throws IOException {
         authorization();
         String url = "https://main.trafficfactory.biz/webservices/" + apiToken + "/campaigns.json";
@@ -55,50 +54,80 @@ public class TrafficFactory implements AffiliateNetwork {
     public Map<Integer, NetworkStats> getCampaignStatsMap(LocalDate dateStart, LocalDate dateEnd) {
         authorization();
         Map<Integer, NetworkStats> campaignStats = new HashMap<>();
+        Map<Integer, Future<NetworkStats>> campaignStatsFuture = new HashMap<>();
+
 
         try {
             List<Integer> campaigns = getCampaignList();
-            ExecutorService pool = Executors.newFixedThreadPool(6);
+            ExecutorService executor = Executors.newFixedThreadPool(9);
+            Future<NetworkStats> networkStats;
             for (Integer campaign : campaigns) {
                 if (campaign > 0) {
-                    JsonNode json = parseCampaigStat(dateStart, dateEnd, pool, campaign);
-                    int deliveries = 0;
-                    double total = 0;
-                    for (JsonNode node : json) {
-                        deliveries += node.get("deliveries").asInt();
-                        total += node.get("total").asDouble();
-                    }
-                    campaignStats.put(campaign, new NetworkStats(deliveries, total));
+                    networkStats = executor.submit(() -> {
+                        String url = "https://main.trafficfactory.biz/webservices/" + apiToken + "/stats/campaign/" +
+                                campaign + "/" + dateStart + "/" + dateEnd + ".json";
+                        int deliveries = 0;
+                        double total = 0;
+                        JsonNode json = objectMapper.readTree(parseNetwork(url).body()).get("stats");
+                        for (JsonNode node : json) {
+                            deliveries += node.get("deliveries").asInt();
+                            total += node.get("total").asDouble();
+                        }
+                        return new NetworkStats(deliveries, total);
+
+                    });
+                    campaignStatsFuture.put(campaign, networkStats);
                 }
             }
+            for (Integer campaign : campaignStatsFuture.keySet()) {
+                campaignStats.put(campaign, campaignStatsFuture.get(campaign).get());
+            }
+            executor.shutdown();
+            try {
+                if (!executor.awaitTermination(1, TimeUnit.MINUTES)) {
+                    executor.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                executor.shutdownNow();
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-
         return campaignStats;
     }
 
-    public NetworkStats getNetworkStatEntity(List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd)
-            throws IOException {
+    public NetworkStats getNetworkStatEntity(List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
         authorization();
         int deliveries = 0;
         double total = 0;
 
         try {
-            ExecutorService pool = Executors.newFixedThreadPool(6);
+            ExecutorService executor = Executors.newFixedThreadPool(9);
+            Future<JsonNode> networkStatJson;
+            List<Future<JsonNode>> networkStatsFuture = new ArrayList<>();
             for (Integer campaign : campaigns) {
                 if (campaign > 0) {
-                    JsonNode json = parseCampaigStat(dateStart, dateEnd, pool, campaign);
-                    for (JsonNode node : json) {
-                        deliveries += node.get("deliveries").asInt();
-                        total += node.get("total").asDouble();
-                    }
+                    networkStatJson = executor.submit(() ->
+                    {
+                        String url = "https://main.trafficfactory.biz/webservices/" + apiToken + "/stats/campaign/" +
+                                campaign + "/" + dateStart + "/" + dateEnd + ".json";
+                        return objectMapper.readTree(parseNetwork(url).body()).get("stats");
+                    });
+                    networkStatsFuture.add(networkStatJson);
                 }
             }
+
+            for (Future<JsonNode> networkStat : networkStatsFuture) {
+                for (JsonNode node : networkStat.get()) {
+                    deliveries += node.get("deliveries").asInt();
+                    total += node.get("total").asDouble();
+                }
+            }
+
         } catch (Exception ignore) {
         }
-
         return new NetworkStats(deliveries, total);
     }
 
@@ -114,20 +143,6 @@ public class TrafficFactory implements AffiliateNetwork {
                 .data("status", "active")
                 .ignoreContentType(true)
                 .execute();
-    }
-
-    private JsonNode parseCampaigStat(LocalDate dateStart, LocalDate dateEnd, ExecutorService pool, Integer campaign)
-            throws JsonProcessingException, InterruptedException, java.util.concurrent.ExecutionException {
-        String url = "https://main.trafficfactory.biz/webservices/" + apiToken + "/stats/campaign/" +
-                campaign + "/" + dateStart + "/" + dateEnd + ".json";
-        Future<String> response = pool.submit(() -> {
-            try {
-                return parseNetwork(url).body();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        return objectMapper.readTree(response.get()).get("stats");
     }
 
     private void authorization() {

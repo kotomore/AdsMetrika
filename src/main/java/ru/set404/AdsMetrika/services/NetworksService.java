@@ -28,12 +28,12 @@ public class NetworksService {
         this.adCombo = adCombo;
     }
 
-    public List<StatDTO> getNetworkStatisticsListMock() {
+    public List<StatDTO> getNetworkStatisticsListMock(Network network) {
         List<StatDTO> statDTOS = new ArrayList<>();
         Random random = new Random();
         for (int i = 0; i < 15; i++) {
             statDTOS.add(new StatDTO(random.nextInt(1000),
-                    "Offer or Campaign " + i,
+                    network.getFullName() + " Campaign or Offer " + i,
                     random.nextInt(1000),
                     random.nextDouble(100),
                     random.nextDouble(100),
