@@ -5,7 +5,7 @@ End-to-end analytics service for media buyers. Combines statistics from advertis
 with a partner network <a href="https://adcombo.com">adcombo.com</a>
 
 # Example
-<a target="_blank" href="http://146.19.170.159:8080/">AdsMetrika link</a>
+Go to <a href="https://adsmetrika.ru">https://adsmetrika.ru</a>
 <p><strong>Credentials:</strong>
 <br>Username: guest
 <br>Password: 123
@@ -21,9 +21,8 @@ with a partner network <a href="https://adcombo.com">adcombo.com</a>
 # Usage
 
 <ul>
-<li>1. Create PostgreSQL database <strong>{somename}</strong> UTF8 encoding</li>
-<li>2. Fill in <strong>application.properties</strong> </li>
-<li>3. Execute <strong>PopulateDB.sql</strong> </li>
+<li>1. Run on the command line: <strong>docker-compose</strong></li>
+<li>2. Go to: <a href="http://localhost:8080">http://localhost:8080</a></li>
 </ul>
 
 
