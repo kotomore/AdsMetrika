@@ -21,7 +21,7 @@ Go to <a href="https://adsmetrika.ru">https://adsmetrika.ru</a>
 # Usage
 
 <ul>
-<li>1. Run on the command line: <strong>docker-compose</strong></li>
+<li>1. Run on the command line: <strong>mvn package && docker-compose up</strong></li>
 <li>2. Go to: <a href="http://localhost:8080">http://localhost:8080</a></li>
 </ul>
 
