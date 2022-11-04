@@ -5,7 +5,7 @@ End-to-end analytics service for media buyers. Combines statistics from advertis
 with a partner network <a href="https://adcombo.com">adcombo.com</a>
 
 # Example
-Go to [go](http://stackoverflow.com){:target="_blank"}<a href="https://adsmetrika.ru">https://adsmetrika.ru</a>
+Go to <a href="https://adsmetrika.ru">https://adsmetrika.ru</a>
 <p><strong>Credentials:</strong>
 <br>Username: guest
 <br>Password: 123
