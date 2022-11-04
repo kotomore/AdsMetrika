@@ -1,5 +1,6 @@
 package ru.set404.AdsMetrika.network.ads;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
@@ -7,7 +8,6 @@ import org.apache.commons.logging.LogFactory;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,6 @@ import ru.set404.AdsMetrika.repositories.CredentialsRepository;
 import ru.set404.AdsMetrika.security.UserDetails;
 
 import java.io.IOException;
-import java.rmi.AccessException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,24 +40,28 @@ public class ExoClick implements AffiliateNetwork {
     }
 
 
-    private List<Integer> campaignList() throws IOException {
+    private List<Integer> campaignList() {
         authorization();
         List<Integer> campaigns = new ArrayList<>();
         String url = "https://api.exoclick.com/v2/campaigns?status=1";
-        for (JsonNode node : objectMapper.readTree(parseNetwork(url).body()).get("result")) {
-            campaigns.add(node.get("id").asInt());
+        try {
+            for (JsonNode node : objectMapper.readTree(parseNetwork(url).body()).get("result")) {
+                campaigns.add(node.get("id").asInt());
+            }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Couldn't get statistics from ExoClick");
         }
         return campaigns;
     }
 
-    private void authorization() throws IOException {
+    private void authorization() {
         if (authToken == null) {
             logger.debug("ExoClick authorization...");
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Credentials credentials = credentialsRepository.
                     findCredentialsByOwnerAndNetworkName(((UserDetails) authentication.getPrincipal())
                             .user(), Network.EXO)
-                    .orElseThrow(() -> new BadCredentialsException("ExoClick credentials doesn`t exist"));
+                    .orElseThrow(() -> new RuntimeException("ExoClick API not found"));
 
             String apiToken = credentials.getUsername();
 
@@ -67,29 +70,34 @@ public class ExoClick implements AffiliateNetwork {
                     "api_token": "%s"
                     }
                     """.formatted(apiToken);
+            Connection.Response response;
+            JsonNode token;
+            try {
+                response = Jsoup
+                        .connect("https://api.exoclick.com/v2/login")
+                        .method(Connection.Method.POST)
+                        .ignoreContentType(true)
+                        .header("Content-Type", "application/json")
+                        .requestBody(jsonBody)
+                        .execute();
+            } catch (IOException e) {
+                throw new RuntimeException("Couldn't connect to ExoClick. Check API");
+            }
 
-            Connection.Response response = Jsoup
-                    .connect("https://api.exoclick.com/v2/login")
-                    .method(Connection.Method.POST)
-                    .ignoreContentType(true)
-                    .header("Content-Type", "application/json")
-                    .requestBody(jsonBody)
-                    .execute();
+            try {
+                token = objectMapper.readTree(response.body()).get("token");
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Couldn't get statistics from ExoClick");
+            }
 
-            JsonNode token = objectMapper.readTree(response.body()).get("token");
             if (token.isNull())
-                throw new AccessException("Could not connect to ExoClick");
+                throw new RuntimeException("Couldn't connect to ExoClick. Check API");
             authToken = token.asText();
         }
     }
 
-    public Map<Integer, NetworkStats> getCampaignStatsMap(LocalDate dateStart, LocalDate dateEnd)  {
-        try {
-            authorization();
-        } catch (IOException e) {
-            throw new RuntimeException("Could not connect to ExoClick" + e.getMessage());
-        }
-
+    public Map<Integer, NetworkStats> getCampaignStatsMap(LocalDate dateStart, LocalDate dateEnd) {
+        authorization();
         Map<Integer, NetworkStats> stat = new HashMap<>();
         Map<Integer, Future<JsonNode>> statFuture = new HashMap<>();
 
@@ -129,18 +137,14 @@ public class ExoClick implements AffiliateNetwork {
                 }
                 stat.put(campaign, new NetworkStats(clicks, cost));
             }
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+        }
 
         return stat;
     }
 
     public NetworkStats getNetworkStatEntity(List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
-
-        try {
-            authorization();
-        } catch (IOException e) {
-            throw new RuntimeException("Could not connect to ExoClick" + e.getMessage());
-        }
+        authorization();
         int clicks = 0;
         double cost = 0;
 
@@ -166,7 +170,8 @@ public class ExoClick implements AffiliateNetwork {
                     cost += resultTotal.get("cost").asDouble();
                 }
             }
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+        }
         return new NetworkStats(clicks, cost);
     }
 
@@ -181,7 +186,7 @@ public class ExoClick implements AffiliateNetwork {
                     .header("Authorization", "Bearer " + authToken)
                     .execute();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Couldn't connect to ExoClick. Try later");
         }
 
         return response;

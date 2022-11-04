@@ -44,8 +44,7 @@ public class NetworksService {
     }
 
     public List<StatDTO> getNetworkStatisticsList(Network network, LocalDate dateStart,
-                                                  LocalDate dateEnd) throws IOException {
-
+                                                  LocalDate dateEnd) {
         AffiliateNetwork affiliateNetwork = null;
         switch (network) {
             case TF -> affiliateNetwork = trafficFactory;
@@ -69,7 +68,7 @@ public class NetworksService {
     }
 
     public List<StatDTO> getCampaignStats(Network network, LocalDate dateStart,
-                                          LocalDate dateEnd) throws IOException {
+                                          LocalDate dateEnd) {
         AffiliateNetwork affiliateNetwork = null;
         switch (network) {
             case TF -> affiliateNetwork = trafficFactory;

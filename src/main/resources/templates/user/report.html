@@ -238,7 +238,9 @@
 
         <div class="page-content">
             <div class="container-fluid">
-
+                <div th:if="${checkAPI}"  class="alert alert-warning" role="alert">
+                    Fill in the API fields for adcombo and advertising networks
+                </div>
                 <!-- start page title -->
                 <div class="row">
                     <div class="col-12">
@@ -539,8 +541,8 @@
 <!-- toastr init -->
 <script src="../assets/js/pages/toastr.init.js"></script>
 
-<script th:if="${param.error}">
-    toastr["error"]("Something went wrong");
+<script th:if="${error}" th:inline="javascript">
+    toastr["error"]([[${error}]]);
     toastr.options = {
         "closeButton": false,
         "debug": false,

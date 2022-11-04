@@ -23,4 +23,7 @@ public class ChartDTO {
         this.spend = spend;
         this.revenue = revenue;
     }
+
+    public ChartDTO() {
+    }
 }

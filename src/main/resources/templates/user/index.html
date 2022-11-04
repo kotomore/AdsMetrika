@@ -233,7 +233,9 @@
     <div class="main-content">
         <div class="page-content">
             <div class="container-fluid">
-
+                <div th:if="${checkAPI}"  class="alert alert-warning" role="alert">
+                    Fill in the API fields for adcombo and advertising networks
+                </div>
                 <!-- start page title -->
                 <div class="row">
                     <div class="col-12">
@@ -270,7 +272,7 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="d-flex">
-                                    <div class="flex-grow-1">
+                                    <div th:if="${combinedStats}" class="flex-grow-1">
                                         <p class="text-truncate font-size-14 mb-2">Total Spend</p>
                                         <h4 th:text="${#numbers.formatDecimal(combinedStats.getTotalSpend(), 1, 2)}+'$'" class="mb-2">total spend</h4>
                                         <p th:if="${chartDates.contains(currentDate.minusDays(1)) && chartCosts.size()>1}" class="text-muted mb-0">
@@ -297,7 +299,7 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="d-flex">
-                                    <div class="flex-grow-1">
+                                    <div th:if="${combinedStats}" class="flex-grow-1">
                                         <p class="text-truncate font-size-14 mb-2">Total Revenue</p>
                                         <h4 th:text="${#numbers.formatDecimal(combinedStats.getTotalRevenue(), 1, 2)}+'$'" class="mb-2">total revenue</h4>
                                         <p th:if="${chartDates.contains(currentDate.minusDays(1)) && chartCosts.size()>1}" class="text-muted mb-0">
@@ -324,7 +326,7 @@
                         <div class="card" style="padding-bottom:23px;">
                             <div class="card-body">
                                 <div class="d-flex">
-                                    <div class="flex-grow-1">
+                                    <div th:if="${combinedStats}" class="flex-grow-1">
                                         <p class="text-truncate font-size-14 mb-2">Total Profit</p>
                                         <h4 th:text="${#numbers.formatDecimal(combinedStats.getTotalProfit(), 1, 2)} + '$'" class="mb-2">total profit</h4>
                                     </div>
@@ -341,8 +343,8 @@
                         <div class="card" style="padding-bottom:23px;">
                             <div class="card-body">
                                 <div class="d-flex">
-                                    <div class="flex-grow-1">
-                                        <p class="text-truncate font-size-14 mb-2">Total roi</p>
+                                    <div th:if="${combinedStats}" class="flex-grow-1">
+                                        <p class="text-truncate font-size-14 mb-2">Total ROI</p>
                                         <h4 th:text="${#numbers.formatDecimal(combinedStats.getTotalROI(), 1, 0)} +'%'" class="mb-2">total roi</h4>
                                     </div>
                                     <div class="avatar-sm">
@@ -362,11 +364,11 @@
                     <div class="col-xl-6">
                         <div class="card">
                             <div class="card-body pb-0">
-                                <h4 class="card-title mb-4">Revenue</h4>
+                                <h4 class="card-title mb-4">Last 7 days statistics</h4>
 
                                 <div class="text-center pt-3">
-                                    <div class="row">
-                                        <div class="col-sm-4 mb-3 mb-sm-0">
+                                    <div th:if="${chartTotal}" class="row">
+                                        <div  class="col-sm-4 mb-3 mb-sm-0">
                                             <div>
                                                 <h5 th:text="${#numbers.formatDecimal(chartTotal.getSpend(), 1, 2)} + '$'">Spend</h5>
                                                 <p class="text-muted text-truncate mb-0">Total Spend</p>
@@ -396,9 +398,9 @@
                     <div class="col-xl-6">
                         <div class="card" style="padding-bottom:24px;">
                             <div class="card-body">
-                                <h4 class="card-title mb-4">Comparing networks sales</h4>
+                                <h4 class="card-title mb-4">Comparing networks spend</h4>
 
-                                <div class="row">
+                                <div th:if="${totalSpendByNetwork}" class="row">
                                     <div th:each="network : ${totalSpendByNetwork.keySet()}" class="col-6">
                                         <div class="text-center mt-4">
                                             <h5 th:text="${#numbers.formatDecimal(totalSpendByNetwork.get(network), 1, 2)} + '$'">spend count</h5>
@@ -818,8 +820,8 @@
 <!-- toastr init -->
 <script src="assets/js/pages/toastr.init.js"></script>
 
-<script th:if="${param.error}">
-    toastr["error"]("Something went wrong");
+<script th:if="${error}" th:inline="javascript">
+    toastr["error"]([[${error}]]);
 
     toastr.options = {
         "closeButton": false,
@@ -839,6 +841,29 @@
         "hideMethod": "fadeOut"
     }
 </script>
+
+<script th:if="${param.password_error}">
+    toastr["error"]("Need password for traffic factory API");
+
+    toastr.options = {
+        "closeButton": false,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": false,
+        "positionClass": "toast-top-center",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": 300,
+        "hideDuration": 1000,
+        "timeOut": 5000,
+        "extendedTimeOut": 1000,
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    }
+</script>
+
 
 <script>
     $(document).ready(function () {
@@ -898,7 +923,7 @@
     });
 </script>
 
-<script th:if="${!chartCosts.isEmpty()}" th:inline="javascript">
+<script th:if="(${chartCosts} and ${!chartCosts.isEmpty()})" th:inline="javascript">
 
     var options = {
         series: [{

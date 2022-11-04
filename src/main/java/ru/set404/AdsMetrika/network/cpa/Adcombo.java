@@ -1,5 +1,6 @@
 package ru.set404.AdsMetrika.network.cpa;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
@@ -38,7 +39,7 @@ public class Adcombo {
         this.objectMapper = objectMapper;
     }
 
-    public Map<Integer, AdcomboStats> getNetworkStatMap(Network network, LocalDate dateStart, LocalDate dateEnd) throws IOException {
+    public Map<Integer, AdcomboStats> getNetworkStatMap(Network network, LocalDate dateStart, LocalDate dateEnd) {
         authorization();
         String url = "https://api.adcombo.com/stats/data/?api_key=%s" +
                 "&ts=%s&te=%s" +
@@ -73,7 +74,7 @@ public class Adcombo {
         return stats;
     }
 
-    public Map<Integer, AdcomboStats> getCampaignStatMap(Network network, LocalDate dateStart, LocalDate dateEnd) throws IOException {
+    public Map<Integer, AdcomboStats> getCampaignStatMap(Network network, LocalDate dateStart, LocalDate dateEnd) {
         authorization();
         String url = "https://api.adcombo.com/stats/data/?api_key=%s" +
                 "&ts=%s&te=%s" +
@@ -97,7 +98,7 @@ public class Adcombo {
     }
 
 
-    private JsonNode parseNetwork(String url, Network network, LocalDate dateStart, LocalDate dateEnd) throws IOException {
+    private JsonNode parseNetwork(String url, Network network, LocalDate dateStart, LocalDate dateEnd) {
         String timeZone = "+03:00";
         String tzOffset = "180";
         int time = 0;
@@ -108,14 +109,25 @@ public class Adcombo {
 
         long timeStart = dateStart.plusDays(1).toEpochSecond(LocalTime.MIN, ZoneOffset.of(timeZone)) - time;
         long timeEnd = dateEnd.plusDays(1).toEpochSecond(LocalTime.MIN, ZoneOffset.of(timeZone)) - 60 - time;
-        Connection.Response response = Jsoup
-                .connect(String.format(url, apiKey, timeStart, timeEnd, tzOffset, network.getName()))
-                .method(Connection.Method.GET)
-                .ignoreContentType(true)
-                .maxBodySize(0)
-                .execute();
+        Connection.Response response;
+        try {
+            response = Jsoup
+                    .connect(String.format(url, apiKey, timeStart, timeEnd, tzOffset, network.getName()))
+                    .method(Connection.Method.GET)
+                    .ignoreContentType(true)
+                    .maxBodySize(0)
+                    .execute();
+        } catch (IOException e) {
+            throw new RuntimeException("Couldn't access to adcombo. Check API");
+        }
+        JsonNode result;
+        try {
+            result = objectMapper.readTree(response.body()).get("data").elements().next().get("rows");
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Couldn't get statistics from adcombo");
+        }
 
-        return objectMapper.readTree(response.body()).get("data").elements().next().get("rows");
+        return result;
     }
 
     private void authorization() {
@@ -123,7 +135,8 @@ public class Adcombo {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Credentials credentials = credentialsRepository.
                     findCredentialsByOwnerAndNetworkName(((UserDetails) authentication.getPrincipal())
-                            .user(), Network.ADCOMBO).orElseThrow(() -> new BadCredentialsException("Api token not found"));
+                            .user(), Network.ADCOMBO).orElseThrow(() ->
+                            new RuntimeException("Adcombo API token not found"));
             this.apiKey = credentials.getUsername();
         }
     }

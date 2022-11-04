@@ -60,7 +60,7 @@
         return new bootstrap.Popover(e)
     }), n(window).on("load", function() {
         n("#status").fadeOut(), n("#preloader").delay(350).fadeOut("slow")
-    }), window.sessionStorage && ((a = sessionStorage.getItem("is_visited")) ? (n(".right-bar input:checkbox").prop("checked", !1), n("#" + a).prop("checked", !0), t(a)) : sessionStorage.setItem("is_visited", "light-mode-switch")), n("#light-mode-switch, #dark-mode-switch, #rtl-mode-switch").on("change", function(e) {
+    }), window.sessionStorage && ((a = sessionStorage.getItem("is_visited")) ? (n(".right-bar input:checkbox").prop("checked", !1), n("#" + a).prop("checked", !0), t(a)) : sessionStorage.setItem("is_visited", "dark-mode-switch")), n("#light-mode-switch, #dark-mode-switch, #rtl-mode-switch").on("change", function(e) {
         t(e.target.id)
     }), Waves.init()
 }(jQuery);

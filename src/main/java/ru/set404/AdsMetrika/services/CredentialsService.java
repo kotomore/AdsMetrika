@@ -9,6 +9,7 @@ import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.repositories.CredentialsRepository;
 import ru.set404.AdsMetrika.network.Network;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,10 +41,13 @@ public class CredentialsService {
                 .map(credentials -> modelMapper.map(credentials, CredentialsDTO.class)).toList();
     }
 
-    public void saveCredentialsDTO(CredentialsDTO credentialsDTO, User user) {
-        Credentials credentials = modelMapper.map(credentialsDTO, Credentials.class);
-        credentials.setOwner(user);
-        credentialsRepository.save(credentials);
+    public void saveCredentialsDTO(Credentials credentials, User user) {
+        if (credentials.getUsername().isEmpty())
+            credentialsRepository.deleteById(credentials.getId());
+        else {
+            credentials.setOwner(user);
+            credentialsRepository.save(credentials);
+        }
 
     }
 }

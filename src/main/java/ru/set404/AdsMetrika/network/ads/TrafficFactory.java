@@ -1,11 +1,11 @@
 package ru.set404.AdsMetrika.network.ads;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -40,11 +40,16 @@ public class TrafficFactory implements AffiliateNetwork {
         this.objectMapper = objectMapper;
     }
 
-    private List<Integer> getCampaignList() throws IOException {
+    private List<Integer> getCampaignList() {
         authorization();
         String url = "https://main.trafficfactory.biz/webservices/" + apiToken + "/campaigns.json";
         List<Integer> campaigns = new ArrayList<>();
-        JsonNode json = objectMapper.readTree(parseNetwork(url).body());
+        JsonNode json;
+        try {
+            json = objectMapper.readTree(parseNetwork(url).body());
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Couldn't get statistics from traffic factory. Try later");
+        }
         for (JsonNode campaign : json.get("campaigns")) {
             campaigns.add(campaign.get("id").asInt());
         }
@@ -89,10 +94,12 @@ public class TrafficFactory implements AffiliateNetwork {
                 }
             } catch (InterruptedException e) {
                 executor.shutdownNow();
+                throw new RuntimeException("Something wrong. Try again");
+
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Couldn't get statistics from traffic factory. Try later");
         }
 
         return campaignStats;
@@ -126,23 +133,31 @@ public class TrafficFactory implements AffiliateNetwork {
                 }
             }
 
-        } catch (Exception ignore) {
+        } catch (Exception e) {
+            throw new RuntimeException("Couldn't get statistics from traffic factory. Try later");
         }
         return new NetworkStats(deliveries, total);
     }
 
-    private Connection.Response parseNetwork(String url) throws IOException {
+    private Connection.Response parseNetwork(String url) {
 
         String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
         String securityToken = sha1(timestamp + url + password);
-        return Jsoup
-                .connect(url)
-                .method(Connection.Method.POST)
-                .data("timestamp", timestamp)
-                .data("security_token", securityToken.toLowerCase())
-                .data("status", "active")
-                .ignoreContentType(true)
-                .execute();
+
+        Connection.Response response;
+        try {
+            response = Jsoup
+                    .connect(url)
+                    .method(Connection.Method.POST)
+                    .data("timestamp", timestamp)
+                    .data("security_token", securityToken.toLowerCase())
+                    .data("status", "active")
+                    .ignoreContentType(true)
+                    .execute();
+        } catch (IOException e) {
+            throw new RuntimeException("Couldn't get statistics from traffic factory. Try later");
+        }
+        return response;
     }
 
     private void authorization() {
@@ -150,7 +165,8 @@ public class TrafficFactory implements AffiliateNetwork {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Credentials credentials = credentialsRepository.
                     findCredentialsByOwnerAndNetworkName(((UserDetails) authentication.getPrincipal())
-                            .user(), Network.TF).orElseThrow(() -> new BadCredentialsException("Api token not found"));
+                            .user(), Network.TF).orElseThrow(() ->
+                            new RuntimeException("Couldn't connect to Traffic Factory. Check API"));
             this.apiToken = credentials.getUsername();
             this.password = credentials.getPassword();
         }
