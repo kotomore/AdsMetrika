@@ -18,7 +18,6 @@ import ru.set404.AdsMetrika.util.UserValidator;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/auth")
 public class AuthController {
 
     private final RegistrationService registrationService;
@@ -30,7 +29,7 @@ public class AuthController {
         this.userValidator = userValidator;
     }
 
-    @GetMapping("/login")
+    @GetMapping("/")
     public String loginPage(@ModelAttribute("person") User user) {
         if (isAuthenticated()) {
             return "redirect:/statistics";
@@ -38,7 +37,7 @@ public class AuthController {
         return "auth/login";
     }
 
-    @PostMapping("/login")
+    @PostMapping("/registration")
     public String performReg(@ModelAttribute("person") @Valid User user, BindingResult bindingResult, Model model) {
         if (isAuthenticated()) {
             return "redirect:/statistics";

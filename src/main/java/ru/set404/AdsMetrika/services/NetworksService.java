@@ -11,7 +11,6 @@ import ru.set404.AdsMetrika.network.cpa.Adcombo;
 import ru.set404.AdsMetrika.network.cpa.AdcomboStats;
 import ru.set404.AdsMetrika.util.StatisticsUtilities;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -59,7 +58,7 @@ public class NetworksService {
         for (int offerId : adcomboStatsMap.keySet()) {
             if (adcomboStatsMap.containsKey(offerId)) {
                 assert affiliateNetwork != null;
-                NetworkStats stat = affiliateNetwork.getNetworkStatEntity(adcomboStatsMap.get(offerId)
+                NetworkStats stat = affiliateNetwork.getNetworkStatsByOfferCampaigns(adcomboStatsMap.get(offerId)
                         .getCampaigns(), dateStart, dateEnd);
                 statsEntities.add(StatisticsUtilities.createStatsDTO(offerId, stat, adcomboStatsMap));
             }

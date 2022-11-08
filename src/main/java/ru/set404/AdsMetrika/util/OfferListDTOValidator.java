@@ -12,15 +12,6 @@ import ru.set404.AdsMetrika.repositories.OffersRepository;
 @Component
 public class OfferListDTOValidator implements Validator {
 
-    private final OffersRepository offersRepository;
-    private final ModelMapper modelMapper;
-
-    @Autowired
-    public OfferListDTOValidator(OffersRepository offersRepository, ModelMapper modelMapper) {
-        this.offersRepository = offersRepository;
-        this.modelMapper = modelMapper;
-    }
-
     @Override
     public boolean supports(Class<?> clazz) {
         return OfferListDTO.class.equals(clazz);

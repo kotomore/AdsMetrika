@@ -243,15 +243,15 @@
                             <h4 class="mb-sm-0">Dashboard</h4>
                             <h4 th:if="${statistics.isEmpty()}" class="mb-sm-0">(Choose a date)</h4>
 
-                            <a id="datepicker1" th:href="@{/statistics(ds=${currentDate}, de=${currentDate})}">Today</a>
-                            <a id="datepicker2" th:href="@{/statistics(ds=${currentDate.minusDays(1)}, de=${currentDate.minusDays(1)})}">Yesterday</a>
-                            <a id="datepicker3" th:href="@{/statistics(ds=${currentDate.minusDays(2)}, de=${currentDate})}">Last 3
+                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker1" th:href="@{/statistics(ds=${currentDate}, de=${currentDate})}">Today</a>
+                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker2" th:href="@{/statistics(ds=${currentDate.minusDays(1)}, de=${currentDate.minusDays(1)})}">Yesterday</a>
+                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker3" th:href="@{/statistics(ds=${currentDate.minusDays(2)}, de=${currentDate})}">Last 3
                                 days</a>
-                            <a id="datepicker4" th:href="@{/statistics(ds=${currentDate.minusDays(6)}, de=${currentDate})}">Last 7
+                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker4" th:href="@{/statistics(ds=${currentDate.minusDays(6)}, de=${currentDate})}">Last 7
                                 days</a>
-                            <a id="datepicker5" th:href="@{/statistics(ds=${currentDate.withDayOfMonth(1)}, de=${currentDate})}">This
+                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker5" th:href="@{/statistics(ds=${currentDate.withDayOfMonth(1)}, de=${currentDate})}">This
                                 Month</a>
-                            <a id="datepicker6" th:href="@{/statistics(ds=${currentDate.minusMonths(1).withDayOfMonth(1)},de=${currentDate.minusMonths(1)
+                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker6" th:href="@{/statistics(ds=${currentDate.minusMonths(1).withDayOfMonth(1)},de=${currentDate.minusMonths(1)
                                 .withDayOfMonth(currentDate.minusMonths(1).getMonth()
                                 .length(currentDate.minusMonths(1).isLeapYear()))})}">Last Month</a>
 

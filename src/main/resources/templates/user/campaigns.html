@@ -246,15 +246,15 @@
                     <div class="col-12">
                         <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                             <h4 th:text="'Campaigns ('+${dates}+')'" class="mb-sm-0">Campaigns statistic</h4>
-                            <a id="datepicker1" th:href="@{/campaigns(ds=${currentDate}, de=${currentDate}, network=${param.network})}">Today</a>
-                            <a id="datepicker2" th:href="@{/campaigns(ds=${currentDate.minusDays(1)}, de=${currentDate.minusDays(1)}, network=${param.network})}">Yesterday</a>
-                            <a id="datepicker3" th:href="@{/campaigns(ds=${currentDate.minusDays(2)}, de=${currentDate}, network=${param.network})}">Last 3
+                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker1" th:href="@{/campaigns(ds=${currentDate}, de=${currentDate}, network=${param.network})}">Today</a>
+                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker2" th:href="@{/campaigns(ds=${currentDate.minusDays(1)}, de=${currentDate.minusDays(1)}, network=${param.network})}">Yesterday</a>
+                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker3" th:href="@{/campaigns(ds=${currentDate.minusDays(2)}, de=${currentDate}, network=${param.network})}">Last 3
                                 days</a>
-                            <a id="datepicker4" th:href="@{/campaigns(ds=${currentDate.minusDays(6)}, de=${currentDate}, network=${param.network})}">Last 7
+                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker4" th:href="@{/campaigns(ds=${currentDate.minusDays(6)}, de=${currentDate}, network=${param.network})}">Last 7
                                 days</a>
-                            <a id="datepicker5" th:href="@{/campaigns(ds=${currentDate.withDayOfMonth(1)}, de=${currentDate}, network=${param.network})}">This
+                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker5" th:href="@{/campaigns(ds=${currentDate.withDayOfMonth(1)}, de=${currentDate}, network=${param.network})}">This
                                 Month</a>
-                            <a id="datepicker6" th:href="@{/campaigns(ds=${currentDate.minusMonths(1).withDayOfMonth(1)},de=${currentDate.minusMonths(1)
+                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker6" th:href="@{/campaigns(ds=${currentDate.minusMonths(1).withDayOfMonth(1)},de=${currentDate.minusMonths(1)
                                 .withDayOfMonth(currentDate.minusMonths(1).getMonth()
                                 .length(currentDate.minusMonths(1).isLeapYear()))}, network=${param.network})}">Last Month</a>
 
@@ -294,7 +294,9 @@
                                         <tr th:style="${campaign.getProfit() < 0 ? 'color: red;' : 'color: green;'}"
                                             th:each="campaign : ${combinedStats}">
                                             <td th:text="${campaign.getCampaignName()}">offer name</td>
-                                            <td><h6 th:if="${campaign.getCampaignId()!=null}" th:text="'['+${campaign.getCampaignId()}+'] '" class="mb-0">campaign name</h6>
+                                            <td>
+                                                <a th:if="${campaign.getCampaignId()!=null} and ${#strings.toString(param.network)} == 'TF'" th:href="@{https://main.trafficfactory.biz/campaigns/{id}/edit(id=${campaign.getCampaignId()})}" target="_blank"><h6 th:text="'['+${campaign.getCampaignId()}+'] '" class="mb-0">campaign name</h6></a>
+                                                <h6 th:if="${campaign.getCampaignId()!=null} and ${#strings.toString(param.network)} == 'EXO'" th:text="'['+${campaign.getCampaignId()}+'] '" class="mb-0">campaign name</h6>
                                             </td>
                                             <td th:text="${campaign.getClicks()}">clicks</td>
                                             <td th:text="${#numbers.formatDecimal(campaign.getSpend(), 1, 2)}">cost</td>

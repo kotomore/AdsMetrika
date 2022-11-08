@@ -29,18 +29,18 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/admin").hasRole("ADMIN")
-                .antMatchers("/auth/login", "/error", "/assets/**").permitAll()
+                .antMatchers("/", "/registration", "/error", "/assets/**").permitAll()
                 .antMatchers("/admin/list").hasRole("ADMIN")
                 .anyRequest().hasAnyRole("USER", "ADMIN", "GUEST")
                 .and()
-                .formLogin().loginPage("/auth/login")
+                .formLogin().loginPage("/")
                 .loginProcessingUrl("/process_login")
                 .successHandler(getAuthenticationSuccessHandler())
-                .failureUrl("/auth/login?error")
+                .failureUrl("/?error")
                 .and()
                 .logout()
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/auth/login");
+                .logoutSuccessUrl("/");
         return http.build();
     }
 

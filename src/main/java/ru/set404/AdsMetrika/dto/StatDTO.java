@@ -4,6 +4,8 @@ package ru.set404.AdsMetrika.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 
 @Getter
 @Setter
@@ -44,5 +46,18 @@ public class StatDTO {
         if (revenue != null && spend != null)
             return (int) (((revenue - spend) / spend) * 100);
         return 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StatDTO statDTO = (StatDTO) o;
+        return Objects.equals(campaignId, statDTO.campaignId) && Objects.equals(campaignName, statDTO.campaignName) && Objects.equals(clicks, statDTO.clicks) && Objects.equals(spend, statDTO.spend) && Objects.equals(holdCost, statDTO.holdCost) && Objects.equals(approveCount, statDTO.approveCount) && Objects.equals(revenue, statDTO.revenue);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(campaignId, campaignName, clicks, spend, holdCost, approveCount, revenue);
     }
 }

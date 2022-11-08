@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Connection;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -30,7 +31,6 @@ public class ExoClick implements AffiliateNetwork {
     private final CredentialsRepository credentialsRepository;
     private final ObjectMapper objectMapper;
     protected Log logger = LogFactory.getLog(this.getClass());
-
     private static String authToken = null;
 
     @Autowired
@@ -39,23 +39,8 @@ public class ExoClick implements AffiliateNetwork {
         this.objectMapper = objectMapper;
     }
 
-
-    private List<Integer> campaignList() {
-        authorization();
-        List<Integer> campaigns = new ArrayList<>();
-        String url = "https://api.exoclick.com/v2/campaigns?status=1";
-        try {
-            for (JsonNode node : objectMapper.readTree(parseNetwork(url).body()).get("result")) {
-                campaigns.add(node.get("id").asInt());
-            }
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Couldn't get statistics from ExoClick");
-        }
-        return campaigns;
-    }
-
     private void authorization() {
-        if (authToken == null) {
+        if (authToken == null || !isAuth()) {
             logger.debug("ExoClick authorization...");
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Credentials credentials = credentialsRepository.
@@ -96,6 +81,20 @@ public class ExoClick implements AffiliateNetwork {
         }
     }
 
+    private List<Integer> campaignList() {
+        authorization();
+        List<Integer> campaigns = new ArrayList<>();
+        String url = "https://api.exoclick.com/v2/campaigns?status=1";
+        try {
+            for (JsonNode node : objectMapper.readTree(parseNetwork(url).body()).get("result")) {
+                campaigns.add(node.get("id").asInt());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Couldn't get statistics from ExoClick");
+        }
+        return campaigns;
+    }
+
     public Map<Integer, NetworkStats> getCampaignStatsMap(LocalDate dateStart, LocalDate dateEnd) {
         authorization();
         Map<Integer, NetworkStats> stat = new HashMap<>();
@@ -120,7 +119,7 @@ public class ExoClick implements AffiliateNetwork {
             executor.shutdown();
             try {
                 if (!executor.awaitTermination(1, TimeUnit.MINUTES)) {
-                    logger.debug("Parse ExoClick timed out error");
+                    logger.error("Parse ExoClick timed out error");
                     executor.shutdownNow();
                 }
             } catch (InterruptedException e) {
@@ -137,13 +136,14 @@ public class ExoClick implements AffiliateNetwork {
                 }
                 stat.put(campaign, new NetworkStats(clicks, cost));
             }
-        } catch (Exception ignore) {
+        } catch (Exception e) {
+            throw new RuntimeException("Couldn't get statistics from ExoClick. Check API");
         }
 
         return stat;
     }
 
-    public NetworkStats getNetworkStatEntity(List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+    public NetworkStats getNetworkStatsByOfferCampaigns(List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
         authorization();
         int clicks = 0;
         double cost = 0;
@@ -170,27 +170,49 @@ public class ExoClick implements AffiliateNetwork {
                     cost += resultTotal.get("cost").asDouble();
                 }
             }
-        } catch (Exception ignore) {
+        } catch (Exception e) {
+            throw new RuntimeException("Couldn't get statistics from ExoClick. Check API");
+        }
+        executor.shutdown();
+        try {
+            if (!executor.awaitTermination(1, TimeUnit.MINUTES)) {
+                logger.error("Parse ExoClick timed out error");
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
         }
         return new NetworkStats(clicks, cost);
     }
 
-    private Connection.Response parseNetwork(String url) {
+    private Connection.Response parseNetwork(String url) throws IOException {
         Connection.Response response;
+        response = Jsoup
+                .connect(url)
+                .method(Connection.Method.GET)
+                .ignoreContentType(true)
+                .header("Accept", "application/json")
+                .header("Authorization", "Bearer " + authToken)
+                .execute();
+        return response;
+    }
+
+    private boolean isAuth() {
         try {
-            response = Jsoup
-                    .connect(url)
+            Jsoup.connect("https://api.exoclick.com/v2/statistics/a/campaign")
                     .method(Connection.Method.GET)
                     .ignoreContentType(true)
                     .header("Accept", "application/json")
                     .header("Authorization", "Bearer " + authToken)
                     .execute();
+        } catch (HttpStatusException e) {
+            if (e.getStatusCode() == 401)
+                return false;
         } catch (IOException e) {
-            throw new RuntimeException("Couldn't connect to ExoClick. Try later");
+            throw new RuntimeException("Couldn't connect to ExoClick. Check API");
         }
 
-        return response;
+        return true;
     }
-
 }
 

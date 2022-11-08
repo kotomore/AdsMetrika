@@ -31,15 +31,15 @@ public class StatisticsUtilities {
     }
 
     public static StatDTO createStatsDTO(int offerId, NetworkStats networkStats,
-                                         Map<Integer, AdcomboStats> adcomboStats) {
+                                         Map<Integer, AdcomboStats> adcomboStatsMap) {
         return new StatDTO(
-                adcomboStats.get(offerId).getOfferId(),
-                adcomboStats.get(offerId).getOfferName(),
+                adcomboStatsMap.get(offerId).getOfferId(),
+                adcomboStatsMap.get(offerId).getOfferName(),
                 networkStats.getClicks(),
                 networkStats.getCost(),
-                adcomboStats.get(offerId).getHoldCost(),
-                adcomboStats.get(offerId).getConfirmedCount(),
-                adcomboStats.get(offerId).getCost()
+                adcomboStatsMap.get(offerId).getHoldCost(),
+                adcomboStatsMap.get(offerId).getConfirmedCount(),
+                adcomboStatsMap.get(offerId).getCost()
         );
     }
 
@@ -82,9 +82,9 @@ public class StatisticsUtilities {
         return new TableDTO(statDTOS);
     }
 
-    public static ChartDTO getTotalChartDTO(List<Stat> oldStats) {
-        double totalSpend = oldStats.stream().mapToDouble(Stat::getSpend).sum();
-        double totalRevenue = oldStats.stream().mapToDouble(Stat::getRevenue).sum();
+    public static ChartDTO getTotalChartDTO(List<Stat> userStats) {
+        double totalSpend = userStats.stream().mapToDouble(Stat::getSpend).sum();
+        double totalRevenue = userStats.stream().mapToDouble(Stat::getRevenue).sum();
         return new ChartDTO(totalSpend, totalRevenue);
     }
 

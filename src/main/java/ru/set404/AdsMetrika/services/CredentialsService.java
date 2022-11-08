@@ -3,6 +3,7 @@ package ru.set404.AdsMetrika.services;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.set404.AdsMetrika.dto.CredentialsDTO;
 import ru.set404.AdsMetrika.models.Credentials;
 import ru.set404.AdsMetrika.models.User;
@@ -37,10 +38,12 @@ public class CredentialsService {
     }
 
     public List<CredentialsDTO> getUserCredentialsList(User user) {
+        System.out.println();
         return credentialsRepository.findByOwner(user).stream()
                 .map(credentials -> modelMapper.map(credentials, CredentialsDTO.class)).toList();
     }
 
+    @Transactional
     public void saveCredentialsDTO(Credentials credentials, User user) {
         if (credentials.getUsername().isEmpty())
             credentialsRepository.deleteById(credentials.getId());

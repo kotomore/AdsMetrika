@@ -3,6 +3,8 @@ package ru.set404.AdsMetrika.network.ads;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,8 @@ public class TrafficFactory implements AffiliateNetwork {
     private String password;
     private final CredentialsRepository credentialsRepository;
     private final ObjectMapper objectMapper;
+    protected Log logger = LogFactory.getLog(this.getClass());
+
 
     @Autowired
     public TrafficFactory(CredentialsRepository credentialsRepository, ObjectMapper objectMapper) {
@@ -60,7 +64,6 @@ public class TrafficFactory implements AffiliateNetwork {
         authorization();
         Map<Integer, NetworkStats> campaignStats = new HashMap<>();
         Map<Integer, Future<NetworkStats>> campaignStatsFuture = new HashMap<>();
-
 
         try {
             List<Integer> campaigns = getCampaignList();
@@ -90,6 +93,7 @@ public class TrafficFactory implements AffiliateNetwork {
             executor.shutdown();
             try {
                 if (!executor.awaitTermination(1, TimeUnit.MINUTES)) {
+                    logger.error("Parse Traffic Factory timed out error");
                     executor.shutdownNow();
                 }
             } catch (InterruptedException e) {
@@ -105,7 +109,7 @@ public class TrafficFactory implements AffiliateNetwork {
         return campaignStats;
     }
 
-    public NetworkStats getNetworkStatEntity(List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+    public NetworkStats getNetworkStatsByOfferCampaigns(List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
         authorization();
         int deliveries = 0;
         double total = 0;
@@ -133,9 +137,19 @@ public class TrafficFactory implements AffiliateNetwork {
                 }
             }
 
+            executor.shutdown();
+            try {
+                if (!executor.awaitTermination(1, TimeUnit.MINUTES)) {
+                    logger.error("Parse Traffic Factory timed out error");
+                    executor.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                executor.shutdownNow();
+            }
         } catch (Exception e) {
             throw new RuntimeException("Couldn't get statistics from traffic factory. Try later");
         }
+
         return new NetworkStats(deliveries, total);
     }
 
@@ -166,7 +180,7 @@ public class TrafficFactory implements AffiliateNetwork {
             Credentials credentials = credentialsRepository.
                     findCredentialsByOwnerAndNetworkName(((UserDetails) authentication.getPrincipal())
                             .user(), Network.TF).orElseThrow(() ->
-                            new RuntimeException("Couldn't connect to Traffic Factory. Check API"));
+                            new RuntimeException("Couldn't find Traffic Factory API. Check it"));
             this.apiToken = credentials.getUsername();
             this.password = credentials.getPassword();
         }

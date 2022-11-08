@@ -467,7 +467,7 @@
                                         <h1>Simple Registration</h1>
                                     </div>
                                 </div>
-                                <form th:method="POST" th:action="@{/auth/login}" th:object="${person}">
+                                <form th:method="POST" th:action="@{/registration}" th:object="${person}">
                                     <div class="form-floating">
                                         <input class="input form-control" th:field="*{username}" id="name-field" type="text" placeholder="Full name">
                                         <label for="name-field">Username</label>

@@ -37,6 +37,7 @@ public class UserController {
     private final CredentialsValidator credentialsValidator;
     private final OfferListDTOValidator offerListDTOValidator;
 
+
     @Autowired
     public UserController(NetworksService networksService, OffersService offersService, StatsService statsService,
                           CredentialsService credentialsService, CredentialsValidator credentialsValidator, OfferListDTOValidator offerListDTOValidator) {
@@ -196,7 +197,7 @@ public class UserController {
         return "redirect:/statistics";
     }
 
-    private static User getUser() {
+    private User getUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return ((UserDetails) authentication.getPrincipal()).user();
     }

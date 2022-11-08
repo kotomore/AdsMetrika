@@ -2,6 +2,7 @@ package ru.set404.AdsMetrika.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.set404.AdsMetrika.dto.StatDTO;
 import ru.set404.AdsMetrika.models.Stat;
 import ru.set404.AdsMetrika.models.User;
@@ -24,6 +25,7 @@ public class StatsService {
         return statsRepository.findAllByOwnerAndCreatedDateAfter(user, dateStart);
     }
 
+    @Transactional
     public void saveStatDTOList(List<StatDTO> statDTOList, User user, Network network, LocalDate date) {
 
         double spend = 0;

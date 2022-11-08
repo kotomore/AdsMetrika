@@ -3,6 +3,7 @@ package ru.set404.AdsMetrika.services;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.set404.AdsMetrika.dto.OfferDTO;
 import ru.set404.AdsMetrika.dto.OfferListDTO;
 import ru.set404.AdsMetrika.models.Offer;
@@ -25,6 +26,7 @@ public class OffersService {
                 .map(offer -> modelMapper.map(offer, OfferDTO.class)).toList());
     }
 
+    @Transactional
     public void saveOffersDTOList(OfferListDTO offerListDTO, User user) {
         for (OfferDTO offerDTO : offerListDTO.getOffers()) {
             if (offerDTO.getGroupName() != null && !offerDTO.getGroupName().isEmpty()) {
