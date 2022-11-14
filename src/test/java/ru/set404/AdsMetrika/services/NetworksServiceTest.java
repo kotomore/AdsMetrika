@@ -3,28 +3,21 @@ package ru.set404.AdsMetrika.services;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.stereotype.Component;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.set404.AdsMetrika.dto.StatDTO;
 import ru.set404.AdsMetrika.network.Network;
 import ru.set404.AdsMetrika.network.ads.ExoClick;
-import ru.set404.AdsMetrika.network.ads.NetworkStats;
 import ru.set404.AdsMetrika.network.ads.TrafficFactory;
 import ru.set404.AdsMetrika.network.cpa.Adcombo;
-import ru.set404.AdsMetrika.network.cpa.AdcomboStats;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @RunWith(SpringRunner.class)
-@Import(NetworkServiceTestContextConfiguration.class)
-public class NetworkServiceTest {
+@Import(NetworksServiceTestContextConfiguration.class)
+public class NetworksServiceTest {
     @Autowired
     private TrafficFactory trafficFactory;
     @Autowired
@@ -47,14 +40,5 @@ public class NetworkServiceTest {
         assertTrue(networksService.getNetworkStatisticsList(Network.TF, LocalDate.now(), LocalDate.now()).contains(
                 new StatDTO(12345, "TestName", 100, 100.0, 100.0, 10, 100.0)));
     }
-
-    private NetworkStats getNetworkStats() {
-        return new NetworkStats(100, 100);
-    }
-
-    private AdcomboStats getAdcomboStats() {
-        return new AdcomboStats(12345, "TestName", 100.0, 10, 100.0);
-    }
-
 
 }

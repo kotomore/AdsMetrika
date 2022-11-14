@@ -19,13 +19,13 @@ import java.util.List;
 import java.util.Map;
 
 @TestConfiguration
-public class NetworkServiceTestContextConfiguration {
+public class NetworksServiceTestContextConfiguration {
 
     @MockBean
     private final CredentialsRepository credentialsRepository;
 
     @Autowired
-    public NetworkServiceTestContextConfiguration(CredentialsRepository credentialsRepository) {
+    public NetworksServiceTestContextConfiguration(CredentialsRepository credentialsRepository) {
         this.credentialsRepository = credentialsRepository;
     }
 
