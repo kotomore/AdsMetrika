@@ -27,29 +27,28 @@ public class CredentialsService {
         this.modelMapper = modelMapper;
     }
 
-    @Cacheable("credentials")
+    @Cacheable("networks")
     public Set<Network> userNetworks(User user) {
-        Set<Network> networks = credentialsRepository.findByOwner(user).stream()
-                .collect(Collectors.groupingBy(Credentials::getNetworkName)).keySet();
+        Set<Network> networks = getUserCredentialsList(user).stream()
+                .collect(Collectors.groupingBy(CredentialsDTO::getNetworkName)).keySet();
         networks.remove(Network.ADCOMBO);
         return networks;
     }
 
-    @CacheEvict(value = "credentials", allEntries = true)
-    public void deleteById(int id) {
-        credentialsRepository.deleteById(id);
+    @CacheEvict(value = {"credentials", "networks"}, allEntries = true)
+    public void remove(Credentials credentials) {
+        credentialsRepository.delete(credentials);
     }
 
     @Cacheable("credentials")
     public List<CredentialsDTO> getUserCredentialsList(User user) {
-        System.out.println();
         return credentialsRepository.findByOwner(user).stream()
                 .map(credentials -> modelMapper.map(credentials, CredentialsDTO.class)).toList();
     }
 
     @Transactional
-    @CacheEvict(value = "credentials", allEntries = true)
-    public void saveCredentialsDTO(Credentials credentials, User user) {
+    @CacheEvict(value = {"credentials", "networks"}, allEntries = true)
+    public void save(Credentials credentials, User user) {
         if (credentials.getUsername().isEmpty())
             credentialsRepository.deleteById(credentials.getId());
         else {

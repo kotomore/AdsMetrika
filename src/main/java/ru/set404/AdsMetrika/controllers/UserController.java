@@ -186,13 +186,13 @@ public class UserController {
                                   BindingResult bindingResult) {
         if ((credentials.getUsername().isEmpty())) {
             if (credentials.getId() != 0)
-                credentialsService.deleteById(credentials.getId());
+                credentialsService.remove(credentials);
         } else {
 
             credentialsValidator.validate(credentials, bindingResult);
             if (bindingResult.hasErrors())
                 return "redirect:/statistics?password_error";
-            credentialsService.saveCredentialsDTO(credentials, getUser());
+            credentialsService.save(credentials, getUser());
         }
         return "redirect:/statistics";
     }
