@@ -3,6 +3,8 @@
 End-to-end analytics service for media buyers. Combines statistics from advertising networks 
 <a href="trafficfactory.com">trafficfactory.com</a> and <a href="https://exoclick.com">exoclick.com</a> 
 with a partner network <a href="https://adcombo.com">adcombo.com</a>
+<hr>
+Stack: Spring Boot, Spring Security, Hibernate, PostgreSQL, Thymeleaf, Jsoup, Jackson
 
 # Example
 Go to <a href="https://adsmetrika.ru">https://adsmetrika.ru</a>
