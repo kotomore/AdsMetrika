@@ -246,7 +246,18 @@
                     <div class="col-12">
                         <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                             <h4 th:text="'Report ('+${dates}+')'" class="mb-sm-0">Report</h4>
-                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker1" href="/report?type=daily">Daily report</a>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-link btn-rounded waves-effect dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Daily report<i class="mdi mdi-chevron-down"></i></button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" id="datepicker1" th:href="@{/report(type='daily', date=${currentDate.minusDays(1)})}">Yesterday</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" id="datepicker3" th:text="${currentDate.minusDays(2)}" th:href="@{/report(type='daily', date=${currentDate.minusDays(2)})}">Yesterday</a>
+                                    <a class="dropdown-item" id="datepicker4" th:text="${currentDate.minusDays(3)}" th:href="@{/report(type='daily', date=${currentDate.minusDays(3)})}">Yesterday</a>
+                                    <a class="dropdown-item" id="datepicker5" th:text="${currentDate.minusDays(4)}" th:href="@{/report(type='daily', date=${currentDate.minusDays(4)})}">Yesterday</a>
+                                    <a class="dropdown-item" id="datepicker6" th:text="${currentDate.minusDays(5)}" th:href="@{/report(type='daily', date=${currentDate.minusDays(5)})}">Yesterday</a>
+
+                                </div>
+                            </div>
                             <a class="btn btn-link btn-rounded waves-effect" id="datepicker2" href="/report?type=month">Monthly report</a>
 
                             <div class="page-title-right">

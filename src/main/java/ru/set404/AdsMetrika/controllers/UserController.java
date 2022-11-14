@@ -85,7 +85,8 @@ public class UserController {
     }
 
     @GetMapping("/report")
-    public String report(@RequestParam(value = "type", required = false) String type, Model model) {
+    public String report(@RequestParam(value = "type", required = false) String type,
+                         @RequestParam(value = "date", required = false) LocalDate date, Model model) {
         String headerText = "Choose a date";
         TableDTO combinedStats = new TableDTO();
 
@@ -96,18 +97,17 @@ public class UserController {
                 List<TableDTO> tableStats = getStatsForTables(firstDay, lastDay);
                 combinedStats = StatisticsUtilities.combineTableDTO(tableStats);
                 headerText = firstDay + " - " + lastDay;
-            } else if (type != null && type.equals("daily")) {
-                LocalDate firstDay = LocalDate.now().minusDays(1);
-                LocalDate lastDay = LocalDate.now().minusDays(1);
-                List<TableDTO> tableStats = getStatsForTables(firstDay, lastDay);
+            } else if (type != null && type.equals("daily") && date != null) {
+                List<TableDTO> tableStats = getStatsForTables(date, date);
                 combinedStats = StatisticsUtilities.convertForSingleTable(tableStats);
-                headerText = firstDay.toString();
+                headerText = date.toString();
             }
 
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
         }
         putCredentialsInModel(model);
+        model.addAttribute("currentDate", LocalDate.now());
         model.addAttribute("dates", headerText);
         model.addAttribute("combinedStats", combinedStats);
         return "user/report";
