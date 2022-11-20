@@ -8,14 +8,12 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.set404.AdsMetrika.dto.*;
+import ru.set404.AdsMetrika.exceptions.OAuthCredentialEmptyException;
 import ru.set404.AdsMetrika.models.Credentials;
 import ru.set404.AdsMetrika.models.Stat;
 import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.security.UserDetails;
-import ru.set404.AdsMetrika.services.CredentialsService;
-import ru.set404.AdsMetrika.services.NetworksService;
-import ru.set404.AdsMetrika.services.OffersService;
-import ru.set404.AdsMetrika.services.StatsService;
+import ru.set404.AdsMetrika.services.*;
 import ru.set404.AdsMetrika.network.Network;
 import ru.set404.AdsMetrika.util.CredentialsValidator;
 import ru.set404.AdsMetrika.util.OfferListDTOValidator;
@@ -34,17 +32,19 @@ public class UserController {
     private final OffersService offersService;
     private final StatsService statsService;
     private final CredentialsService credentialsService;
+    private final ScheduledService scheduledService;
     private final CredentialsValidator credentialsValidator;
     private final OfferListDTOValidator offerListDTOValidator;
 
 
     @Autowired
     public UserController(NetworksService networksService, OffersService offersService, StatsService statsService,
-                          CredentialsService credentialsService, CredentialsValidator credentialsValidator, OfferListDTOValidator offerListDTOValidator) {
+                          CredentialsService credentialsService, ScheduledService scheduledService, CredentialsValidator credentialsValidator, OfferListDTOValidator offerListDTOValidator) {
         this.networksService = networksService;
         this.offersService = offersService;
         this.statsService = statsService;
         this.credentialsService = credentialsService;
+        this.scheduledService = scheduledService;
         this.credentialsValidator = credentialsValidator;
         this.offerListDTOValidator = offerListDTOValidator;
     }
@@ -100,12 +100,16 @@ public class UserController {
             } else if (type != null && type.equals("daily") && date != null) {
                 List<TableDTO> tableStats = getStatsForTables(date, date);
                 combinedStats = StatisticsUtilities.convertForSingleTable(tableStats);
+                scheduledService.writeSpreadSheetTable(combinedStats);
                 headerText = date.toString();
             }
 
+        } catch (OAuthCredentialEmptyException e) {
+            model.addAttribute("notAuthorized", e.getMessage());
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
         }
+
         putCredentialsInModel(model);
         model.addAttribute("currentDate", LocalDate.now());
         model.addAttribute("dates", headerText);
@@ -206,10 +210,11 @@ public class UserController {
 
         Set<Network> userNetworks = credentialsService.userNetworks(getUser());
         List<TableDTO> tableStats = new ArrayList<>();
+        User user = getUser();
 
         for (Network network : userNetworks) {
             List<StatDTO> currentNetworkStat;
-            if (getUser().getRole().equals("ROLE_GUEST"))
+            if (user.getRole().equals("ROLE_GUEST"))
                 currentNetworkStat = networksService.getNetworkStatisticsListMock(network);
             else
                 currentNetworkStat = networksService.getNetworkStatisticsList(network, dateStart, dateEnd);

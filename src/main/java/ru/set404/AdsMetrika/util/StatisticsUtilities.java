@@ -106,4 +106,29 @@ public class StatisticsUtilities {
                 .collect(Collectors.groupingBy(Stat::getNetworkName, Collectors.summingDouble(Stat::getSpend)));
     }
 
+    public static List<List<Object>> convertTableDTOToObject(TableDTO tableDTO) {
+        List<List<Object>> objectsList = new ArrayList<>();
+        List<StatDTO> stat = tableDTO.getCurrentStats();
+        for (int i = 0; i < stat.size(); i++) {
+            List<Object> object = new ArrayList<>();
+            if (stat.get(i).getCampaignId() != null) {
+                object.add("[" + stat.get(i).getCampaignId() + "] " + stat.get(i).getCampaignName());
+                object.add(stat.get(i).getClicks());
+                object.add(stat.get(i).getSpend());
+                object.add(stat.get(i).getHoldCost());
+                object.add(stat.get(i).getApproveCount());
+                object.add(stat.get(i).getRevenue());
+                object.add("=(F%s-C%s)".formatted(i + 4, i + 4));
+                object.add("=((F%s/C%s)-1)".formatted(i + 4, i + 4));
+
+            } else if (stat.get(i).getCampaignName() != null) {
+                object.add(stat.get(i).getCampaignName());
+            } else
+                object.add("");
+
+            objectsList.add(object);
+        }
+        return objectsList;
+    }
+
 }
