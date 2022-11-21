@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.set404.AdsMetrika.dto.TableDTO;
 import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.scheduled.googlesheets.SpreadSheet;
-import ru.set404.AdsMetrika.scheduled.telegram.TelegramChatBot;
+import ru.set404.AdsMetrika.scheduled.telegram.TelegramBot;
 import ru.set404.AdsMetrika.util.StatisticsUtilities;
 
 import java.time.LocalDate;
@@ -13,12 +13,12 @@ import java.time.LocalDate;
 @Service
 public class ScheduledService {
     private final SpreadSheet spreadSheet;
-    private final TelegramChatBot telegramChatBot;
+    private final TelegramBot telegramBot;
 
     @Autowired
-    public ScheduledService(SpreadSheet spreadSheet, TelegramChatBot telegramChatBot) {
+    public ScheduledService(SpreadSheet spreadSheet, TelegramBot telegramBot) {
         this.spreadSheet = spreadSheet;
-        this.telegramChatBot = telegramChatBot;
+        this.telegramBot = telegramBot;
     }
 
     public void writeSpreadSheetTable(User user, TableDTO combinedStats, LocalDate date) {
@@ -34,6 +34,6 @@ public class ScheduledService {
                 "Profit:" + combinedStats.getTotalProfit() + "\n" +
                 "ROI:" + combinedStats.getTotalROI();
 
-        telegramChatBot.sendStatistics(Long.parseLong(user.getSettings().getTelegramUsername()), text);
+        telegramBot.setAnswer(Long.parseLong(user.getSettings().getTelegramUsername()), text);
     }
 }
