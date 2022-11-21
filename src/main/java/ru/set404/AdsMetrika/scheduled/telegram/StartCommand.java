@@ -19,7 +19,13 @@ public class StartCommand extends ServiceCommand {
                 String.format("%s %s", user.getLastName(), user.getFirstName());
 
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), userName,
-                "Copy: `%s` \nAdd this to *AdsMetrika - User - Settings - Telegram numbers* field".formatted(chat.getId()));
+                ("""
+                        Copy: `%s`\s
+
+                        --------------
+                        Add this to *AdsMetrika - User - Settings - Telegram numbers* field
+                        https://adsmetrika.ru/settings""").formatted(chat.getId()));
+
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), userName,
                 "You will receive statistics every day at *11:00*");
     }

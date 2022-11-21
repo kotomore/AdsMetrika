@@ -26,13 +26,13 @@ public class ScheduledService {
     }
 
     public void sendTelegramMessage(User user, TableDTO combinedStats) {
-        String text = "Stats by " + LocalDate.now().minusDays(1) + "\n\n" +
-                "Total clicks:" + combinedStats.getTotalClicks() + "\n" +
-                "Total spend:" + combinedStats.getTotalSpend() + "\n" +
-                "Total revenue:" + combinedStats.getTotalRevenue() + "\n" +
+        String text = "*Stats by " + LocalDate.now().minusDays(1) + "*\n\n" +
+                "*Total clicks: *" + combinedStats.getTotalClicks() + "\n" +
+                "*Total spend: *$" + (int) combinedStats.getTotalSpend() + "\n" +
+                "*Total revenue: *$" + (int) combinedStats.getTotalRevenue() + "\n" +
                 "\n---------\n\n" +
-                "Profit:" + combinedStats.getTotalProfit() + "\n" +
-                "ROI:" + combinedStats.getTotalROI();
+                "*Profit: *$" + (int) combinedStats.getTotalProfit() + "\n" +
+                "*ROI: *" + combinedStats.getTotalROI() + "%";
 
         telegramBot.setAnswer(Long.parseLong(user.getSettings().getTelegramUsername()), text);
     }

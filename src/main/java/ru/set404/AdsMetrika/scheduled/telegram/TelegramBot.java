@@ -43,6 +43,7 @@ public final class TelegramBot extends TelegramLongPollingCommandBot {
         SendMessage answer = new SendMessage();
         answer.setText(text);
         answer.setChatId(chatId.toString());
+        answer.enableMarkdown(true);
         try {
             execute(answer);
         } catch (TelegramApiException e) {
