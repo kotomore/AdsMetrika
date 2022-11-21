@@ -101,6 +101,7 @@ public class UserController {
                 List<TableDTO> tableStats = getStatsForTables(date, date);
                 combinedStats = StatisticsUtilities.convertForSingleTable(tableStats);
                 scheduledService.writeSpreadSheetTable(combinedStats);
+                model.addAttribute("success", "success");
                 headerText = date.toString();
             }
 

@@ -238,6 +238,13 @@
 
         <div class="page-content">
             <div class="container-fluid">
+
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="mdi mdi-check-all me-2"></i>
+                    Success
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
                 <div th:if="${checkAPI}"  class="alert alert-warning" role="alert">
                     Fill in the API fields for adcombo and advertising networks
                 </div>
@@ -493,10 +500,37 @@
     </div> <!-- end slimscroll-menu-->
 </div>
 <!-- /Right-bar -->
+<div th:if="${notAuthorized}" class="my-4 text-center">
+    <p class="text-muted">Center modal</p>
+    <!-- Small modal -->
+    <button type="button" id="button-modal" class="btn btn-primary waves-effect waves-light" data-bs-toggle="modal" data-bs-target=".bs-example-modal-center">Center modal</button>
+</div>
+<script>
+    window.onload = function(){
+        document.getElementById('button-modal').click();
+    }
 
+</script>
+<div th:if="${notAuthorized}" class="modal fade bs-example-modal-center" id="modal100500" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Google SpreadSheets Authorization</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Click "Authorize" then after authorization close the window</p>
+                <br><br>
+                <a th:if="${notAuthorized}" class="btn btn-primary" target="_blank" th:href="${notAuthorized}" th:data-url="@{/report(type='daily', date=${param.date})}" onclick="window.location.href = this.getAttribute('data-url');">Authorize</a>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
 <!-- Right bar overlay-->
 <div class="rightbar-overlay"></div>
+<script>
 
+</script>
 <!-- JAVASCRIPT -->
 <script src="../assets/libs/toastr/build/toastr.min.js"></script>
 
