@@ -8,8 +8,6 @@ import ru.set404.AdsMetrika.scheduled.googlesheets.SpreadSheet;
 import ru.set404.AdsMetrika.scheduled.telegram.TelegramChatBot;
 import ru.set404.AdsMetrika.util.StatisticsUtilities;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.time.LocalDate;
 
 @Service
@@ -23,12 +21,12 @@ public class ScheduledService {
         this.telegramChatBot = telegramChatBot;
     }
 
-    public void writeSpreadSheetTable(User user, TableDTO combinedStats, LocalDate date) throws GeneralSecurityException, IOException {
+    public void writeSpreadSheetTable(User user, TableDTO combinedStats, LocalDate date) {
         spreadSheet.writeTable(user, StatisticsUtilities.convertTableDTOToObject(combinedStats), date);
     }
 
     public void sendTelegramMessage(User user, TableDTO combinedStats) {
-        String text = "Yesterday Stats\n\n" +
+        String text = "Stats by " + LocalDate.now().minusDays(1) + "\n\n" +
                 "Total clicks:" + combinedStats.getTotalClicks() + "\n" +
                 "Total spend:" + combinedStats.getTotalSpend() + "\n" +
                 "Total revenue:" + combinedStats.getTotalRevenue() + "\n" +

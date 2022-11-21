@@ -6,6 +6,8 @@ import ru.set404.AdsMetrika.models.Settings;
 import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.repositories.SettingsRepository;
 
+import java.util.List;
+
 @Service
 public class SettingsService {
     private final SettingsRepository settingsRepository;
@@ -20,6 +22,20 @@ public class SettingsService {
 
     public void update(Settings settings, User user) {
         settings.setOwner(user);
+
+        if (settings.getSpreadSheetId().isEmpty()) {
+            settings.setSpreadSheetEnabled(false);
+            settings.setSpreadSheetScheduleEnabled(false);
+        }
+
+        if (settings.getTelegramUsername().isEmpty()) {
+            settings.setTelegramEnabled(false);
+        }
+
         settingsRepository.save(settings);
+    }
+
+    public List<Settings> findSettingsWithScheduledTask() {
+        return settingsRepository.findAllEnabledTasks();
     }
 }

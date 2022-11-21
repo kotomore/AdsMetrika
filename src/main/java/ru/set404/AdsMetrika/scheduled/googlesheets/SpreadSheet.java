@@ -35,7 +35,8 @@ public class SpreadSheet {
         return googleAuthorizeUtil.isAuth();
     }
 
-    public void writeTable(User user, List<List<Object>> combinedStatsObject, LocalDate date) throws IOException, GeneralSecurityException {
+    public void writeTable(User user, List<List<Object>> combinedStatsObject, LocalDate date) {
+        try {
             authorize();
 
             String spreadSheetId = user.getSettings().getSpreadSheetId();
@@ -56,6 +57,9 @@ public class SpreadSheet {
                     .update(spreadSheetId, "A4", body)
                     .setValueInputOption("USER_ENTERED")
                     .execute();
+        } catch (GeneralSecurityException | IOException e) {
+            throw new RuntimeException("Something wrong with google authorization");
+        }
     }
 
     private int getSecondSheet(String spreadSheetId) throws IOException {
@@ -68,7 +72,7 @@ public class SpreadSheet {
                 .getSheetId();
     }
 
-    private void copyTable(String spreadSheetId, int cellsCount) throws IOException, GeneralSecurityException {
+    private void copyTable(String spreadSheetId, int cellsCount) throws IOException {
         CopyPasteRequest copyRequest = new CopyPasteRequest()
                 .setSource(new GridRange().setSheetId(getSecondSheet(spreadSheetId))
                         .setStartColumnIndex(0).setEndColumnIndex(10)

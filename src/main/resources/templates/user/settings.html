@@ -129,7 +129,8 @@
                     </button>
                     <div class="dropdown-menu dropdown-menu-end">
                         <!-- item-->
-                        <a class="dropdown-item" href="/offers}"><i class="ri-user-line align-middle me-1"></i> Offers</a>
+                        <a class="dropdown-item" href="/offers"><i class="ri-user-line align-middle me-1"></i> Offers</a>
+                        <a class="dropdown-item" href="/settings"><i class="ri-settings-2-line align-middle me-1"></i> Settings</a>
                         <div class="dropdown-divider"></div>
 
                         <form th:action="@{/logout}" th:method="POST">
@@ -170,7 +171,7 @@
                     <li>
                         <a href="javascript: void(0);" class="has-arrow waves-effect">
                             <i class="ri-mail-send-line"></i>
-                            <span>Statistics</span>
+                            <span>Campaigns</span>
                         </a>
                         <ul class="sub-menu" aria-expanded="false">
                             <li><a href="/campaigns?network=TF">Traffic Factory</a></li>
@@ -185,15 +186,6 @@
                         </a>
                     </li>
 
-
-                    <li class="menu-title">Settings</li>
-
-                    <li>
-                        <a href="/offers" class="waves-effect">
-                            <i class="ri-calendar-2-line"></i>
-                            <span>Offers</span>
-                        </a>
-                    </li>
 
                     <li class="menu-title">Networks</li>
 

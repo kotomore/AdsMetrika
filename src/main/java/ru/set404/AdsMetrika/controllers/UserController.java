@@ -1,6 +1,7 @@
 package ru.set404.AdsMetrika.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -71,7 +72,6 @@ public class UserController {
         }
 
         TableDTO combinedStats = StatisticsUtilities.combineTableDTO(tableStats);
-        //scheduledService.sendTelegramMessage(currentUser, combinedStats);
 
         putCredentialsInModel(model);
         model.addAttribute("currentDate", LocalDate.now());
@@ -226,6 +226,23 @@ public class UserController {
             credentialsService.save(credentials, getUser());
         }
         return "redirect:/statistics";
+    }
+
+    @Scheduled(cron = "0 0 11 * * *", zone = "Europe/Moscow")
+    public void scheduleTask() {
+        LocalDate date = LocalDate.now().minusDays(1);
+
+        List<Settings> settingsList = settingsService.findSettingsWithScheduledTask();
+        for (Settings settings : settingsList) {
+            User user = settings.getOwner();
+            List<TableDTO> tableStats = getStatsForTables(user, date, date);
+            TableDTO combinedStats = StatisticsUtilities.combineTableDTO(tableStats);
+
+            if (user.getSettings().isTelegramEnabled())
+                scheduledService.sendTelegramMessage(user, combinedStats);
+            if (user.getSettings().isSpreadSheetScheduleEnabled())
+                scheduledService.writeSpreadSheetTable(user, combinedStats, date);
+        }
     }
 
     private User getUser() {
