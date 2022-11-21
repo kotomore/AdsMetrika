@@ -70,10 +70,13 @@ public class UserController {
             model.addAttribute("error", e.getMessage());
         }
 
+        TableDTO combinedStats = StatisticsUtilities.combineTableDTO(tableStats);
+        //scheduledService.sendTelegramMessage(currentUser, combinedStats);
+
         putCredentialsInModel(model);
         model.addAttribute("currentDate", LocalDate.now());
         model.addAttribute("statistics", tableStats);
-        model.addAttribute("combinedStats", StatisticsUtilities.combineTableDTO(tableStats));
+        model.addAttribute("combinedStats", combinedStats);
 
         //column_line_chart
         model.addAttribute("chartTotal", StatisticsUtilities.getTotalChartDTO(oldStats));

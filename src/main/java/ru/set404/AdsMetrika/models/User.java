@@ -2,6 +2,7 @@ package ru.set404.AdsMetrika.models;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -24,14 +25,13 @@ public class User {
     @OneToMany(mappedBy = "owner")
     private List<Credentials> credentials;
 
-    @OneToOne(mappedBy = "owner")
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "owner")
     private Settings settings;
 
     @NotEmpty(message = "Username empty")
     @Size(min = 2, max = 100, message = "2 chars and more")
     @Column(name = "username", unique = true)
     private String username;
-
 
     @NotEmpty(message = "Password empty")
     @Column(name = "password")
