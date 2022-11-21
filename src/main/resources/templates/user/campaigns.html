@@ -304,7 +304,7 @@
                                             <td th:text="${campaign.getApproveCount()}">approve count</td>
                                             <td th:text="${#numbers.formatDecimal(campaign.getRevenue(), 1, 2)}">approve cost</td>
                                             <td th:text="${#numbers.formatDecimal(campaign.getProfit(), 1, 2)}">profit</td>
-                                            <td th:text="${campaign.getROI()}">roi</td>
+                                            <td th:text="${campaign.getROI()}+'%'">roi</td>
 
                                         </tr>
                                         </tbody><!-- end tbody -->

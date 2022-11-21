@@ -55,7 +55,8 @@ public class TrafficFactory implements AffiliateNetwork {
             throw new RuntimeException("Couldn't get statistics from traffic factory. Try later");
         }
         for (JsonNode campaign : json.get("campaigns")) {
-            campaigns.add(campaign.get("id").asInt());
+            if (campaign.get("daily_spent").asDouble(0) > 0)
+                campaigns.add(campaign.get("id").asInt());
         }
         return campaigns;
     }
@@ -165,7 +166,8 @@ public class TrafficFactory implements AffiliateNetwork {
                     .method(Connection.Method.POST)
                     .data("timestamp", timestamp)
                     .data("security_token", securityToken.toLowerCase())
-                    .data("status", "active")
+                    //Filter by campaign status
+                    //.data("status", "active")
                     .ignoreContentType(true)
                     .execute();
         } catch (IOException e) {
