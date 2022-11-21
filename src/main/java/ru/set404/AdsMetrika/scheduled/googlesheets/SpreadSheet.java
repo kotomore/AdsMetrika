@@ -4,6 +4,7 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.set404.AdsMetrika.exceptions.GoogleAuthTimedOutException;
 import ru.set404.AdsMetrika.models.User;
 
 import java.io.IOException;

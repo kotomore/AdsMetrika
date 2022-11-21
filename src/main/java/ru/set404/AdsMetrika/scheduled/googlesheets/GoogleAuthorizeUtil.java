@@ -13,6 +13,7 @@ import com.google.api.client.util.store.MemoryDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import org.springframework.stereotype.Component;
+import ru.set404.AdsMetrika.exceptions.GoogleAuthTimedOutException;
 import ru.set404.AdsMetrika.exceptions.OAuthCredentialEmptyException;
 
 import java.io.IOException;
@@ -57,16 +58,30 @@ public class GoogleAuthorizeUtil {
 
             redirectUri = auth.getReceiver().getRedirectUri();
             AuthorizationCodeRequestUrl authorizationUrl = auth.getFlow().newAuthorizationUrl().setRedirectUri(redirectUri);
-            String redirectUrl = String.valueOf(authorizationUrl);
             throw new OAuthCredentialEmptyException(String.valueOf(authorizationUrl));
         }
 
-            String code = auth.getReceiver().waitForCode();
-            TokenResponse response = auth.getFlow().newTokenRequest(code).setRedirectUri(redirectUri).execute();
-            var7 = auth.getFlow().createAndStoreCredential(response, "user");
-            auth.getReceiver().stop();
-            this.credential = var7;
-            return var7;
+        Thread thread = new Thread(() -> {
+            try {
+                Thread.sleep(60000);
+                auth.getReceiver().stop();
+                auth = null;
+                redirectUri = null;
+
+            } catch (InterruptedException | IOException ignore) {}
+        });
+        thread.start();
+
+        String code = auth.getReceiver().waitForCode();
+        thread.interrupt();
+
+        if (code == null)
+            throw new GoogleAuthTimedOutException("Login timed out");
+        TokenResponse response = auth.getFlow().newTokenRequest(code).setRedirectUri(redirectUri).execute();
+        var7 = auth.getFlow().createAndStoreCredential(response, "user");
+        auth.getReceiver().stop();
+        this.credential = var7;
+        return var7;
     }
 
     public boolean isAuth() {
