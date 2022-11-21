@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.set404.AdsMetrika.dto.*;
 import ru.set404.AdsMetrika.exceptions.OAuthCredentialEmptyException;
 import ru.set404.AdsMetrika.models.Credentials;
+import ru.set404.AdsMetrika.models.Settings;
 import ru.set404.AdsMetrika.models.Stat;
 import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.security.UserDetails;
@@ -33,18 +34,20 @@ public class UserController {
     private final StatsService statsService;
     private final CredentialsService credentialsService;
     private final ScheduledService scheduledService;
+    private final SettingsService settingsService;
     private final CredentialsValidator credentialsValidator;
     private final OfferListDTOValidator offerListDTOValidator;
 
 
     @Autowired
     public UserController(NetworksService networksService, OffersService offersService, StatsService statsService,
-                          CredentialsService credentialsService, ScheduledService scheduledService, CredentialsValidator credentialsValidator, OfferListDTOValidator offerListDTOValidator) {
+                          CredentialsService credentialsService, ScheduledService scheduledService, SettingsService settingsService, CredentialsValidator credentialsValidator, OfferListDTOValidator offerListDTOValidator) {
         this.networksService = networksService;
         this.offersService = offersService;
         this.statsService = statsService;
         this.credentialsService = credentialsService;
         this.scheduledService = scheduledService;
+        this.settingsService = settingsService;
         this.credentialsValidator = credentialsValidator;
         this.offerListDTOValidator = offerListDTOValidator;
     }
@@ -102,8 +105,10 @@ public class UserController {
             } else if (type != null && type.equals("daily") && date != null) {
                 List<TableDTO> tableStats = getStatsForTables(currentUser, date, date);
                 combinedStats = StatisticsUtilities.convertForSingleTable(tableStats);
-                scheduledService.writeSpreadSheetTable(combinedStats, date);
-                model.addAttribute("success", "success");
+                if (settingsService.userSettings(currentUser).isSpreadSheetEnabled()) {
+                    scheduledService.writeSpreadSheetTable(currentUser, combinedStats, date);
+                    model.addAttribute("success", "success");
+                }
                 headerText = date.toString();
             }
 
@@ -164,6 +169,14 @@ public class UserController {
         return "user/offers";
     }
 
+    @GetMapping("/settings")
+    public String settings(Model model) {
+        putCredentialsInModel(model);
+        model.addAttribute("settings", settingsService.userSettings(getUser()));
+
+        return "user/settings";
+    }
+
     @GetMapping("/offers/{id}/delete")
     public String delete(@PathVariable("id") int id) {
         offersService.deleteById(getUser(), id);
@@ -188,6 +201,12 @@ public class UserController {
 
         offersService.saveOffersDTOList(offerDTOS, getUser());
         return "redirect:/offers?success";
+    }
+
+    @PostMapping("/settings/update")
+    public String updateSettings(@ModelAttribute("settings") @Valid Settings settings) {
+        settingsService.update(settings, getUser());
+        return "redirect:/statistics";
     }
 
     @PostMapping("/credentials/save")

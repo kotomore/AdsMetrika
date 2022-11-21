@@ -24,6 +24,9 @@ public class User {
     @OneToMany(mappedBy = "owner")
     private List<Credentials> credentials;
 
+    @OneToOne(mappedBy = "owner")
+    private Settings settings;
+
     @NotEmpty(message = "Username empty")
     @Size(min = 2, max = 100, message = "2 chars and more")
     @Column(name = "username", unique = true)
@@ -39,7 +42,6 @@ public class User {
 
     public User() {
     }
-
 
     @Override
     public String toString() {
