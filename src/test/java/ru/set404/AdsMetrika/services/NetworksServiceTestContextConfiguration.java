@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.network.Network;
 import ru.set404.AdsMetrika.network.ads.ExoClick;
 import ru.set404.AdsMetrika.network.ads.NetworkStats;
@@ -33,7 +34,7 @@ public class NetworksServiceTestContextConfiguration {
     public TrafficFactory trafficFactory () {
         return new TrafficFactory(credentialsRepository, new ObjectMapper()) {
             @Override
-            public Map<Integer, NetworkStats> getCampaignStatsMap(LocalDate dateStart, LocalDate dateEnd) {
+            public Map<Integer, NetworkStats> getCampaignStatsMap(User user, LocalDate dateStart, LocalDate dateEnd) {
                 Map<Integer, NetworkStats> networkStatsMap = new HashMap<>();
                 networkStatsMap.put(12345, getNetworkStats());
                 networkStatsMap.put(54321, getNetworkStats());
@@ -41,7 +42,7 @@ public class NetworksServiceTestContextConfiguration {
             }
 
             @Override
-            public NetworkStats getNetworkStatsByOfferCampaigns(List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+            public NetworkStats getNetworkStatsByOfferCampaigns(User user, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
                 return getNetworkStats();
             }
         };
@@ -51,7 +52,7 @@ public class NetworksServiceTestContextConfiguration {
     public ExoClick exoClick () {
         return new ExoClick(credentialsRepository, new ObjectMapper()) {
             @Override
-            public Map<Integer, NetworkStats> getCampaignStatsMap(LocalDate dateStart, LocalDate dateEnd) {
+            public Map<Integer, NetworkStats> getCampaignStatsMap(User user, LocalDate dateStart, LocalDate dateEnd) {
                 Map<Integer, NetworkStats> networkStatsMap = new HashMap<>();
                 networkStatsMap.put(12345, getNetworkStats());
                 networkStatsMap.put(54321, getNetworkStats());
@@ -59,7 +60,7 @@ public class NetworksServiceTestContextConfiguration {
             }
 
             @Override
-            public NetworkStats getNetworkStatsByOfferCampaigns(List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+            public NetworkStats getNetworkStatsByOfferCampaigns(User user, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
                 return getNetworkStats();
             }
         };
@@ -69,7 +70,7 @@ public class NetworksServiceTestContextConfiguration {
     public Adcombo adcombo() {
         return new Adcombo(credentialsRepository, new ObjectMapper()) {
             @Override
-            public Map<Integer, AdcomboStats> getNetworkStatMap(Network network, LocalDate dateStart, LocalDate dateEnd) {
+            public Map<Integer, AdcomboStats> getNetworkStatMap(User user, Network network, LocalDate dateStart, LocalDate dateEnd) {
                 Map<Integer, AdcomboStats> adcomboStatsMap = new HashMap<>();
                 adcomboStatsMap.put(12345, getAdcomboStats());
                 adcomboStatsMap.put(54321, getAdcomboStats());
@@ -77,7 +78,7 @@ public class NetworksServiceTestContextConfiguration {
             }
 
             @Override
-            public Map<Integer, AdcomboStats> getCampaignStatMap(Network network, LocalDate dateStart, LocalDate dateEnd) {
+            public Map<Integer, AdcomboStats> getCampaignStatMap(User user, Network network, LocalDate dateStart, LocalDate dateEnd) {
                 Map<Integer, AdcomboStats> adcomboStatsMap = new HashMap<>();
                 adcomboStatsMap.put(12345, getAdcomboStats());
                 adcomboStatsMap.put(54321, getAdcomboStats());
