@@ -8,6 +8,7 @@ import ru.set404.AdsMetrika.util.StatisticsUtilities;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.time.LocalDate;
 
 @Service
 public class ScheduledService {
@@ -18,7 +19,7 @@ public class ScheduledService {
         this.spreadSheet = spreadSheet;
     }
 
-    public void writeSpreadSheetTable(TableDTO combinedStats) throws GeneralSecurityException, IOException {
-        spreadSheet.writeTable(StatisticsUtilities.convertTableDTOToObject(combinedStats));
+    public void writeSpreadSheetTable(TableDTO combinedStats, LocalDate date) throws GeneralSecurityException, IOException {
+        spreadSheet.writeTable(StatisticsUtilities.convertTableDTOToObject(combinedStats), date);
     }
 }

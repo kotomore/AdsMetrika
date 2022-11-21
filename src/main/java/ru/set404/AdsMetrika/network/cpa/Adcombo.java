@@ -8,14 +8,11 @@ import org.apache.commons.logging.LogFactory;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import ru.set404.AdsMetrika.models.Credentials;
+import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.network.Network;
 import ru.set404.AdsMetrika.repositories.CredentialsRepository;
-import ru.set404.AdsMetrika.security.UserDetails;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -39,8 +36,8 @@ public class Adcombo {
         this.objectMapper = objectMapper;
     }
 
-    public Map<Integer, AdcomboStats> getNetworkStatMap(Network network, LocalDate dateStart, LocalDate dateEnd) {
-        authorization();
+    public Map<Integer, AdcomboStats> getNetworkStatMap(User user, Network network, LocalDate dateStart, LocalDate dateEnd) {
+        authorization(user);
         String url = "https://api.adcombo.com/stats/data/?api_key=%s" +
                 "&ts=%s&te=%s" +
                 "&group_by=offer_id" +
@@ -74,8 +71,8 @@ public class Adcombo {
         return stats;
     }
 
-    public Map<Integer, AdcomboStats> getCampaignStatMap(Network network, LocalDate dateStart, LocalDate dateEnd) {
-        authorization();
+    public Map<Integer, AdcomboStats> getCampaignStatMap(User user, Network network, LocalDate dateStart, LocalDate dateEnd) {
+        authorization(user);
         String url = "https://api.adcombo.com/stats/data/?api_key=%s" +
                 "&ts=%s&te=%s" +
                 "&group_by=subacc_4&group_by=offer_id&tz_offset=%s" +
@@ -130,12 +127,10 @@ public class Adcombo {
         return result;
     }
 
-    private void authorization() {
+    private void authorization(User user) {
         if (apiKey == null) {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Credentials credentials = credentialsRepository.
-                    findCredentialsByOwnerAndNetworkName(((UserDetails) authentication.getPrincipal())
-                            .user(), Network.ADCOMBO).orElseThrow(() ->
+                    findCredentialsByOwnerAndNetworkName((user), Network.ADCOMBO).orElseThrow(() ->
                             new RuntimeException("Adcombo API token not found"));
             this.apiKey = credentials.getUsername();
         }

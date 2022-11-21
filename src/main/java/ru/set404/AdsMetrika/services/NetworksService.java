@@ -2,6 +2,7 @@ package ru.set404.AdsMetrika.services;
 
 import org.springframework.stereotype.Service;
 import ru.set404.AdsMetrika.dto.StatDTO;
+import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.network.Network;
 import ru.set404.AdsMetrika.network.ads.ExoClick;
 import ru.set404.AdsMetrika.network.ads.NetworkStats;
@@ -42,7 +43,7 @@ public class NetworksService {
         return statDTOS;
     }
 
-    public List<StatDTO> getNetworkStatisticsList(Network network, LocalDate dateStart,
+    public List<StatDTO> getNetworkStatisticsList(User user, Network network, LocalDate dateStart,
                                                   LocalDate dateEnd) {
         AffiliateNetwork affiliateNetwork = null;
         switch (network) {
@@ -50,7 +51,7 @@ public class NetworksService {
             case EXO -> affiliateNetwork = exoClick;
         }
 
-        Map<Integer, AdcomboStats> adcomboStatsMap = adCombo.getNetworkStatMap(network,
+        Map<Integer, AdcomboStats> adcomboStatsMap = adCombo.getNetworkStatMap(user, network,
                 dateStart.minusDays(1), dateEnd);
 
         List<StatDTO> statsEntities = new ArrayList<>();
@@ -58,7 +59,7 @@ public class NetworksService {
         for (int offerId : adcomboStatsMap.keySet()) {
             if (adcomboStatsMap.containsKey(offerId)) {
                 assert affiliateNetwork != null;
-                NetworkStats stat = affiliateNetwork.getNetworkStatsByOfferCampaigns(adcomboStatsMap.get(offerId)
+                NetworkStats stat = affiliateNetwork.getNetworkStatsByOfferCampaigns(user, adcomboStatsMap.get(offerId)
                         .getCampaigns(), dateStart, dateEnd);
                 statsEntities.add(StatisticsUtilities.createStatsDTO(offerId, stat, adcomboStatsMap));
             }
@@ -66,7 +67,7 @@ public class NetworksService {
         return statsEntities;
     }
 
-    public List<StatDTO> getCampaignStats(Network network, LocalDate dateStart,
+    public List<StatDTO> getCampaignStats(User user, Network network, LocalDate dateStart,
                                           LocalDate dateEnd) {
         AffiliateNetwork affiliateNetwork = null;
         switch (network) {
@@ -76,8 +77,8 @@ public class NetworksService {
 
         assert affiliateNetwork != null;
         Map<Integer, NetworkStats> networkStatsMap = affiliateNetwork
-                .getCampaignStatsMap(dateStart, dateEnd);
-        Map<Integer, AdcomboStats> adcomboStatsMap = adCombo.getCampaignStatMap(network, dateStart, dateEnd);
+                .getCampaignStatsMap(user, dateStart, dateEnd);
+        Map<Integer, AdcomboStats> adcomboStatsMap = adCombo.getCampaignStatMap(user, network, dateStart, dateEnd);
 
         List<StatDTO> stats = new ArrayList<>();
         for (int campaignId : networkStatsMap.keySet()) {

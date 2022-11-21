@@ -9,13 +9,11 @@ import org.jsoup.Connection;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import ru.set404.AdsMetrika.models.Credentials;
+import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.network.Network;
 import ru.set404.AdsMetrika.repositories.CredentialsRepository;
-import ru.set404.AdsMetrika.security.UserDetails;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -39,13 +37,11 @@ public class ExoClick implements AffiliateNetwork {
         this.objectMapper = objectMapper;
     }
 
-    private void authorization() {
+    private void authorization(User user) {
         if (authToken == null || !isAuth()) {
             logger.debug("ExoClick authorization...");
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Credentials credentials = credentialsRepository.
-                    findCredentialsByOwnerAndNetworkName(((UserDetails) authentication.getPrincipal())
-                            .user(), Network.EXO)
+                    findCredentialsByOwnerAndNetworkName((user), Network.EXO)
                     .orElseThrow(() -> new RuntimeException("ExoClick API not found"));
 
             String apiToken = credentials.getUsername();
@@ -81,8 +77,8 @@ public class ExoClick implements AffiliateNetwork {
         }
     }
 
-    public Map<Integer, NetworkStats> getCampaignStatsMap(LocalDate dateStart, LocalDate dateEnd) {
-        authorization();
+    public Map<Integer, NetworkStats> getCampaignStatsMap(User user, LocalDate dateStart, LocalDate dateEnd) {
+        authorization(user);
         Map<Integer, NetworkStats> stat = new HashMap<>();
         try {
             String url = "https://api.exoclick.com/v2/statistics/a/campaign"
@@ -100,8 +96,8 @@ public class ExoClick implements AffiliateNetwork {
         return stat;
     }
 
-    public NetworkStats getNetworkStatsByOfferCampaigns(List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
-        authorization();
+    public NetworkStats getNetworkStatsByOfferCampaigns(User user, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+        authorization(user);
         int clicks = 0;
         double cost = 0;
 

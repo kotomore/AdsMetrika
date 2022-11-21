@@ -7,8 +7,12 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Component
 public class SpreadSheet {
@@ -30,9 +34,20 @@ public class SpreadSheet {
     public boolean isAuth() {
         return googleAuthorizeUtil.isAuth();
     }
-    public void writeTable(List<List<Object>> combinedStatsObject) throws IOException, GeneralSecurityException {
+
+    public void writeTable(List<List<Object>> combinedStatsObject, LocalDate date) throws IOException, GeneralSecurityException {
         authorize();
+
         copyTable(combinedStatsObject.size() - 3);
+
+        String dateString = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
+                .withLocale(new Locale.Builder().setLanguage("ru").build())
+                .format(date);
+        sheetsService.spreadsheets().values()
+                .update(SPREADSHEET_ID, "A1", new ValueRange().setValues(List.of(List.of(dateString))))
+                .setValueInputOption("RAW")
+                .execute();
+
         ValueRange body = new ValueRange()
                 .setValues(combinedStatsObject);
         sheetsService.spreadsheets().values()
@@ -51,7 +66,7 @@ public class SpreadSheet {
                 .getSheetId();
     }
 
-    private void copyTable(int cellsCount) throws IOException {
+    private void copyTable(int cellsCount) throws IOException, GeneralSecurityException {
         CopyPasteRequest copyRequest = new CopyPasteRequest()
                 .setSource(new GridRange().setSheetId(getSecondSheet())
                         .setStartColumnIndex(0).setEndColumnIndex(10)

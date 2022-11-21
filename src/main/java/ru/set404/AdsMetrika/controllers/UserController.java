@@ -58,7 +58,7 @@ public class UserController {
         List<ChartDTO> chartStats = new ArrayList<>();
         try {
             if (dateStart != null) {
-                tableStats = getStatsForTables(dateStart, dateEnd);
+                tableStats = getStatsForTables(currentUser, dateStart, dateEnd);
             }
             final int COUNT_DAYS_IN_CHART = 7;
             oldStats = statsService.getStatsList(currentUser, LocalDate.now().minusDays(COUNT_DAYS_IN_CHART));
@@ -90,17 +90,19 @@ public class UserController {
         String headerText = "Choose a date";
         TableDTO combinedStats = new TableDTO();
 
+        User currentUser = getUser();
+
         try {
             if (type != null && type.equals("month")) {
                 LocalDate firstDay = LocalDate.now().minusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
                 LocalDate lastDay = LocalDate.now().minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
-                List<TableDTO> tableStats = getStatsForTables(firstDay, lastDay);
+                List<TableDTO> tableStats = getStatsForTables(currentUser, firstDay, lastDay);
                 combinedStats = StatisticsUtilities.combineTableDTO(tableStats);
                 headerText = firstDay + " - " + lastDay;
             } else if (type != null && type.equals("daily") && date != null) {
-                List<TableDTO> tableStats = getStatsForTables(date, date);
+                List<TableDTO> tableStats = getStatsForTables(currentUser, date, date);
                 combinedStats = StatisticsUtilities.convertForSingleTable(tableStats);
-                scheduledService.writeSpreadSheetTable(combinedStats);
+                scheduledService.writeSpreadSheetTable(combinedStats, date);
                 model.addAttribute("success", "success");
                 headerText = date.toString();
             }
@@ -126,12 +128,14 @@ public class UserController {
         List<StatDTO> campaignStats = new ArrayList<>();
         String headerText = "Choose a date";
 
+        User currentUser = getUser();
+
         try {
             if (dateStart != null && dateEnd != null) {
-                if (getUser().getRole().equals("ROLE_GUEST"))
+                if (currentUser.getRole().equals("ROLE_GUEST"))
                     campaignStats = networksService.getNetworkStatisticsListMock(network);
                 else
-                    campaignStats = networksService.getCampaignStats(network, dateStart, dateEnd);
+                    campaignStats = networksService.getCampaignStats(currentUser, network, dateStart, dateEnd);
                 headerText = dateStart + " - " + dateEnd;
             }
         } catch (Exception e) {
@@ -207,21 +211,20 @@ public class UserController {
         return ((UserDetails) authentication.getPrincipal()).user();
     }
 
-    private List<TableDTO> getStatsForTables(LocalDate dateStart, LocalDate dateEnd) {
+    private List<TableDTO> getStatsForTables(User user, LocalDate dateStart, LocalDate dateEnd) {
 
-        Set<Network> userNetworks = credentialsService.userNetworks(getUser());
+        Set<Network> userNetworks = credentialsService.userNetworks(user);
         List<TableDTO> tableStats = new ArrayList<>();
-        User user = getUser();
 
         for (Network network : userNetworks) {
             List<StatDTO> currentNetworkStat;
             if (user.getRole().equals("ROLE_GUEST"))
                 currentNetworkStat = networksService.getNetworkStatisticsListMock(network);
             else
-                currentNetworkStat = networksService.getNetworkStatisticsList(network, dateStart, dateEnd);
+                currentNetworkStat = networksService.getNetworkStatisticsList(user, network, dateStart, dateEnd);
             tableStats.add(new TableDTO(currentNetworkStat, network));
             if (dateStart.equals(dateEnd))
-                statsService.saveStatDTOList(currentNetworkStat, getUser(), network, dateStart);
+                statsService.saveStatDTOList(currentNetworkStat, user, network, dateStart);
         }
         return tableStats;
     }
@@ -232,6 +235,7 @@ public class UserController {
         if (!credentials.containsKey(Network.ADCOMBO) || (credentials.containsKey(Network.ADCOMBO) &&
                 credentials.size() < 2))
             model.addAttribute("checkAPI", "Add API for Adcombo and ad network");
+
         credentials.putIfAbsent(Network.ADCOMBO, new CredentialsDTO());
         credentials.putIfAbsent(Network.EXO, new CredentialsDTO());
         credentials.putIfAbsent(Network.TF, new CredentialsDTO());
