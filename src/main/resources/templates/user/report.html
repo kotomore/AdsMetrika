@@ -512,7 +512,7 @@
             <div class="modal-body">
                 <p>Click "Authorize" then after authorization close the window</p>
                 <br><br>
-                <a th:if="${notAuthorized}" class="btn btn-primary" target="_blank" th:href="${notAuthorized}" th:data-url="@{/report(type='daily', date=${param.date})}" onclick="window.location.href = this.getAttribute('data-url');">Authorize</a>
+                <a th:if="${notAuthorized}" class="btn btn-primary"  th:href="${notAuthorized}" >Authorize</a>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

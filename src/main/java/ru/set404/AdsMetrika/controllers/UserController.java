@@ -108,8 +108,10 @@ public class UserController {
             } else if (type != null && type.equals("daily") && date != null) {
                 List<TableDTO> tableStats = getStatsForTables(currentUser, date, date);
                 combinedStats = StatisticsUtilities.convertForSingleTable(tableStats);
-                if (settingsService.userSettings(currentUser).isSpreadSheetEnabled()) {
-                    scheduledService.writeSpreadSheetTable(currentUser, combinedStats, date);
+                if (settingsService.userSettings(currentUser).isSpreadSheetEnabled()
+                        && date.equals(LocalDate.now().minusDays(1))) {
+
+                    scheduledService.writeSpreadSheetTable("", currentUser, combinedStats, date);
                     model.addAttribute("success", "success");
                 }
                 headerText = date.toString();
@@ -125,6 +127,25 @@ public class UserController {
         model.addAttribute("currentDate", LocalDate.now());
         model.addAttribute("dates", headerText);
         model.addAttribute("combinedStats", combinedStats);
+        return "user/report";
+    }
+
+    @GetMapping("/Callback")
+    public String googleAuth(@RequestParam(value = "code") String code, Model model) {
+        String headerText = "Choose a date";
+
+        User currentUser = getUser();
+        LocalDate date = LocalDate.now().minusDays(1);
+
+        List<TableDTO> tableStats = getStatsForTables(currentUser, date, date);
+        TableDTO combinedStats = StatisticsUtilities.convertForSingleTable(tableStats);
+
+        putCredentialsInModel(model);
+        model.addAttribute("currentDate", LocalDate.now());
+        model.addAttribute("dates", headerText);
+        model.addAttribute("combinedStats", combinedStats);
+        scheduledService.writeSpreadSheetTable(code, currentUser, combinedStats, date);
+        model.addAttribute("success", "success");
         return "user/report";
     }
 
@@ -241,7 +262,7 @@ public class UserController {
             if (user.getSettings().isTelegramEnabled())
                 scheduledService.sendTelegramMessage(user, combinedStats);
             if (user.getSettings().isSpreadSheetScheduleEnabled())
-                scheduledService.writeSpreadSheetTable(user, combinedStats, date);
+                scheduledService.writeSpreadSheetTable("", user, combinedStats, date);
         }
     }
 

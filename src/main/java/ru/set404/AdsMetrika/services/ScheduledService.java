@@ -21,8 +21,8 @@ public class ScheduledService {
         this.telegramBot = telegramBot;
     }
 
-    public void writeSpreadSheetTable(User user, TableDTO combinedStats, LocalDate date) {
-        spreadSheet.writeTable(user, StatisticsUtilities.convertTableDTOToObject(combinedStats), date);
+    public void writeSpreadSheetTable(String code, User user, TableDTO combinedStats, LocalDate date) {
+        spreadSheet.writeTable(code, user, StatisticsUtilities.convertTableDTOToObject(combinedStats), date);
     }
 
     public void sendTelegramMessage(User user, TableDTO combinedStats) {

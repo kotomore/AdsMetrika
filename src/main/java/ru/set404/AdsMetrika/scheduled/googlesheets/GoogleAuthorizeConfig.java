@@ -12,8 +12,8 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.MemoryDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import org.springframework.stereotype.Component;
-import ru.set404.AdsMetrika.exceptions.GoogleAuthTimedOutException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import ru.set404.AdsMetrika.exceptions.OAuthCredentialEmptyException;
 
 import java.io.IOException;
@@ -22,19 +22,23 @@ import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
-@Component
-public class GoogleAuthorizeUtil {
-    private static final String APPLICATION_NAME = "AdsMetrika";
+@Configuration
+public class GoogleAuthorizeConfig {
     private Credential credential;
     private String redirectUri;
+    @Value("${google.application.name}")
+    private String applicationName;
+    @Value("${google.credentials.file.path}")
+    private String credentialsFilePath;
 
     private AuthorizationCodeInstalledApp auth;
 
-    private Credential getCredential() throws IOException, GeneralSecurityException {
+
+    private Credential getCredential(String code) throws IOException, GeneralSecurityException {
         Credential var7;
 
         if (auth == null) {
-            InputStream in = GoogleAuthorizeUtil.class.getResourceAsStream("/credentials.json");
+            InputStream in = GoogleAuthorizationConfig.class.getResourceAsStream(credentialsFilePath);
             assert in != null;
             GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JacksonFactory.getDefaultInstance(),
                     new InputStreamReader(in));
@@ -45,7 +49,9 @@ public class GoogleAuthorizeUtil {
                     clientSecrets, scopes)
                     .setDataStoreFactory(new MemoryDataStoreFactory()).setAccessType("offline").build();
 
-            LocalServerReceiver localServerReceiver = new LocalServerReceiver();
+            LocalServerReceiver localServerReceiver = new LocalServerReceiver.Builder()
+                    .setPort(8888)
+                    .build();
             auth = new AuthorizationCodeInstalledApp(flow, localServerReceiver);
         }
         if (redirectUri == null) {
@@ -56,28 +62,13 @@ public class GoogleAuthorizeUtil {
                 return credential;
             }
 
-            redirectUri = auth.getReceiver().getRedirectUri();
+            redirectUri = "https://adsmetrika.ru/Callback";
             AuthorizationCodeRequestUrl authorizationUrl = auth.getFlow().newAuthorizationUrl().setRedirectUri(redirectUri);
             throw new OAuthCredentialEmptyException(String.valueOf(authorizationUrl));
         }
 
-        Thread thread = new Thread(() -> {
-            try {
-                Thread.sleep(60000);
-                auth.getReceiver().stop();
-                auth = null;
-                redirectUri = null;
-
-            } catch (InterruptedException | IOException ignore) {}
-        });
-        thread.start();
-
-        String code = auth.getReceiver().waitForCode();
-        thread.interrupt();
-
-        if (code == null)
-            throw new GoogleAuthTimedOutException("Login timed out");
         TokenResponse response = auth.getFlow().newTokenRequest(code).setRedirectUri(redirectUri).execute();
+
         var7 = auth.getFlow().createAndStoreCredential(response, "user");
         auth.getReceiver().stop();
         this.credential = var7;
@@ -88,13 +79,13 @@ public class GoogleAuthorizeUtil {
         return credential != null && (credential.getRefreshToken() != null || credential.getExpiresInSeconds() == null || credential.getExpiresInSeconds() > 60L);
     }
 
-    public Sheets getSheetsService() throws IOException, GeneralSecurityException {
+    public Sheets getSheetsService(String code) throws IOException, GeneralSecurityException {
         if (!isAuth())
-            credential = getCredential();
+            credential = getCredential(code);
         return new Sheets.Builder(
                 GoogleNetHttpTransport.newTrustedTransport(),
                 JacksonFactory.getDefaultInstance(), credential)
-                .setApplicationName(APPLICATION_NAME)
+                .setApplicationName(applicationName)
                 .build();
     }
 }

@@ -4,7 +4,6 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.set404.AdsMetrika.exceptions.GoogleAuthTimedOutException;
 import ru.set404.AdsMetrika.models.User;
 
 import java.io.IOException;
@@ -18,27 +17,21 @@ import java.util.Locale;
 
 @Component
 public class SpreadSheet {
-    private final GoogleAuthorizeUtil googleAuthorizeUtil;
-    //Google Spreadsheet id (getting from url)
+    private final GoogleAuthorizeConfig googleAuthorizeConfig;
     private Sheets sheetsService;
 
-
     @Autowired
-    public SpreadSheet(GoogleAuthorizeUtil googleAuthorizeUtil) {
-        this.googleAuthorizeUtil = googleAuthorizeUtil;
+    public SpreadSheet(GoogleAuthorizeConfig googleAuthorizeConfig) {
+        this.googleAuthorizeConfig = googleAuthorizeConfig;
     }
 
-    public void authorize() throws GeneralSecurityException, IOException {
-        sheetsService = googleAuthorizeUtil.getSheetsService();
+    public void authorize(String code) throws GeneralSecurityException, IOException {
+        sheetsService = googleAuthorizeConfig.getSheetsService(code);
     }
 
-    public boolean isAuth() {
-        return googleAuthorizeUtil.isAuth();
-    }
-
-    public void writeTable(User user, List<List<Object>> combinedStatsObject, LocalDate date) {
+    public void writeTable(String code, User user, List<List<Object>> combinedStatsObject, LocalDate date) {
         try {
-            authorize();
+            authorize(code);
 
             String spreadSheetId = user.getSettings().getSpreadSheetId();
 
@@ -59,6 +52,7 @@ public class SpreadSheet {
                     .setValueInputOption("USER_ENTERED")
                     .execute();
         } catch (GeneralSecurityException | IOException e) {
+            e.printStackTrace();
             throw new RuntimeException("Something wrong with google authorization");
         }
     }
