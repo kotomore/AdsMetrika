@@ -14,6 +14,7 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.context.annotation.SessionScope;
 import ru.set404.AdsMetrika.exceptions.OAuthCredentialEmptyException;
 
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.security.GeneralSecurityException;
 import java.util.List;
 
 @Configuration
+@SessionScope
 public class GoogleAuthorizeConfig {
     private Credential credential;
     private String redirectUri;
@@ -53,9 +55,20 @@ public class GoogleAuthorizeConfig {
                     .setPort(8888)
                     .build();
             auth = new AuthorizationCodeInstalledApp(flow, localServerReceiver);
+            // timeout for google authorization one minute
+            Thread thread = new Thread(() -> {
+                try {
+                    Thread.sleep(5000);
+                    auth = null;
+                    redirectUri = null;
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
+            });
+            thread.start();
         }
         if (redirectUri == null) {
-            //Google OAuth credentials json file
             Credential credential = auth.getFlow().loadCredential("user");
             if (credential != null && (credential.getRefreshToken() != null || credential.getExpiresInSeconds() == null || credential.getExpiresInSeconds() > 60L)) {
                 this.credential = credential;

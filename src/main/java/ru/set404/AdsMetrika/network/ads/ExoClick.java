@@ -10,6 +10,7 @@ import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.SessionScope;
 import ru.set404.AdsMetrika.models.Credentials;
 import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.network.Network;
@@ -24,6 +25,7 @@ import java.util.Map;
 import java.util.concurrent.*;
 
 @Component
+@SessionScope
 public class ExoClick implements AffiliateNetwork {
 
     private final CredentialsRepository credentialsRepository;

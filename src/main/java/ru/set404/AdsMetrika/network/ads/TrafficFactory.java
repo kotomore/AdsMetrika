@@ -9,6 +9,7 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.SessionScope;
 import ru.set404.AdsMetrika.models.Credentials;
 import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.network.Network;
@@ -27,6 +28,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@SessionScope
 public class TrafficFactory implements AffiliateNetwork {
 
     private String apiToken;
