@@ -1,7 +1,10 @@
 package ru.set404.AdsMetrika.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.set404.AdsMetrika.models.Settings;
 import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.repositories.SettingsRepository;
@@ -16,10 +19,13 @@ public class SettingsService {
         this.settingsRepository = settingsRepository;
     }
 
+    @Cacheable("settings")
     public Settings userSettings(User user) {
         return settingsRepository.findSettingsByOwner(user).orElse(new Settings());
     }
 
+    @Transactional
+    @CacheEvict("settings")
     public void update(Settings settings, User user) {
         settings.setOwner(user);
 
@@ -34,7 +40,6 @@ public class SettingsService {
 
         settingsRepository.save(settings);
     }
-
     public List<Settings> findSettingsWithScheduledTask() {
         return settingsRepository.findAllEnabledTasks();
     }

@@ -1,7 +1,6 @@
 package ru.set404.AdsMetrika.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -144,8 +143,13 @@ public class UserController {
         model.addAttribute("currentDate", LocalDate.now());
         model.addAttribute("dates", headerText);
         model.addAttribute("combinedStats", combinedStats);
-        scheduledService.writeSpreadSheetTable(code, currentUser, combinedStats, date);
-        model.addAttribute("success", "success");
+        try {
+            scheduledService.writeSpreadSheetTable(code, currentUser, combinedStats, date);
+        } catch (OAuthCredentialEmptyException e) {
+            model.addAttribute("error", "Permission denied");
+        }
+        if (!model.containsAttribute("error"))
+            model.addAttribute("success", "success");
         return "user/report";
     }
 
@@ -230,7 +234,7 @@ public class UserController {
     @PostMapping("/settings/update")
     public String updateSettings(@ModelAttribute("settings") @Valid Settings settings) {
         settingsService.update(settings, getUser());
-        return "redirect:/statistics";
+        return "redirect:/settings?success";
     }
 
     @PostMapping("/credentials/save")
@@ -247,23 +251,6 @@ public class UserController {
             credentialsService.save(credentials, getUser());
         }
         return "redirect:/statistics";
-    }
-
-    @Scheduled(cron = "0 0 11 * * *", zone = "Europe/Moscow")
-    public void scheduleTask() {
-        LocalDate date = LocalDate.now().minusDays(1);
-
-        List<Settings> settingsList = settingsService.findSettingsWithScheduledTask();
-        for (Settings settings : settingsList) {
-            User user = settings.getOwner();
-            List<TableDTO> tableStats = getStatsForTables(user, date, date);
-            TableDTO combinedStats = StatisticsUtilities.combineTableDTO(tableStats);
-
-            if (user.getSettings().isTelegramEnabled())
-                scheduledService.sendTelegramMessage(user, combinedStats);
-            if (user.getSettings().isSpreadSheetScheduleEnabled())
-                scheduledService.writeSpreadSheetTable("", user, combinedStats, date);
-        }
     }
 
     private User getUser() {

@@ -230,6 +230,11 @@
 
         <div class="page-content">
             <div class="container-fluid">
+                <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="mdi mdi-check-all me-2"></i>
+                    Success
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
                 <div class="row">
                     <div class="col-12">
                         <div class="page-title-box d-sm-flex align-items-center justify-content-between">
@@ -260,6 +265,7 @@
                                             <input th:field="${settings.spreadSheetScheduleEnabled}" th:name="${settings.spreadSheetScheduleEnabled}" type="checkbox" class="form-check-input" id="customSwitch3" checked>
                                             <label class="form-check-label" for="customSwitch3">Activate scheduled send for Google SpreadSheets (11:00 a.m)</label>
                                         </div>
+                                        <hr>
                                         <div class="row mb-3">
                                             <label for="telegram-name" class="col-sm-5 col-form-label">Telegram numbers</label>
                                             <p>Add this - <a

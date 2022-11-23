@@ -11,9 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 import ru.set404.AdsMetrika.models.Credentials;
-import ru.set404.AdsMetrika.models.User;
-import ru.set404.AdsMetrika.network.Network;
-import ru.set404.AdsMetrika.repositories.CredentialsRepository;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
@@ -33,19 +30,17 @@ public class TrafficFactory implements AffiliateNetwork {
 
     private String apiToken;
     private String password;
-    private final CredentialsRepository credentialsRepository;
     private final ObjectMapper objectMapper;
     protected Log logger = LogFactory.getLog(this.getClass());
 
 
     @Autowired
-    public TrafficFactory(CredentialsRepository credentialsRepository, ObjectMapper objectMapper) {
-        this.credentialsRepository = credentialsRepository;
+    public TrafficFactory(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
-    private List<Integer> getCampaignList(User user) {
-        authorization(user);
+    private List<Integer> getCampaignList(Credentials credentials) {
+        authorization(credentials);
         String url = "https://main.trafficfactory.biz/webservices/" + apiToken + "/campaigns.json";
         List<Integer> campaigns = new ArrayList<>();
         JsonNode json;
@@ -61,13 +56,13 @@ public class TrafficFactory implements AffiliateNetwork {
         return campaigns;
     }
 
-    public Map<Integer, NetworkStats> getCampaignStatsMap(User user, LocalDate dateStart, LocalDate dateEnd) {
-        authorization(user);
+    public Map<Integer, NetworkStats> getCampaignStatsMap(Credentials credentials, LocalDate dateStart, LocalDate dateEnd) {
+        authorization(credentials);
         Map<Integer, NetworkStats> campaignStats = new HashMap<>();
         Map<Integer, Future<NetworkStats>> campaignStatsFuture = new HashMap<>();
 
         try {
-            List<Integer> campaigns = getCampaignList(user);
+            List<Integer> campaigns = getCampaignList(credentials);
             ExecutorService executor = Executors.newFixedThreadPool(9);
             Future<NetworkStats> networkStats;
             for (Integer campaign : campaigns) {
@@ -110,8 +105,8 @@ public class TrafficFactory implements AffiliateNetwork {
         return campaignStats;
     }
 
-    public NetworkStats getNetworkStatsByOfferCampaigns(User user, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
-        authorization(user);
+    public NetworkStats getNetworkStatsByOfferCampaigns(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+        authorization(credentials);
         int deliveries = 0;
         double total = 0;
 
@@ -176,11 +171,8 @@ public class TrafficFactory implements AffiliateNetwork {
         return response;
     }
 
-    private void authorization(User user) {
+    private void authorization(Credentials credentials) {
         if (apiToken == null || password == null) {
-            Credentials credentials = credentialsRepository.
-                    findCredentialsByOwnerAndNetworkName(user, Network.TF).orElseThrow(() ->
-                            new RuntimeException("Couldn't find Traffic Factory API. Check it"));
             this.apiToken = credentials.getUsername();
             this.password = credentials.getPassword();
         }

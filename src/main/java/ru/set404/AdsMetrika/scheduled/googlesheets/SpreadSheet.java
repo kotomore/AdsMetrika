@@ -1,13 +1,15 @@
 package ru.set404.AdsMetrika.scheduled.googlesheets;
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.set404.AdsMetrika.models.User;
+import org.springframework.web.context.annotation.SessionScope;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -16,8 +18,11 @@ import java.util.List;
 import java.util.Locale;
 
 @Component
+@SessionScope
+@NoArgsConstructor
+@Setter
 public class SpreadSheet {
-    private final GoogleAuthorizeConfig googleAuthorizeConfig;
+    private GoogleAuthorizeConfig googleAuthorizeConfig;
     private Sheets sheetsService;
 
     @Autowired
@@ -25,35 +30,34 @@ public class SpreadSheet {
         this.googleAuthorizeConfig = googleAuthorizeConfig;
     }
 
-    public void authorize(String code) throws GeneralSecurityException, IOException {
+    public void authorize(String code) {
         sheetsService = googleAuthorizeConfig.getSheetsService(code);
     }
 
-    public void writeTable(String code, User user, List<List<Object>> combinedStatsObject, LocalDate date) {
+    public void writeTable(String code, String sheetId, List<List<Object>> combinedStatsObject, LocalDate date) {
+        authorize(code);
         try {
-            authorize(code);
-
-            String spreadSheetId = user.getSettings().getSpreadSheetId();
-
-            copyTable(spreadSheetId, combinedStatsObject.size() - 3);
+            copyTable(sheetId, combinedStatsObject.size() - 3);
 
             String dateString = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
                     .withLocale(new Locale.Builder().setLanguage("ru").build())
                     .format(date);
             sheetsService.spreadsheets().values()
-                    .update(spreadSheetId, "A1", new ValueRange().setValues(List.of(List.of(dateString))))
+                    .update(sheetId, "A1", new ValueRange().setValues(List.of(List.of(dateString))))
                     .setValueInputOption("RAW")
                     .execute();
 
             ValueRange body = new ValueRange()
                     .setValues(combinedStatsObject);
             sheetsService.spreadsheets().values()
-                    .update(spreadSheetId, "A4", body)
+                    .update(sheetId, "A4", body)
                     .setValueInputOption("USER_ENTERED")
                     .execute();
-        } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Something wrong with google authorization");
+
+        } catch (GoogleJsonResponseException e) {
+            authorize(GoogleAuthorizeConfig.PERMISSION_DENIED);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

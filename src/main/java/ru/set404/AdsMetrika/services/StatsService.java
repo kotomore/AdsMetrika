@@ -1,7 +1,10 @@
 package ru.set404.AdsMetrika.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.set404.AdsMetrika.dto.StatDTO;
 import ru.set404.AdsMetrika.models.Stat;
@@ -21,11 +24,12 @@ public class StatsService {
         this.statsRepository = statsRepository;
     }
 
+    @Cacheable("stats")
     public List<Stat> getStatsList(User user, LocalDate dateStart) {
         return statsRepository.findAllByOwnerAndCreatedDateAfter(user, dateStart);
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void saveStatDTOList(List<StatDTO> statDTOList, User user, Network network, LocalDate date) {
 
         double spend = 0;

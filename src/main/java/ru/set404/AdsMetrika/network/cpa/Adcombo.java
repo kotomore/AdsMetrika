@@ -11,9 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 import ru.set404.AdsMetrika.models.Credentials;
-import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.network.Network;
-import ru.set404.AdsMetrika.repositories.CredentialsRepository;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -28,18 +26,16 @@ import java.util.Map;
 @SessionScope
 public class Adcombo {
     protected Log logger = LogFactory.getLog(this.getClass());
-    private final CredentialsRepository credentialsRepository;
     private final ObjectMapper objectMapper;
     private String apiKey;
 
     @Autowired
-    public Adcombo(CredentialsRepository credentialsRepository, ObjectMapper objectMapper) {
-        this.credentialsRepository = credentialsRepository;
+    public Adcombo(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
-    public Map<Integer, AdcomboStats> getNetworkStatMap(User user, Network network, LocalDate dateStart, LocalDate dateEnd) {
-        authorization(user);
+    public Map<Integer, AdcomboStats> getNetworkStatMap(Credentials credentials, Network network, LocalDate dateStart, LocalDate dateEnd) {
+        authorization(credentials);
         String url = "https://api.adcombo.com/stats/data/?api_key=%s" +
                 "&ts=%s&te=%s" +
                 "&group_by=offer_id" +
@@ -73,8 +69,8 @@ public class Adcombo {
         return stats;
     }
 
-    public Map<Integer, AdcomboStats> getCampaignStatMap(User user, Network network, LocalDate dateStart, LocalDate dateEnd) {
-        authorization(user);
+    public Map<Integer, AdcomboStats> getCampaignStatMap(Credentials credentials, Network network, LocalDate dateStart, LocalDate dateEnd) {
+        authorization(credentials);
         String url = "https://api.adcombo.com/stats/data/?api_key=%s" +
                 "&ts=%s&te=%s" +
                 "&group_by=subacc_4&group_by=offer_id&tz_offset=%s" +
@@ -129,11 +125,8 @@ public class Adcombo {
         return result;
     }
 
-    private void authorization(User user) {
+    private void authorization(Credentials credentials) {
         if (apiKey == null) {
-            Credentials credentials = credentialsRepository.
-                    findCredentialsByOwnerAndNetworkName((user), Network.ADCOMBO).orElseThrow(() ->
-                            new RuntimeException("Adcombo API token not found"));
             this.apiKey = credentials.getUsername();
         }
     }

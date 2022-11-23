@@ -23,4 +23,5 @@ telegram.bot.token=
 
 #JSON credential secret and app name by Google OAuth 2.0
 google.credentials.file.path=
+google.tokens.directory.path=tokens
 google.application.name=

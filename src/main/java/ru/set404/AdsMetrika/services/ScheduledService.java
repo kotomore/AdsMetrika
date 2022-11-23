@@ -14,18 +14,22 @@ import java.time.LocalDate;
 public class ScheduledService {
     private final SpreadSheet spreadSheet;
     private final TelegramBot telegramBot;
+    private final SettingsService settingsService;
 
     @Autowired
-    public ScheduledService(SpreadSheet spreadSheet, TelegramBot telegramBot) {
+    public ScheduledService(SpreadSheet spreadSheet, TelegramBot telegramBot, SettingsService settingsService) {
         this.spreadSheet = spreadSheet;
         this.telegramBot = telegramBot;
+        this.settingsService = settingsService;
     }
 
     public void writeSpreadSheetTable(String code, User user, TableDTO combinedStats, LocalDate date) {
-        spreadSheet.writeTable(code, user, StatisticsUtilities.convertTableDTOToObject(combinedStats), date);
+        String sheetId = settingsService.userSettings(user).getSpreadSheetId();
+        spreadSheet.writeTable(code, sheetId, StatisticsUtilities.convertTableDTOToObject(combinedStats), date);
     }
 
     public void sendTelegramMessage(User user, TableDTO combinedStats) {
+        String telegramId = settingsService.userSettings(user).getTelegramUsername();
         String text = "*Stats by " + LocalDate.now().minusDays(1) + "*\n\n" +
                 "*Total clicks: *" + combinedStats.getTotalClicks() + "\n" +
                 "*Total spend: *$" + (int) combinedStats.getTotalSpend() + "\n" +
@@ -34,6 +38,6 @@ public class ScheduledService {
                 "*Profit: *$" + (int) combinedStats.getTotalProfit() + "\n" +
                 "*ROI: *" + combinedStats.getTotalROI() + "%";
 
-        telegramBot.setAnswer(Long.parseLong(user.getSettings().getTelegramUsername()), text);
+        telegramBot.setAnswer(Long.parseLong(telegramId), text);
     }
 }

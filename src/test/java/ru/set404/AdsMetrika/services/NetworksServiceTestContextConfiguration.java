@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import ru.set404.AdsMetrika.models.Credentials;
 import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.network.Network;
 import ru.set404.AdsMetrika.network.ads.ExoClick;
@@ -21,20 +22,11 @@ import java.util.Map;
 
 @TestConfiguration
 public class NetworksServiceTestContextConfiguration {
-
-    @MockBean
-    private final CredentialsRepository credentialsRepository;
-
-    @Autowired
-    public NetworksServiceTestContextConfiguration(CredentialsRepository credentialsRepository) {
-        this.credentialsRepository = credentialsRepository;
-    }
-
     @Bean
     public TrafficFactory trafficFactory () {
-        return new TrafficFactory(credentialsRepository, new ObjectMapper()) {
+        return new TrafficFactory(new ObjectMapper()) {
             @Override
-            public Map<Integer, NetworkStats> getCampaignStatsMap(User user, LocalDate dateStart, LocalDate dateEnd) {
+            public Map<Integer, NetworkStats> getCampaignStatsMap(Credentials credentials, LocalDate dateStart, LocalDate dateEnd) {
                 Map<Integer, NetworkStats> networkStatsMap = new HashMap<>();
                 networkStatsMap.put(12345, getNetworkStats());
                 networkStatsMap.put(54321, getNetworkStats());
@@ -42,7 +34,7 @@ public class NetworksServiceTestContextConfiguration {
             }
 
             @Override
-            public NetworkStats getNetworkStatsByOfferCampaigns(User user, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+            public NetworkStats getNetworkStatsByOfferCampaigns(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
                 return getNetworkStats();
             }
         };
@@ -50,9 +42,9 @@ public class NetworksServiceTestContextConfiguration {
 
     @Bean
     public ExoClick exoClick () {
-        return new ExoClick(credentialsRepository, new ObjectMapper()) {
+        return new ExoClick(new ObjectMapper()) {
             @Override
-            public Map<Integer, NetworkStats> getCampaignStatsMap(User user, LocalDate dateStart, LocalDate dateEnd) {
+            public Map<Integer, NetworkStats> getCampaignStatsMap(Credentials credentials, LocalDate dateStart, LocalDate dateEnd) {
                 Map<Integer, NetworkStats> networkStatsMap = new HashMap<>();
                 networkStatsMap.put(12345, getNetworkStats());
                 networkStatsMap.put(54321, getNetworkStats());
@@ -60,7 +52,7 @@ public class NetworksServiceTestContextConfiguration {
             }
 
             @Override
-            public NetworkStats getNetworkStatsByOfferCampaigns(User user, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+            public NetworkStats getNetworkStatsByOfferCampaigns(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
                 return getNetworkStats();
             }
         };
@@ -68,9 +60,9 @@ public class NetworksServiceTestContextConfiguration {
 
     @Bean
     public Adcombo adcombo() {
-        return new Adcombo(credentialsRepository, new ObjectMapper()) {
+        return new Adcombo(new ObjectMapper()) {
             @Override
-            public Map<Integer, AdcomboStats> getNetworkStatMap(User user, Network network, LocalDate dateStart, LocalDate dateEnd) {
+            public Map<Integer, AdcomboStats> getNetworkStatMap(Credentials credentials, Network network, LocalDate dateStart, LocalDate dateEnd) {
                 Map<Integer, AdcomboStats> adcomboStatsMap = new HashMap<>();
                 adcomboStatsMap.put(12345, getAdcomboStats());
                 adcomboStatsMap.put(54321, getAdcomboStats());
@@ -78,7 +70,7 @@ public class NetworksServiceTestContextConfiguration {
             }
 
             @Override
-            public Map<Integer, AdcomboStats> getCampaignStatMap(User user, Network network, LocalDate dateStart, LocalDate dateEnd) {
+            public Map<Integer, AdcomboStats> getCampaignStatMap(Credentials credentials, Network network, LocalDate dateStart, LocalDate dateEnd) {
                 Map<Integer, AdcomboStats> adcomboStatsMap = new HashMap<>();
                 adcomboStatsMap.put(12345, getAdcomboStats());
                 adcomboStatsMap.put(54321, getAdcomboStats());
