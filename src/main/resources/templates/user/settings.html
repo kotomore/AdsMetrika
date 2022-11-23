@@ -129,7 +129,6 @@
                     </button>
                     <div class="dropdown-menu dropdown-menu-end">
                         <!-- item-->
-                        <a class="dropdown-item" href="/offers"><i class="ri-user-line align-middle me-1"></i> Offers</a>
                         <a class="dropdown-item" href="/settings"><i class="ri-settings-2-line align-middle me-1"></i> Settings</a>
                         <div class="dropdown-divider"></div>
 
@@ -230,11 +229,7 @@
 
         <div class="page-content">
             <div class="container-fluid">
-                <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="mdi mdi-check-all me-2"></i>
-                    Success
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
+
                 <div class="row">
                     <div class="col-12">
                         <div class="page-title-box d-sm-flex align-items-center justify-content-between">
@@ -267,11 +262,11 @@
                                         </div>
                                         <hr>
                                         <div class="row mb-3">
-                                            <label for="telegram-name" class="col-sm-5 col-form-label">Telegram numbers</label>
+                                            <label for="telegram-name" class="col-sm-5 col-form-label">Telegram digits</label>
                                             <p>Add this - <a
                                                     target="_blank" href="https://t.me/AdsMetrikaBot">bot</a> and press "start" and enter the received numbers</p>
                                             <div class="col-sm-5">
-                                                <input th:field="${settings.telegramUsername}" th:name="${settings.telegramUsername}" th:value="${settings.getTelegramUsername()}" class="form-control" type="text" placeholder="Username"
+                                                <input th:field="${settings.telegramUsername}" th:name="${settings.telegramUsername}" th:value="${settings.getTelegramUsername()}" class="form-control" type="text" placeholder="Telegram digits"
                                                        id="telegram-name">
                                             </div>
                                         </div>
@@ -279,6 +274,16 @@
                                             <input th:field="${settings.telegramEnabled}" th:name="${settings.telegramEnabled}" type="checkbox" class="form-check-input" id="customSwitch2" checked>
                                             <label class="form-check-label" for="customSwitch2">Activate scheduled send for Telegram Bot (11:00 a.m)</label>
                                         </div>
+                                        <hr>
+                                        <div style="padding-bottom: 50px;" class="row mb-3">
+                                            <label for="adcombo-name" class="col-sm-5 col-form-label">Favorite offers</label>
+                                            <p>Add the offers id from Adcombo separated by commas <strong style="color: red">12345, 54321, 11223</strong></p>
+                                            <div class="col-sm-5">
+                                                <input th:field="${settings.adcomboId}" th:name="${settings.adcomboId}" th:value="${settings.getAdcomboId()}" class="form-control" type="text" placeholder="Adcombo id"
+                                                       id="adcombo-name">
+                                            </div>
+                                        </div>
+
                                         <button type="submit" class="btn btn-success waves-effect waves-light">Save</button>
                                     </form>
                                 </div>
@@ -561,8 +566,29 @@
 <!-- toastr init -->
 <script src="../assets/js/pages/toastr.init.js"></script>
 
-<script th:if="${error}" th:inline="javascript">
-    toastr["error"]([[${error}]]);
+<script th:if="${param.success}" th:inline="javascript">
+    toastr["success"]("Success");
+    toastr.options = {
+        "closeButton": false,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": false,
+        "positionClass": "toast-top-center",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": 300,
+        "hideDuration": 1000,
+        "timeOut": 5000,
+        "extendedTimeOut": 1000,
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    }
+</script>
+
+<script th:if="${param.error}" th:inline="javascript">
+    toastr["error"]("Adcombo Id not valid");
     toastr.options = {
         "closeButton": false,
         "debug": false,

@@ -25,9 +25,12 @@ public class SettingsService {
     }
 
     @Transactional
-    @CacheEvict("settings")
+    @CacheEvict(cacheNames = "settings", allEntries = true)
     public void update(Settings settings, User user) {
         settings.setOwner(user);
+
+        if (!settings.getAdcomboId().isEmpty())
+            settings.setAdcomboId(settings.getAdcomboId().trim());
 
         if (settings.getSpreadSheetId().isEmpty()) {
             settings.setSpreadSheetEnabled(false);

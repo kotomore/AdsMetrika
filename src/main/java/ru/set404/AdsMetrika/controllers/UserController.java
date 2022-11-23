@@ -17,7 +17,7 @@ import ru.set404.AdsMetrika.security.UserDetails;
 import ru.set404.AdsMetrika.services.*;
 import ru.set404.AdsMetrika.network.Network;
 import ru.set404.AdsMetrika.util.CredentialsValidator;
-import ru.set404.AdsMetrika.util.OfferListDTOValidator;
+import ru.set404.AdsMetrika.util.SettingsValidator;
 import ru.set404.AdsMetrika.util.StatisticsUtilities;
 
 import javax.validation.Valid;
@@ -30,26 +30,24 @@ import java.util.stream.Collectors;
 @Controller
 public class UserController {
     private final NetworksService networksService;
-    private final OffersService offersService;
     private final StatsService statsService;
     private final CredentialsService credentialsService;
     private final ScheduledService scheduledService;
     private final SettingsService settingsService;
     private final CredentialsValidator credentialsValidator;
-    private final OfferListDTOValidator offerListDTOValidator;
+    private final SettingsValidator settingsValidator;
 
 
     @Autowired
-    public UserController(NetworksService networksService, OffersService offersService, StatsService statsService,
-                          CredentialsService credentialsService, ScheduledService scheduledService, SettingsService settingsService, CredentialsValidator credentialsValidator, OfferListDTOValidator offerListDTOValidator) {
+    public UserController(NetworksService networksService, StatsService statsService, CredentialsService credentialsService,
+                          ScheduledService scheduledService, SettingsService settingsService, CredentialsValidator credentialsValidator, SettingsValidator settingsValidator) {
         this.networksService = networksService;
-        this.offersService = offersService;
         this.statsService = statsService;
         this.credentialsService = credentialsService;
         this.scheduledService = scheduledService;
         this.settingsService = settingsService;
         this.credentialsValidator = credentialsValidator;
-        this.offerListDTOValidator = offerListDTOValidator;
+        this.settingsValidator = settingsValidator;
     }
 
     @GetMapping("/statistics")
@@ -62,6 +60,7 @@ public class UserController {
         try {
             if (dateStart != null) {
                 tableStats = getStatsForTables(currentUser, dateStart, dateEnd);
+                model.addAttribute("success", "Success");
             }
             final int COUNT_DAYS_IN_CHART = 7;
             oldStats = statsService.getStatsList(currentUser, LocalDate.now().minusDays(COUNT_DAYS_IN_CHART));
@@ -72,8 +71,17 @@ public class UserController {
 
         TableDTO combinedStats = StatisticsUtilities.combineTableDTO(tableStats);
 
+        List<String> favoriteOffers = List.of(settingsService.userSettings(currentUser).getAdcomboId().split(","));
+        List<StatDTO> favoriteStatDTO = combinedStats.getCurrentStats().stream()
+                .filter(statDTO -> favoriteOffers.contains(String.valueOf(statDTO.getCampaignId()))).toList();
+
         putCredentialsInModel(model);
         model.addAttribute("currentDate", LocalDate.now());
+
+        //Favorite offers statistics
+        model.addAttribute("favorite", favoriteStatDTO);
+
+        //Table statistics
         model.addAttribute("statistics", tableStats);
         model.addAttribute("combinedStats", combinedStats);
 
@@ -85,7 +93,6 @@ public class UserController {
 
         //donut-chart
         model.addAttribute("totalSpendByNetwork", StatisticsUtilities.getTotalChartSpend(oldStats));
-
         return "user/index";
     }
 
@@ -104,6 +111,7 @@ public class UserController {
                 List<TableDTO> tableStats = getStatsForTables(currentUser, firstDay, lastDay);
                 combinedStats = StatisticsUtilities.combineTableDTO(tableStats);
                 headerText = firstDay + " - " + lastDay;
+                model.addAttribute("success", "Success");
             } else if (type != null && type.equals("daily") && date != null) {
                 List<TableDTO> tableStats = getStatsForTables(currentUser, date, date);
                 combinedStats = StatisticsUtilities.convertForSingleTable(tableStats);
@@ -111,7 +119,7 @@ public class UserController {
                         && date.equals(LocalDate.now().minusDays(1))) {
 
                     scheduledService.writeSpreadSheetTable("", currentUser, combinedStats, date);
-                    model.addAttribute("success", "success");
+                    model.addAttribute("success", "Success");
                 }
                 headerText = date.toString();
             }
@@ -170,6 +178,7 @@ public class UserController {
                 else
                     campaignStats = networksService.getCampaignStats(currentUser, network, dateStart, dateEnd);
                 headerText = dateStart + " - " + dateEnd;
+                model.addAttribute("success", "Success");
             }
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
@@ -179,22 +188,7 @@ public class UserController {
         model.addAttribute("dates", headerText);
         model.addAttribute("currentDate", LocalDate.now());
         model.addAttribute("combinedStats", campaignStats);
-
         return "user/campaigns";
-    }
-
-    @GetMapping("/offers")
-    public String offers(Model model) {
-        OfferListDTO offerForm = new OfferListDTO();
-        final int COUNT_EMPTY_FIELDS_FOR_OFFER = 7;
-        for (int i = 1; i <= COUNT_EMPTY_FIELDS_FOR_OFFER; i++) {
-            offerForm.addOffer(new OfferDTO());
-        }
-
-        putCredentialsInModel(model);
-        model.addAttribute("blankForm", offerForm);
-        model.addAttribute("form", offersService.getOfferListDTO(getUser()));
-        return "user/offers";
     }
 
     @GetMapping("/settings")
@@ -205,34 +199,12 @@ public class UserController {
         return "user/settings";
     }
 
-    @GetMapping("/offers/{id}/delete")
-    public String delete(@PathVariable("id") int id) {
-        offersService.deleteById(getUser(), id);
-        return "redirect:/offers?success";
-    }
-
-    @PostMapping("/offers/edit")
-    public String editOffers(@ModelAttribute("form") OfferListDTO offerDTOS, BindingResult bindingResult) {
-        offerListDTOValidator.validate(offerDTOS, bindingResult);
-        if (bindingResult.hasErrors())
-            return "redirect:/offers?error";
-
-        offersService.saveOffersDTOList(offerDTOS, getUser());
-        return "redirect:/offers?success";
-    }
-
-    @PostMapping("/offers/save")
-    public String saveOffers(@ModelAttribute("blankForm") OfferListDTO offerDTOS, BindingResult bindingResult) {
-        offerListDTOValidator.validate(offerDTOS, bindingResult);
-        if (bindingResult.hasErrors())
-            return "redirect:/offers?error";
-
-        offersService.saveOffersDTOList(offerDTOS, getUser());
-        return "redirect:/offers?success";
-    }
-
     @PostMapping("/settings/update")
-    public String updateSettings(@ModelAttribute("settings") @Valid Settings settings) {
+    public String updateSettings(@ModelAttribute("settings") @Valid Settings settings, BindingResult bindingResult) {
+        settingsValidator.validate(settings, bindingResult);
+        if (bindingResult.hasErrors()) {
+            return "redirect:/settings?error";
+        }
         settingsService.update(settings, getUser());
         return "redirect:/settings?success";
     }

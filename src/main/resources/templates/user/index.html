@@ -57,7 +57,7 @@
                                 <span class="logo-sm">
                                     <img src="assets/images/logo-sm.png" alt="logo-sm" height="36">
                                 </span>
-                        <span style="height: 36px;"  class="logo-lg">
+                        <span style="height: 36px;" class="logo-lg">
                                     <img src="assets/images/logo-dark.png" alt="logo-dark" height="36">
                                 </span>
                     </a>
@@ -127,12 +127,12 @@
                     </button>
                     <div class="dropdown-menu dropdown-menu-end">
                         <!-- item-->
-                        <a class="dropdown-item" href="/offers"><i class="ri-user-line align-middle me-1"></i> Offers</a>
-                        <a class="dropdown-item" href="/settings"><i class="ri-settings-2-line align-middle me-1"></i> Settings</a>
+                        <a class="dropdown-item" href="/settings"><i class="ri-settings-2-line align-middle me-1"></i>
+                            Settings</a>
                         <div class="dropdown-divider"></div>
 
                         <form th:action="@{/logout}" th:method="POST">
-                            <input class="dropdown-item text-danger"  type="submit" value="Logout">
+                            <input class="dropdown-item text-danger" type="submit" value="Logout">
                         </form>
                     </div>
                 </div>
@@ -190,8 +190,10 @@
                     <li>
                         <a href="#" data-bs-toggle="modal" data-bs-target="#myModal" class=" waves-effect">
                             <i class="ri-account-circle-line"></i>
-                            <span th:if="${credentialsADCOMBO.getUsername()==null}" class="badge rounded-pill bg-danger float-end">NO</span>
-                            <span th:unless="${credentialsADCOMBO.getUsername()==null}" class="badge rounded-pill bg-success float-end">OK</span>
+                            <span th:if="${credentialsADCOMBO.getUsername()==null}"
+                                  class="badge rounded-pill bg-danger float-end">NO</span>
+                            <span th:unless="${credentialsADCOMBO.getUsername()==null}"
+                                  class="badge rounded-pill bg-success float-end">OK</span>
                             <span>Adcombo</span>
                         </a>
                     </li>
@@ -199,16 +201,20 @@
                     <li>
                         <a href="#" data-bs-toggle="modal" data-bs-target="#myModal2" class=" waves-effect">
                             <i class="ri-account-circle-line"></i>
-                            <span th:if="${credentialsTF.getUsername()==null}" class="badge rounded-pill bg-danger float-end">NO</span>
-                            <span th:unless="${credentialsTF.getUsername()==null}" class="badge rounded-pill bg-success float-end">OK</span>
+                            <span th:if="${credentialsTF.getUsername()==null}"
+                                  class="badge rounded-pill bg-danger float-end">NO</span>
+                            <span th:unless="${credentialsTF.getUsername()==null}"
+                                  class="badge rounded-pill bg-success float-end">OK</span>
                             <span>TrafficFactory</span>
                         </a>
                     </li>
                     <li>
                         <a href="#" data-bs-toggle="modal" data-bs-target="#myModal3" class=" waves-effect">
                             <i class="ri-account-circle-line"></i>
-                            <span th:if="${credentialsEXO.getUsername()==null}" class="badge rounded-pill bg-danger float-end">NO</span>
-                            <span th:unless="${credentialsEXO.getUsername()==null}" class="badge rounded-pill bg-success float-end">OK</span>
+                            <span th:if="${credentialsEXO.getUsername()==null}"
+                                  class="badge rounded-pill bg-danger float-end">NO</span>
+                            <span th:unless="${credentialsEXO.getUsername()==null}"
+                                  class="badge rounded-pill bg-success float-end">OK</span>
                             <span>ExoClick</span>
                         </a>
                     </li>
@@ -225,7 +231,7 @@
     <div class="main-content">
         <div class="page-content">
             <div class="container-fluid">
-                <div th:if="${checkAPI}"  class="alert alert-warning" role="alert">
+                <div th:if="${checkAPI}" class="alert alert-warning" role="alert">
                     Fill in the API fields for adcombo and advertising networks
                 </div>
                 <!-- start page title -->
@@ -235,13 +241,18 @@
                             <h4 class="mb-sm-0">Dashboard</h4>
                             <h4 th:if="${statistics.isEmpty()}" class="mb-sm-0">(Choose a date)</h4>
 
-                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker1" th:href="@{/statistics(ds=${currentDate}, de=${currentDate})}">Today</a>
-                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker2" th:href="@{/statistics(ds=${currentDate.minusDays(1)}, de=${currentDate.minusDays(1)})}">Yesterday</a>
-                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker3" th:href="@{/statistics(ds=${currentDate.minusDays(2)}, de=${currentDate})}">Last 3
+                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker1"
+                               th:href="@{/statistics(ds=${currentDate}, de=${currentDate})}">Today</a>
+                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker2"
+                               th:href="@{/statistics(ds=${currentDate.minusDays(1)}, de=${currentDate.minusDays(1)})}">Yesterday</a>
+                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker3"
+                               th:href="@{/statistics(ds=${currentDate.minusDays(2)}, de=${currentDate})}">Last 3
                                 days</a>
-                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker4" th:href="@{/statistics(ds=${currentDate.minusDays(6)}, de=${currentDate})}">Last 7
+                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker4"
+                               th:href="@{/statistics(ds=${currentDate.minusDays(6)}, de=${currentDate})}">Last 7
                                 days</a>
-                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker5" th:href="@{/statistics(ds=${currentDate.withDayOfMonth(1)}, de=${currentDate})}">This
+                            <a class="btn btn-link btn-rounded waves-effect" id="datepicker5"
+                               th:href="@{/statistics(ds=${currentDate.withDayOfMonth(1)}, de=${currentDate})}">This
                                 Month</a>
                             <a class="btn btn-link btn-rounded waves-effect" id="datepicker6" th:href="@{/statistics(ds=${currentDate.minusMonths(1).withDayOfMonth(1)},de=${currentDate.minusMonths(1)
                                 .withDayOfMonth(currentDate.minusMonths(1).getMonth()
@@ -266,13 +277,17 @@
                                 <div class="d-flex">
                                     <div th:if="${combinedStats}" class="flex-grow-1">
                                         <p class="text-truncate font-size-14 mb-2">Total Spend</p>
-                                        <h4 th:text="${#numbers.formatDecimal(combinedStats.getTotalSpend(), 1, 2)}+'$'" class="mb-2">total spend</h4>
-                                        <p th:if="${chartDates.contains(currentDate.minusDays(1)) && chartCosts.size()>1}" class="text-muted mb-0">
-                                            <span th:if="${((combinedStats.getTotalSpend()-chartCosts.get(chartDates.indexOf(currentDate.minusDays(1))))/chartCosts.get(chartDates.indexOf(currentDate.minusDays(1)))*100)}>=0"  class="text-success fw-bold font-size-12 me-2">
+                                        <h4 th:text="${#numbers.formatDecimal(combinedStats.getTotalSpend(), 1, 2)}+'$'"
+                                            class="mb-2">total spend</h4>
+                                        <p th:if="${chartDates.contains(currentDate.minusDays(1)) && chartCosts.size()>1}"
+                                           class="text-muted mb-0">
+                                            <span th:if="${((combinedStats.getTotalSpend()-chartCosts.get(chartDates.indexOf(currentDate.minusDays(1))))/chartCosts.get(chartDates.indexOf(currentDate.minusDays(1)))*100)}>=0"
+                                                  class="text-success fw-bold font-size-12 me-2">
                                             <i class="ri-arrow-right-up-line me-1 align-middle"></i>
                                                 <span th:text="${#numbers.formatDecimal(((combinedStats.getTotalSpend()-chartCosts.get(chartDates.indexOf(currentDate.minusDays(1))))/chartCosts.get(chartDates.indexOf(currentDate.minusDays(1)))*100), 1, 2)}+'%'"></span>
                                             </span>
-                                            <span th:if="${((combinedStats.getTotalSpend()-chartCosts.get(chartDates.indexOf(currentDate.minusDays(1))))/chartCosts.get(chartDates.indexOf(currentDate.minusDays(1)))*100)}<0" class="text-danger fw-bold font-size-12 me-2">
+                                            <span th:if="${((combinedStats.getTotalSpend()-chartCosts.get(chartDates.indexOf(currentDate.minusDays(1))))/chartCosts.get(chartDates.indexOf(currentDate.minusDays(1)))*100)}<0"
+                                                  class="text-danger fw-bold font-size-12 me-2">
                                             <i class="ri-arrow-right-down-line me-1 align-middle"></i>
                                                 <span th:text="${#numbers.formatDecimal(((combinedStats.getTotalSpend()-chartCosts.get(chartDates.indexOf(currentDate.minusDays(1))))/chartCosts.get(chartDates.indexOf(currentDate.minusDays(1)))*100), 1, 2)}+'%'"></span>
                                             </span>
@@ -293,13 +308,17 @@
                                 <div class="d-flex">
                                     <div th:if="${combinedStats}" class="flex-grow-1">
                                         <p class="text-truncate font-size-14 mb-2">Total Revenue</p>
-                                        <h4 th:text="${#numbers.formatDecimal(combinedStats.getTotalRevenue(), 1, 2)}+'$'" class="mb-2">total revenue</h4>
-                                        <p th:if="${chartDates.contains(currentDate.minusDays(1)) && chartCosts.size()>1}" class="text-muted mb-0">
-                                            <span th:if="${((combinedStats.getTotalRevenue()-chartRevenue.get(chartDates.indexOf(currentDate.minusDays(1))))/chartRevenue.get(chartDates.indexOf(currentDate.minusDays(1)))*100)}>=0"  class="text-success fw-bold font-size-12 me-2">
+                                        <h4 th:text="${#numbers.formatDecimal(combinedStats.getTotalRevenue(), 1, 2)}+'$'"
+                                            class="mb-2">total revenue</h4>
+                                        <p th:if="${chartDates.contains(currentDate.minusDays(1)) && chartCosts.size()>1}"
+                                           class="text-muted mb-0">
+                                            <span th:if="${((combinedStats.getTotalRevenue()-chartRevenue.get(chartDates.indexOf(currentDate.minusDays(1))))/chartRevenue.get(chartDates.indexOf(currentDate.minusDays(1)))*100)}>=0"
+                                                  class="text-success fw-bold font-size-12 me-2">
                                             <i class="ri-arrow-right-up-line me-1 align-middle"></i>
                                                 <span th:text="${#numbers.formatDecimal(((combinedStats.getTotalRevenue()-chartRevenue.get(chartDates.indexOf(currentDate.minusDays(1))))/chartRevenue.get(chartDates.indexOf(currentDate.minusDays(1)))*100), 1, 2)}+'%'"></span>
                                             </span>
-                                            <span th:if="${((combinedStats.getTotalRevenue()-chartRevenue.get(chartDates.indexOf(currentDate.minusDays(1))))/chartRevenue.get(chartDates.indexOf(currentDate.minusDays(1)))*100)}<0" class="text-danger fw-bold font-size-12 me-2">
+                                            <span th:if="${((combinedStats.getTotalRevenue()-chartRevenue.get(chartDates.indexOf(currentDate.minusDays(1))))/chartRevenue.get(chartDates.indexOf(currentDate.minusDays(1)))*100)}<0"
+                                                  class="text-danger fw-bold font-size-12 me-2">
                                             <i class="ri-arrow-right-down-line me-1 align-middle"></i>
                                                 <span th:text="${#numbers.formatDecimal(((combinedStats.getTotalRevenue()-chartRevenue.get(chartDates.indexOf(currentDate.minusDays(1))))/chartRevenue.get(chartDates.indexOf(currentDate.minusDays(1)))*100), 1, 2)}+'%'"></span>
                                             </span>
@@ -320,7 +339,8 @@
                                 <div class="d-flex">
                                     <div th:if="${combinedStats}" class="flex-grow-1">
                                         <p class="text-truncate font-size-14 mb-2">Total Profit</p>
-                                        <h4 th:text="${#numbers.formatDecimal(combinedStats.getTotalProfit(), 1, 2)} + '$'" class="mb-2">total profit</h4>
+                                        <h4 th:text="${#numbers.formatDecimal(combinedStats.getTotalProfit(), 1, 2)} + '$'"
+                                            class="mb-2">total profit</h4>
                                     </div>
                                     <div class="avatar-sm">
                                                 <span class="avatar-title bg-light text-primary rounded-3">
@@ -337,7 +357,8 @@
                                 <div class="d-flex">
                                     <div th:if="${combinedStats}" class="flex-grow-1">
                                         <p class="text-truncate font-size-14 mb-2">Total ROI</p>
-                                        <h4 th:text="${#numbers.formatDecimal(combinedStats.getTotalROI(), 1, 0)} +'%'" class="mb-2">total roi</h4>
+                                        <h4 th:text="${#numbers.formatDecimal(combinedStats.getTotalROI(), 1, 0)} +'%'"
+                                            class="mb-2">total roi</h4>
                                     </div>
                                     <div class="avatar-sm">
                                                 <span class="avatar-title bg-light text-success rounded-3">
@@ -350,6 +371,71 @@
                     </div><!-- end col -->
                 </div><!-- end row -->
 
+                <a th:if="${favorite.size() > 0}" data-bs-toggle="collapse" href="#collapseExample"
+                   aria-expanded="false" aria-controls="collapseExample">
+
+                    <div  class="row">
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Favorite offers</h4>
+                                    <div class="collapse" id="collapseExample">
+                                        <div class="card card-body mb-0">
+                                            <div class="table-responsive">
+                                                <table class="table mb-0">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Offer</th>
+                                                        <th>Clicks</th>
+                                                        <th>Cost $</th>
+                                                        <th>Hold</th>
+                                                        <th>Approve</th>
+                                                        <th>Approve $</th>
+                                                        <th>Profit $</th>
+                                                        <th style="width: 120px;">ROI %</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr th:style="${offer.getProfit() < 0 ? 'color: red;' : 'color: green;'}"
+                                                        th:each="offer : ${favorite}">
+                                                        <td th:text="'[' + ${offer.getCampaignId()} + '] ' + ${offer.getCampaignName()}">
+                                                            Table cell
+                                                        </td>
+                                                        <td th:text="${#numbers.formatDecimal(offer.getClicks(), 1, 2)}">
+                                                            Table cell
+                                                        </td>
+                                                        <td th:text="${#numbers.formatDecimal(offer.getSpend(), 1, 2)} + '$'">
+                                                            Table cell
+                                                        </td>
+                                                        <td th:text="${#numbers.formatDecimal(offer.getHoldCost(), 1, 2)} + '$'">
+                                                            Table cell
+                                                        </td>
+                                                        <td th:text="${offer.getApproveCount()}">Table cell</td>
+                                                        <td th:text="${#numbers.formatDecimal(offer.getRevenue(), 1, 2)} + '$'">
+                                                            Table cell
+                                                        </td>
+                                                        <td th:text="${#numbers.formatDecimal(offer.getProfit(), 1, 2)} + '$'">
+                                                            Table cell
+                                                        </td>
+                                                        <td th:text="${#numbers.formatDecimal(offer.getROI(), 1, 2)} + '%'">
+                                                            Table cell
+                                                        </td>
+
+
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
                 <div class="row">
 
                     <!-- end col -->
@@ -360,15 +446,17 @@
 
                                 <div class="text-center pt-3">
                                     <div th:if="${chartTotal}" class="row">
-                                        <div  class="col-sm-4 mb-3 mb-sm-0">
+                                        <div class="col-sm-4 mb-3 mb-sm-0">
                                             <div>
-                                                <h5 th:text="${#numbers.formatDecimal(chartTotal.getSpend(), 1, 2)} + '$'">Spend</h5>
+                                                <h5 th:text="${#numbers.formatDecimal(chartTotal.getSpend(), 1, 2)} + '$'">
+                                                    Spend</h5>
                                                 <p class="text-muted text-truncate mb-0">Total Spend</p>
                                             </div>
                                         </div><!-- end col -->
                                         <div class="col-sm-4 mb-3 mb-sm-0">
                                             <div>
-                                                <h5 th:text="${#numbers.formatDecimal(chartTotal.getRevenue(), 1, 2)} + '$'">Revenue</h5>
+                                                <h5 th:text="${#numbers.formatDecimal(chartTotal.getRevenue(), 1, 2)} + '$'">
+                                                    Revenue</h5>
                                                 <p class="text-muted text-truncate mb-0">Total Revenue</p>
                                             </div>
                                         </div><!-- end col -->
@@ -395,7 +483,8 @@
                                 <div th:if="${totalSpendByNetwork}" class="row">
                                     <div th:each="network : ${totalSpendByNetwork.keySet()}" class="col-6">
                                         <div class="text-center mt-4">
-                                            <h5 th:text="${#numbers.formatDecimal(totalSpendByNetwork.get(network), 1, 2)} + '$'">spend count</h5>
+                                            <h5 th:text="${#numbers.formatDecimal(totalSpendByNetwork.get(network), 1, 2)} + '$'">
+                                                spend count</h5>
                                             <p th:text="${network.getFullName()}" class="mb-2 text-truncate">Network</p>
                                         </div>
                                     </div>
@@ -414,217 +503,232 @@
                 <!-- end row -->
 
 
-                    <div th:unless="${statistics.isEmpty()}" class="card">
-                        <div class="card-body">
+                <div th:unless="${statistics.isEmpty()}" class="card">
+                    <div class="card-body">
 
-                            <ul class="nav nav-pills nav-justified" role="tablist">
-                                <li th:each="statistic : ${statistics}" class="nav-item waves-effect waves-light">
-                                    <a class="nav-link" data-bs-toggle="tab" th:href="'#'+${statistic.getNetwork()}" role="tab">
-                                        <span class="d-block d-sm-none"><i class="fas fa-home"></i></span>
-                                        <span th:text="${statistic.getNetwork().getFullName()}" class="d-none d-sm-block">Networks</span>
-                                    </a>
-                                </li>
-                                <li  class="nav-item waves-effect waves-light">
-                                    <a class="nav-link active" data-bs-toggle="tab" href="#combined" role="tab">
-                                        <span class="d-block d-sm-none"><i class="fas fa-home"></i></span>
-                                        <span class="d-none d-sm-block">Combined Stats</span>
-                                    </a>
-                                </li>
-                            </ul>
+                        <ul class="nav nav-pills nav-justified" role="tablist">
+                            <li th:each="statistic : ${statistics}" class="nav-item waves-effect waves-light">
+                                <a class="nav-link" data-bs-toggle="tab" th:href="'#'+${statistic.getNetwork()}"
+                                   role="tab">
+                                    <span class="d-block d-sm-none"><i class="fas fa-home"></i></span>
+                                    <span th:text="${statistic.getNetwork().getFullName()}" class="d-none d-sm-block">Networks</span>
+                                </a>
+                            </li>
+                            <li class="nav-item waves-effect waves-light">
+                                <a class="nav-link active" data-bs-toggle="tab" href="#combined" role="tab">
+                                    <span class="d-block d-sm-none"><i class="fas fa-home"></i></span>
+                                    <span class="d-none d-sm-block">Combined Stats</span>
+                                </a>
+                            </li>
+                        </ul>
 
-                            <div class="tab-content p-3 text-muted">
+                        <div class="tab-content p-3 text-muted">
 
-                                <div class="tab-pane" th:id="${statistic.getNetwork()}"
-                                     th:each="statistic : ${statistics}"
-                                     role="tabpanel">
-                                    <div class="row">
-                                        <div class="col-xl-12">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <div style="margin-bottom: 50px;"
-                                                         class="table-responsive">
-                                                        <h4 th:text="${statistic.getNetwork().getFullName()} + ' Offers'"
-                                                            class="card-title mb-4">
-                                                            Offers Statistics</h4>
-                                                        <table id="key-datatable"
-                                                               class="table table-centered mb-0 align-middle table-hover table-nowrap">
-                                                            <thead class="table-light">
-                                                            <tr>
-                                                                <th>Campaign ID</th>
-                                                                <th>Offer</th>
-                                                                <th>Clicks</th>
-                                                                <th>Cost $</th>
-                                                                <th>Hold</th>
-                                                                <th>Approve</th>
-                                                                <th>Approve $</th>
-                                                                <th>Profit $</th>
-                                                                <th style="width: 120px;">ROI %</th>
-                                                            </tr>
-                                                            </thead><!-- end thead -->
-                                                            <tbody>
-                                                            <tr th:style="${offer.getProfit() < 0 ? 'color: red;' : 'color: green;'}"
-                                                                th:each="offer : ${statistic.getCurrentStats()}">
-                                                                <td><h6 th:text="${offer.getCampaignId()}" class="mb-0">
-                                                                    campaign
-                                                                    id</h6></td>
-                                                                <td th:text="${offer.getCampaignName()}">Campaign name
-                                                                </td>
-                                                                <td th:text="${offer.getClicks()}">clicks</td>
-                                                                <td th:text="${#numbers.formatDecimal(offer.getSpend(), 1, 2)} + '$'">
-                                                                    cost
-                                                                </td>
-                                                                <td th:text="${#numbers.formatDecimal(offer.getHoldCost(), 1, 2)}">
-                                                                    hold cost
-                                                                </td>
-                                                                <td th:text="${offer.getApproveCount()}">approve count
-                                                                </td>
-                                                                <td th:text="${#numbers.formatDecimal(offer.getRevenue(), 1, 2)} + '$'">
-                                                                    approve cost
-                                                                </td>
-                                                                <td th:text="${#numbers.formatDecimal(offer.getProfit(), 1, 2)} + '$'">
-                                                                    profit
-                                                                </td>
-                                                                <td th:text="${offer.getROI()} + '%'">roi</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td><h6 class="mb-0">Total</h6></td>
-                                                                <td></td>
-                                                                <td th:text="${statistic.getTotalClicks()}">clicks</td>
-                                                                <td th:text="${#numbers.formatDecimal(statistic.getTotalSpend(), 1, 2)} + '$'">
-                                                                    cost
-                                                                </td>
-                                                                <td th:text="${#numbers.formatDecimal(statistic.getTotalHoldCost(), 1, 2)}">
-                                                                    hold cost
-                                                                </td>
-                                                                <td th:text="${statistic.getTotalApproveCount()}">
-                                                                    approve
-                                                                    count
-                                                                </td>
-                                                                <td th:text="${#numbers.formatDecimal(statistic.getTotalRevenue(), 1, 2)} + '$'">
-                                                                    approve cost
-                                                                </td>
-                                                                <td th:text="${#numbers.formatDecimal(statistic.getTotalProfit(), 1, 2)} + '$'">
-                                                                    profit
-                                                                </td>
-                                                                <td th:text="${statistic.getTotalROI()} + '%'">roi</td>
-                                                            </tr>
-                                                            </tbody><!-- end tbody -->
-                                                        </table> <!-- end table -->
-                                                    </div>
-                                                </div><!-- end card -->
+                            <div class="tab-pane" th:id="${statistic.getNetwork()}"
+                                 th:each="statistic : ${statistics}"
+                                 role="tabpanel">
+                                <div class="row">
+                                    <div class="col-xl-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div style="margin-bottom: 50px;"
+                                                     class="table-responsive">
+                                                    <h4 th:text="${statistic.getNetwork().getFullName()} + ' Offers'"
+                                                        class="card-title mb-4">
+                                                        Offers Statistics</h4>
+                                                    <table id="key-datatable"
+                                                           class="table table-centered mb-0 align-middle table-hover table-nowrap">
+                                                        <thead class="table-light">
+                                                        <tr>
+                                                            <th>Campaign ID</th>
+                                                            <th>Offer</th>
+                                                            <th>Clicks</th>
+                                                            <th>Cost $</th>
+                                                            <th>Hold</th>
+                                                            <th>Approve</th>
+                                                            <th>Approve $</th>
+                                                            <th>Profit $</th>
+                                                            <th style="width: 120px;">ROI %</th>
+                                                        </tr>
+                                                        </thead><!-- end thead -->
+                                                        <tbody>
+                                                        <tr th:style="${offer.getProfit() < 0 ? 'color: red;' : 'color: green;'}"
+                                                            th:each="offer : ${statistic.getCurrentStats()}">
+                                                            <td><h6 th:text="${offer.getCampaignId()}" class="mb-0">
+                                                                campaign
+                                                                id</h6></td>
+                                                            <td th:text="${offer.getCampaignName()}">Campaign name
+                                                            </td>
+                                                            <td th:text="${offer.getClicks()}">clicks</td>
+                                                            <td th:text="${#numbers.formatDecimal(offer.getSpend(), 1, 2)} + '$'">
+                                                                cost
+                                                            </td>
+                                                            <td th:text="${#numbers.formatDecimal(offer.getHoldCost(), 1, 2)} + '$'">
+                                                                hold cost
+                                                            </td>
+                                                            <td th:text="${offer.getApproveCount()}">approve count
+                                                            </td>
+                                                            <td th:text="${#numbers.formatDecimal(offer.getRevenue(), 1, 2)} + '$'">
+                                                                approve cost
+                                                            </td>
+                                                            <td th:text="${#numbers.formatDecimal(offer.getProfit(), 1, 2)} + '$'">
+                                                                profit
+                                                            </td>
+                                                            <td th:text="${offer.getROI()} + '%'">roi</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><h6 class="mb-0">Total</h6></td>
+                                                            <td></td>
+                                                            <td th:text="${statistic.getTotalClicks()}">clicks</td>
+                                                            <td th:text="${#numbers.formatDecimal(statistic.getTotalSpend(), 1, 2)} + '$'">
+                                                                cost
+                                                            </td>
+                                                            <td th:text="${#numbers.formatDecimal(statistic.getTotalHoldCost(), 1, 2)} + '$'">
+                                                                hold cost
+                                                            </td>
+                                                            <td th:text="${statistic.getTotalApproveCount()}">
+                                                                approve
+                                                                count
+                                                            </td>
+                                                            <td th:text="${#numbers.formatDecimal(statistic.getTotalRevenue(), 1, 2)} + '$'">
+                                                                approve cost
+                                                            </td>
+                                                            <td th:text="${#numbers.formatDecimal(statistic.getTotalProfit(), 1, 2)} + '$'">
+                                                                profit
+                                                            </td>
+                                                            <td th:text="${statistic.getTotalROI()} + '%'">roi</td>
+                                                        </tr>
+                                                        </tbody><!-- end tbody -->
+                                                    </table> <!-- end table -->
+                                                </div>
                                             </div><!-- end card -->
-                                        </div>
-                                        <!-- end col -->
+                                        </div><!-- end card -->
                                     </div>
+                                    <!-- end col -->
                                 </div>
-
-                                <div class="tab-pane active" id="combined" role="tabpanel">
-
-                                    <div th:if="${statistics.size()}>1" class="row">
-                                        <div class="col-xl-12">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h4>Combined Offer Statistics</h4>
-                                                    <div style="margin-bottom: 50px;" class="table-responsive">
-
-                                                        <table id="datatable1"
-                                                               class="table table-centered mb-0 align-middle table-hover table-nowrap">
-                                                            <thead class="table-light">
-                                                            <tr>
-                                                                <th>Campaign ID</th>
-                                                                <th>Offer</th>
-                                                                <th>Clicks</th>
-                                                                <th>Cost</th>
-                                                                <th>Hold</th>
-                                                                <th>Approve</th>
-                                                                <th>Approve $</th>
-                                                                <th>Profit $</th>
-                                                                <th style="width: 120px;">ROI %</th>
-                                                            </tr>
-                                                            </thead><!-- end thead -->
-                                                            <tfoot>
-                                                            <tr>
-                                                                <th>Total</th>
-                                                                <th></th>
-                                                                <th></th>
-                                                                <th></th>
-                                                                <th></th>
-                                                                <th></th>
-                                                                <th></th>
-                                                                <th></th>
-                                                                <th></th>
-
-                                                            </tr>
-                                                            </tfoot>
-                                                            <tbody>
-                                                            <tr th:style="${offer.getProfit() < 0 ? 'color: red;' : 'color: green;'}"
-                                                                th:each="offer : ${combinedStats.getCurrentStats()}">
-                                                                <td><h6 th:text="${offer.getCampaignId()}" class="mb-0">
-                                                                    campaign
-                                                                    id</h6></td>
-                                                                <td th:text="${offer.getCampaignName()}">Campaign name
-                                                                </td>
-                                                                <td th:text="${offer.getClicks()}">clicks</td>
-                                                                <td th:text="${#numbers.formatDecimal(offer.getSpend(), 1, 2)} + '$'">
-                                                                    cost
-                                                                </td>
-                                                                <td th:text="${#numbers.formatDecimal(offer.getHoldCost(), 1, 2)}">
-                                                                    hold cost
-                                                                </td>
-                                                                <td th:text="${offer.getApproveCount()}">approve count
-                                                                </td>
-                                                                <td th:text="${#numbers.formatDecimal(offer.getRevenue(), 1, 2)} + '$'">
-                                                                    approve cost
-                                                                </td>
-                                                                <td th:text="${#numbers.formatDecimal(offer.getProfit(), 1, 2)} + '$'">
-                                                                    profit
-                                                                </td>
-                                                                <td th:text="${offer.getROI()} + '%'">roi</td>
-                                                            </tr>
-                                                            </tbody><!-- end tbody -->
-                                                        </table> <!-- end table -->
-                                                    </div>
-                                                </div><!-- end card -->
-                                            </div><!-- end card -->
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- end col -->
                             </div>
+
+                            <div class="tab-pane active" id="combined" role="tabpanel">
+
+                                <div th:if="${statistics.size()}>1" class="row">
+                                    <div class="col-xl-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div style="margin-bottom: 50px;" class="table-responsive">
+                                                    <h4>Combined Offer Statistics</h4>
+
+                                                    <table id="datatable1"
+                                                           class="table table-centered mb-0 align-middle table-hover table-nowrap">
+                                                        <thead class="table-light">
+                                                        <tr>
+                                                            <th>Campaign ID</th>
+                                                            <th>Offer</th>
+                                                            <th>Clicks</th>
+                                                            <th>Cost</th>
+                                                            <th>Hold</th>
+                                                            <th>Approve</th>
+                                                            <th>Approve $</th>
+                                                            <th>Profit $</th>
+                                                            <th style="width: 120px;">ROI %</th>
+                                                        </tr>
+                                                        </thead><!-- end thead -->
+                                                        <tfoot>
+                                                        <tr>
+                                                            <th>Total</th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+
+                                                        </tr>
+                                                        </tfoot>
+                                                        <tbody>
+                                                        <tr th:style="${offer.getProfit() < 0 ? 'color: red;' : 'color: green;'}"
+                                                            th:each="offer : ${combinedStats.getCurrentStats()}">
+                                                            <td><h6 th:text="${offer.getCampaignId()}" class="mb-0">
+                                                                campaign
+                                                                id</h6></td>
+                                                            <td th:text="${offer.getCampaignName()}">Campaign name
+                                                            </td>
+                                                            <td th:text="${offer.getClicks()}">clicks</td>
+                                                            <td th:text="${#numbers.formatDecimal(offer.getSpend(), 1, 2)} + '$'">
+                                                                cost
+                                                            </td>
+                                                            <td th:text="${#numbers.formatDecimal(offer.getHoldCost(), 1, 2)}">
+                                                                hold cost
+                                                            </td>
+                                                            <td th:text="${offer.getApproveCount()}">approve count
+                                                            </td>
+                                                            <td th:text="${#numbers.formatDecimal(offer.getRevenue(), 1, 2)} + '$'">
+                                                                approve cost
+                                                            </td>
+                                                            <td th:text="${#numbers.formatDecimal(offer.getProfit(), 1, 2)} + '$'">
+                                                                profit
+                                                            </td>
+                                                            <td th:text="${offer.getROI()} + '%'">roi</td>
+                                                        </tr>
+                                                        </tbody><!-- end tbody -->
+                                                    </table> <!-- end table -->
+                                                </div>
+                                            </div><!-- end card -->
+                                        </div><!-- end card -->
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end col -->
                         </div>
                     </div>
+                </div>
 
 
                 <div class="row">
 
                     <div class="col-sm-6 col-md-5 col-xl-4">
                         <!-- sample modal content -->
-                        <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
+                        <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2"
+                             aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="myModalLabel">Add credentials</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
                                     </div>
-                                    <form th:method="POST" th:action="@{/credentials/save}" th:object="${credentialsADCOMBO}">
-                                    <div class="modal-body">
-                                        <h5>Enter Network Credentials from Adcombo.com</h5>
+                                    <form th:method="POST" th:action="@{/credentials/save}"
+                                          th:object="${credentialsADCOMBO}">
+                                        <div class="modal-body">
+                                            <h5>Enter Network Credentials from Adcombo.com</h5>
 
-                                        <p>You can get it - <strong>(User Profile - Account settings - API key)</strong></p>
-                                        <div class="row mb-4">
-                                            <input hidden th:field="${credentialsADCOMBO.id}" th:name="${credentialsADCOMBO.id}" th:value="${credentialsADCOMBO.getId()}"/>
+                                            <p>You can get it - <strong>(User Profile - Account settings - API
+                                                key)</strong></p>
+                                            <div class="row mb-4">
+                                                <input hidden th:field="${credentialsADCOMBO.id}"
+                                                       th:name="${credentialsADCOMBO.id}"
+                                                       th:value="${credentialsADCOMBO.getId()}"/>
 
-                                            <label style="margin-right: -40px" for="example-text-input" class="col-sm-3 col-form-label">API-token</label>
-                                            <div class="col-sm-9">
-                                                <input th:field="${credentialsADCOMBO.username}" th:name="${credentialsADCOMBO.username}" th:value="${credentialsADCOMBO.getUsername()}" class="form-control" type="text" id="example-text-input">
+                                                <label style="margin-right: -40px" for="example-text-input"
+                                                       class="col-sm-3 col-form-label">API-token</label>
+                                                <div class="col-sm-9">
+                                                    <input th:field="${credentialsADCOMBO.username}"
+                                                           th:name="${credentialsADCOMBO.username}"
+                                                           th:value="${credentialsADCOMBO.getUsername()}"
+                                                           class="form-control" type="text" id="example-text-input">
+                                                </div>
+                                                <input hidden name="networkName" value="ADCOMBO"/>
                                             </div>
-                                            <input hidden name="networkName" value="ADCOMBO" />
                                         </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-light waves-effect" data-bs-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-primary waves-effect waves-light">Save changes</button>
-                                    </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-light waves-effect"
+                                                    data-bs-dismiss="modal">Close
+                                            </button>
+                                            <button type="submit" class="btn btn-primary waves-effect waves-light">Save
+                                                changes
+                                            </button>
+                                        </div>
                                     </form>
 
                                 </div><!-- /.modal-content -->
@@ -634,38 +738,55 @@
 
                     <div class="col-sm-6 col-md-4 col-xl-3">
                         <!-- sample modal content -->
-                        <div id="myModal2" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
+                        <div id="myModal2" class="modal fade" tabindex="-1" role="dialog"
+                             aria-labelledby="myModalLabel2" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="myModalLabel">Add credentials</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
                                     </div>
-                                    <form th:method="POST" th:action="@{/credentials/save}" th:object="${credentialsTF}">
+                                    <form th:method="POST" th:action="@{/credentials/save}"
+                                          th:object="${credentialsTF}">
                                         <div class="modal-body">
                                             <h5>Enter Network Credentials from TrafficFactory.com</h5>
 
                                             <p>You can get it - <strong>(Help - API - Create API key)</strong></p>
                                             <div class="row mb-4">
-                                                <input hidden th:field="${credentialsTF.id}" th:name="${credentialsTF.id}" th:value="${credentialsTF.getId()}"/>
+                                                <input hidden th:field="${credentialsTF.id}"
+                                                       th:name="${credentialsTF.id}"
+                                                       th:value="${credentialsTF.getId()}"/>
 
-                                                <label for="example-text-input" class="col-sm-2 col-form-label">API token</label>
+                                                <label for="example-text-input" class="col-sm-2 col-form-label">API
+                                                    token</label>
                                                 <div class="col-sm-9">
-                                                    <input th:field="${credentialsTF.username}" th:name="${credentialsTF.username}" th:value="${credentialsTF.getUsername()}" class="form-control" type="text" id="example-text-input">
+                                                    <input th:field="${credentialsTF.username}"
+                                                           th:name="${credentialsTF.username}"
+                                                           th:value="${credentialsTF.getUsername()}"
+                                                           class="form-control" type="text" id="example-text-input">
                                                 </div>
                                             </div>
                                             <div class="row mb-4">
-                                                <label for="example-text-input" class="col-sm-2 col-form-label">Token password</label>
+                                                <label for="example-text-input" class="col-sm-2 col-form-label">Token
+                                                    password</label>
                                                 <div class="col-sm-9">
-                                                    <input th:field="${credentialsTF.password}" th:name="${credentialsTF.password}" th:value="${credentialsTF.getPassword()}" class="form-control" type="text">
+                                                    <input th:field="${credentialsTF.password}"
+                                                           th:name="${credentialsTF.password}"
+                                                           th:value="${credentialsTF.getPassword()}"
+                                                           class="form-control" type="text">
                                                 </div>
-                                                <input hidden name="networkName" value="TF" />
+                                                <input hidden name="networkName" value="TF"/>
 
                                             </div>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-light waves-effect" data-bs-dismiss="modal">Close</button>
-                                            <button type="submit" class="btn btn-primary waves-effect waves-light">Save changes</button>
+                                            <button type="button" class="btn btn-light waves-effect"
+                                                    data-bs-dismiss="modal">Close
+                                            </button>
+                                            <button type="submit" class="btn btn-primary waves-effect waves-light">Save
+                                                changes
+                                            </button>
                                         </div>
                                     </form>
 
@@ -676,31 +797,45 @@
 
                     <div class="col-sm-6 col-md-4 col-xl-3">
                         <!-- sample modal content -->
-                        <div id="myModal3" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
+                        <div id="myModal3" class="modal fade" tabindex="-1" role="dialog"
+                             aria-labelledby="myModalLabel2" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="myModalLabel">Add credentials</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
                                     </div>
-                                    <form th:method="POST" th:action="@{/credentials/save}" th:object="${credentialsEXO}">
+                                    <form th:method="POST" th:action="@{/credentials/save}"
+                                          th:object="${credentialsEXO}">
                                         <div class="modal-body">
                                             <h5>Enter Network Credentials from ExoClick.com</h5>
 
-                                            <p>You can get it - <strong>(User Profile - API token - New API token)</strong></p>
+                                            <p>You can get it - <strong>(User Profile - API token - New API
+                                                token)</strong></p>
                                             <div class="row mb-4">
-                                                <input hidden th:field="${credentialsEXO.id}" th:name="${credentialsEXO.id}" th:value="${credentialsEXO.getId()}"/>
+                                                <input hidden th:field="${credentialsEXO.id}"
+                                                       th:name="${credentialsEXO.id}"
+                                                       th:value="${credentialsEXO.getId()}"/>
 
-                                                <label style="margin-right: -40px" for="example-text-input" class="col-sm-3 col-form-label">Api-token</label>
+                                                <label style="margin-right: -40px" for="example-text-input"
+                                                       class="col-sm-3 col-form-label">Api-token</label>
                                                 <div class="col-sm-9">
-                                                    <input th:field="${credentialsEXO.username}" th:name="${credentialsEXO.username}" th:value="${credentialsEXO.getUsername()}" class="form-control" type="text" id="example-text-input">
+                                                    <input th:field="${credentialsEXO.username}"
+                                                           th:name="${credentialsEXO.username}"
+                                                           th:value="${credentialsEXO.getUsername()}"
+                                                           class="form-control" type="text" id="example-text-input">
                                                 </div>
                                             </div>
-                                                <input hidden name="networkName" value="EXO" />
+                                            <input hidden name="networkName" value="EXO"/>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-light waves-effect" data-bs-dismiss="modal">Close</button>
-                                            <button type="submit" class="btn btn-primary waves-effect waves-light">Save changes</button>
+                                            <button type="button" class="btn btn-light waves-effect"
+                                                    data-bs-dismiss="modal">Close
+                                            </button>
+                                            <button type="submit" class="btn btn-primary waves-effect waves-light">Save
+                                                changes
+                                            </button>
                                         </div>
                                     </form>
 
@@ -856,6 +991,26 @@
     }
 </script>
 
+<script th:if="${success}" th:inline="javascript">
+    toastr["success"]([[${success}]]);
+    toastr.options = {
+        "closeButton": false,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": false,
+        "positionClass": "toast-top-center",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": 300,
+        "hideDuration": 1000,
+        "timeOut": 5000,
+        "extendedTimeOut": 1000,
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    }
+</script>
 
 <script>
     $(document).ready(function () {
@@ -865,7 +1020,7 @@
 
                 // Remove the formatting to get integer data for summation
                 var intVal = function (i) {
-                    return typeof i === 'string' ? i.replace(",",".").replace(/[\$,]/g, '') * 1 : typeof i === 'number' ? i : 0;
+                    return typeof i === 'string' ? i.replace(",", ".").replace(/[\$,]/g, '') * 1 : typeof i === 'number' ? i : 0;
                 };
 
                 total = api

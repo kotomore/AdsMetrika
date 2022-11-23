@@ -1,6 +1,7 @@
 package ru.set404.AdsMetrika.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.SessionScope;
 import ru.set404.AdsMetrika.dto.StatDTO;
@@ -36,11 +37,12 @@ public class NetworksService {
         this.credentialsRepository = credentialsRepository;
     }
 
+    @Cacheable("network_stats")
     public List<StatDTO> getNetworkStatisticsListMock(Network network) {
         List<StatDTO> statDTOS = new ArrayList<>();
         Random random = new Random();
         for (int i = 0; i < 15; i++) {
-            statDTOS.add(new StatDTO(random.nextInt(1000),
+            statDTOS.add(new StatDTO(i,
                     network.getFullName() + " Campaign or Offer " + i,
                     random.nextInt(1000),
                     random.nextDouble(100),
@@ -55,6 +57,8 @@ public class NetworksService {
         return credentialsRepository.findCredentialsByOwnerAndNetworkName(user, network).orElseThrow(() ->
                         new RuntimeException("Couldn't find %s API. Check it".formatted(network.getFullName())));
     }
+
+    @Cacheable("network_stats")
     public List<StatDTO> getNetworkStatisticsList(User user, Network network, LocalDate dateStart,
                                                   LocalDate dateEnd) {
         AffiliateNetwork affiliateNetwork = null;
@@ -80,6 +84,7 @@ public class NetworksService {
         return statsEntities;
     }
 
+    @Cacheable("network_stats")
     public List<StatDTO> getCampaignStats(User user, Network network, LocalDate dateStart,
                                           LocalDate dateEnd) {
         AffiliateNetwork affiliateNetwork = null;

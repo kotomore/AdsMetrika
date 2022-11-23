@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -33,4 +34,7 @@ public class Settings {
 
     @Column(name = "telegram_enabled")
     private boolean telegramEnabled;
+
+    @Column(name = "adcombo_id")
+    private String adcomboId = "";
 }

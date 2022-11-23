@@ -30,6 +30,7 @@ public class StatsService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @CacheEvict(value = "stats", allEntries = true)
     public void saveStatDTOList(List<StatDTO> statDTOList, User user, Network network, LocalDate date) {
 
         double spend = 0;

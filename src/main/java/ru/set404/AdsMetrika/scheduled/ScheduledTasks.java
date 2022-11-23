@@ -1,6 +1,9 @@
 package ru.set404.AdsMetrika.scheduled;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -14,6 +17,7 @@ import ru.set404.AdsMetrika.services.CredentialsService;
 import ru.set404.AdsMetrika.services.SettingsService;
 import ru.set404.AdsMetrika.util.StatisticsUtilities;
 
+import javax.management.timer.Timer;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +28,8 @@ public class ScheduledTasks {
     private final SingletonFactoryForScheduling schedulingObjects;
     private final SettingsService settingsService;
     private final CredentialsService credentialsService;
+
+    protected Log logger = LogFactory.getLog(this.getClass());
 
     @Autowired
     public ScheduledTasks(SingletonFactoryForScheduling schedulingObjects, SettingsService settingsService,
@@ -49,6 +55,12 @@ public class ScheduledTasks {
             if (user.getSettings().isSpreadSheetScheduleEnabled())
                 schedulingObjects.getScheduledServiceSingleton().writeSpreadSheetTable("", user, combinedStats, date);
         }
+    }
+
+    @Scheduled(fixedRate = Timer.ONE_MINUTE * 10)
+    @CacheEvict(value = "network_stats")
+    public void clearCache() {
+        logger.debug("Cache {network_stats} cleared.");
     }
 
     private List<TableDTO> getStatsForTables(User user, LocalDate dateStart, LocalDate dateEnd) {

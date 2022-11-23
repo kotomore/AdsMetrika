@@ -20,9 +20,6 @@ public class User {
     private int id;
 
     @OneToMany(mappedBy = "owner")
-    private List<Offer> offers;
-
-    @OneToMany(mappedBy = "owner")
     private List<Credentials> credentials;
 
     @OneToOne(fetch = FetchType.EAGER, mappedBy = "owner")

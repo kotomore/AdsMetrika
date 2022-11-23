@@ -129,7 +129,6 @@
                     </button>
                     <div class="dropdown-menu dropdown-menu-end">
                         <!-- item-->
-                        <a class="dropdown-item" href="/offers"><i class="ri-user-line align-middle me-1"></i> Offers</a>
                         <a class="dropdown-item" href="/settings"><i class="ri-settings-2-line align-middle me-1"></i> Settings</a>
                         <div class="dropdown-divider"></div>
 
@@ -229,13 +228,6 @@
 
         <div class="page-content">
             <div class="container-fluid">
-
-                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="mdi mdi-check-all me-2"></i>
-                    Success
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-
                 <div th:if="${checkAPI}"  class="alert alert-warning" role="alert">
                     Fill in the API fields for adcombo and advertising networks
                 </div>
@@ -579,6 +571,27 @@
 
 <script th:if="${error}" th:inline="javascript">
     toastr["error"]([[${error}]]);
+    toastr.options = {
+        "closeButton": false,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": false,
+        "positionClass": "toast-top-center",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": 300,
+        "hideDuration": 1000,
+        "timeOut": 5000,
+        "extendedTimeOut": 1000,
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    }
+</script>
+
+<script th:if="${success}" th:inline="javascript">
+    toastr["success"]([[${success}]]);
     toastr.options = {
         "closeButton": false,
         "debug": false,
