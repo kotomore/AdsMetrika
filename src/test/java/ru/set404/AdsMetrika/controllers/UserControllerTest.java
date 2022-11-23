@@ -10,10 +10,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.set404.AdsMetrika.models.Credentials;
+import ru.set404.AdsMetrika.models.Settings;
 import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.network.Network;
 import ru.set404.AdsMetrika.repositories.CredentialsRepository;
 import ru.set404.AdsMetrika.security.UserDetails;
+import ru.set404.AdsMetrika.services.SettingsService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -36,6 +38,8 @@ public class UserControllerTest {
     @Autowired
     @MockBean
     private CredentialsRepository credentialsRepository;
+    @MockBean
+    private SettingsService settingsService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -43,8 +47,11 @@ public class UserControllerTest {
     @Test
     public void test_statistics_page_with_guest_role_without_dates() throws Exception {
         User user = getNewUser();
+        Settings settings = getSettings(user);
+        user.setSettings(settings);
         user.setRole("ROLE_GUEST");
         UserDetails userDetails = new UserDetails(user);
+        when(settingsService.userSettings(user)).thenReturn(settings);
         mockMvc.perform(get("/statistics")
                         .with(user(userDetails))
                 )
@@ -58,11 +65,13 @@ public class UserControllerTest {
     @Test
     public void test_statistics_page_with_guest_role_with_dates_and_credentials() throws Exception {
         User user = getNewUser();
+        Settings settings = getSettings(user);
+        user.setSettings(settings);
         List<Credentials> credentials = getCredentials(user);
         user.setCredentials(credentials);
         user.setRole("ROLE_GUEST");
         UserDetails userDetails = new UserDetails(user);
-
+        when(settingsService.userSettings(user)).thenReturn(settings);
         when(credentialsRepository.findByOwner(user)).thenReturn(credentials);
         mockMvc.perform(get("/statistics?ds=2022-11-07&de=2022-11-08")
                         .with(user(userDetails))
@@ -94,11 +103,14 @@ public class UserControllerTest {
     @Test
     public void test_report_page_with_guest_role_with_type_daily_and_credentials() throws Exception {
         User user = getNewUser();
+        Settings settings = getSettings(user);
+        user.setSettings(settings);
         List<Credentials> credentials = getCredentials(user);
         user.setCredentials(credentials);
         user.setRole("ROLE_GUEST");
         UserDetails userDetails = new UserDetails(user);
 
+        when(settingsService.userSettings(user)).thenReturn(settings);
         when(credentialsRepository.findByOwner(user)).thenReturn(credentials);
         mockMvc.perform(get("/statistics?type=daily")
                         .with(user(userDetails))
@@ -112,11 +124,15 @@ public class UserControllerTest {
     @Test
     public void test_report_page_with_guest_role_with_type_monthly_and_credentials() throws Exception {
         User user = getNewUser();
+        Settings settings = getSettings(user);
+        user.setSettings(settings);
         List<Credentials> credentials = getCredentials(user);
         user.setCredentials(credentials);
         user.setRole("ROLE_GUEST");
+        user.setSettings(getSettings(user));
         UserDetails userDetails = new UserDetails(user);
 
+        when(settingsService.userSettings(user)).thenReturn(settings);
         when(credentialsRepository.findByOwner(user)).thenReturn(credentials);
         mockMvc.perform(get("/statistics?type=monthly")
                         .with(user(userDetails))
@@ -225,6 +241,17 @@ public class UserControllerTest {
         return user;
     }
 
+    private Settings getSettings(User user) {
+        Settings settings = new Settings();
+        settings.setAdcomboId("123");
+        settings.setTelegramEnabled(false);
+        settings.setSpreadSheetScheduleEnabled(false);
+        settings.setSpreadSheetEnabled(false);
+        settings.setSpreadSheetId("1231");
+        settings.setOwner(user);
+        settings.setTelegramUsername("123");
+        return settings;
+    }
     private List<Credentials> getCredentials(User user) {
         List<Credentials> credentialsList = new ArrayList<>();
         Credentials credentials = new Credentials();
