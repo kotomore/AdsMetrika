@@ -43,7 +43,7 @@ public class GoogleAuthorizeConfig {
         Credential var7;
 
         if (code.isEmpty() || code.equals(PERMISSION_DENIED)) {
-            InputStream in = GoogleAuthorizationConfig.class.getResourceAsStream(credentialsFilePath);
+            InputStream in = GoogleAuthorizeConfig.class.getResourceAsStream(credentialsFilePath);
             assert in != null;
             GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JacksonFactory.getDefaultInstance(),
                     new InputStreamReader(in));

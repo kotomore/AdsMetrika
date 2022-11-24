@@ -15,6 +15,7 @@ import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.network.Network;
 import ru.set404.AdsMetrika.services.CredentialsService;
 import ru.set404.AdsMetrika.services.SettingsService;
+import ru.set404.AdsMetrika.services.TelegramBotService;
 import ru.set404.AdsMetrika.util.StatisticsUtilities;
 
 import javax.management.timer.Timer;
@@ -28,15 +29,17 @@ public class ScheduledTasks {
     private final SingletonFactoryForScheduling schedulingObjects;
     private final SettingsService settingsService;
     private final CredentialsService credentialsService;
+    private final TelegramBotService telegramBotService;
 
     protected Log logger = LogFactory.getLog(this.getClass());
 
     @Autowired
     public ScheduledTasks(SingletonFactoryForScheduling schedulingObjects, SettingsService settingsService,
-                          CredentialsService credentialsService) {
+                          CredentialsService credentialsService, TelegramBotService telegramBotService) {
         this.schedulingObjects = schedulingObjects;
         this.settingsService = settingsService;
         this.credentialsService = credentialsService;
+        this.telegramBotService = telegramBotService;
     }
 
 
@@ -51,7 +54,7 @@ public class ScheduledTasks {
             TableDTO combinedStats = StatisticsUtilities.combineTableDTO(tableStats);
 
             if (user.getSettings().isTelegramEnabled())
-                schedulingObjects.getScheduledServiceSingleton().sendTelegramMessage(user, combinedStats);
+                telegramBotService.sendTelegramMessage(user, combinedStats);
             if (user.getSettings().isSpreadSheetScheduleEnabled())
                 schedulingObjects.getScheduledServiceSingleton().writeSpreadSheetTable("", user, combinedStats, date);
         }

@@ -32,19 +32,19 @@ public class UserController {
     private final NetworksService networksService;
     private final StatsService statsService;
     private final CredentialsService credentialsService;
-    private final ScheduledService scheduledService;
+    private final GoogleSpreadSheetService googleSpreadSheetService;
     private final SettingsService settingsService;
     private final CredentialsValidator credentialsValidator;
     private final SettingsValidator settingsValidator;
 
-
     @Autowired
     public UserController(NetworksService networksService, StatsService statsService, CredentialsService credentialsService,
-                          ScheduledService scheduledService, SettingsService settingsService, CredentialsValidator credentialsValidator, SettingsValidator settingsValidator) {
+                          GoogleSpreadSheetService googleSpreadSheetService, SettingsService settingsService, CredentialsValidator credentialsValidator,
+                          SettingsValidator settingsValidator) {
         this.networksService = networksService;
         this.statsService = statsService;
         this.credentialsService = credentialsService;
-        this.scheduledService = scheduledService;
+        this.googleSpreadSheetService = googleSpreadSheetService;
         this.settingsService = settingsService;
         this.credentialsValidator = credentialsValidator;
         this.settingsValidator = settingsValidator;
@@ -118,7 +118,7 @@ public class UserController {
                 if (settingsService.userSettings(currentUser).isSpreadSheetEnabled()
                         && date.equals(LocalDate.now().minusDays(1))) {
 
-                    scheduledService.writeSpreadSheetTable("", currentUser, combinedStats, date);
+                    googleSpreadSheetService.writeSpreadSheetTable("", currentUser, combinedStats, date);
                     model.addAttribute("success", "Success");
                 }
                 headerText = date.toString();
@@ -152,7 +152,7 @@ public class UserController {
         model.addAttribute("dates", headerText);
         model.addAttribute("combinedStats", combinedStats);
         try {
-            scheduledService.writeSpreadSheetTable(code, currentUser, combinedStats, date);
+            googleSpreadSheetService.writeSpreadSheetTable(code, currentUser, combinedStats, date);
         } catch (OAuthCredentialEmptyException e) {
             model.addAttribute("error", "Permission denied");
         }

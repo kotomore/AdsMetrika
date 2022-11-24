@@ -119,13 +119,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.telegram</groupId>
-			<artifactId>telegrambots</artifactId>
-			<version>6.1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.telegram</groupId>
-			<artifactId>telegrambotsextensions</artifactId>
-			<version>6.1.0</version>
+			<artifactId>telegrambots-spring-boot-starter</artifactId>
+			<version>5.3.0</version>
 		</dependency>
     </dependencies>
 

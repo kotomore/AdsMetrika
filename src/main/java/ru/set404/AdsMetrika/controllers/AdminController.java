@@ -9,7 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import ru.set404.AdsMetrika.scheduled.telegram.TelegramBot;
 import ru.set404.AdsMetrika.services.AdminService;
 
 @Controller
@@ -17,13 +16,10 @@ import ru.set404.AdsMetrika.services.AdminService;
 public class AdminController {
     private final AdminService adminService;
     private final ApplicationContext context;
-    private final TelegramBot telegramBot;
-
     @Autowired
-    public AdminController(AdminService adminService, ApplicationContext context, TelegramBot telegramBot) {
+    public AdminController(AdminService adminService, ApplicationContext context) {
         this.adminService = adminService;
         this.context = context;
-        this.telegramBot = telegramBot;
     }
 
     @GetMapping
@@ -34,7 +30,6 @@ public class AdminController {
 
     @PostMapping("/shutdown")
     public void shutdown() {
-        telegramBot.stop();
         int exitCode = SpringApplication.exit(context, (ExitCodeGenerator) () -> 0);
         System.exit(exitCode);
     }

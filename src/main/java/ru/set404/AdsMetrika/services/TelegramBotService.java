@@ -1,31 +1,27 @@
 package ru.set404.AdsMetrika.services;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.set404.AdsMetrika.dto.TableDTO;
 import ru.set404.AdsMetrika.models.User;
-import ru.set404.AdsMetrika.scheduled.googlesheets.SpreadSheet;
 import ru.set404.AdsMetrika.scheduled.telegram.TelegramBot;
-import ru.set404.AdsMetrika.util.StatisticsUtilities;
 
 import java.time.LocalDate;
 
 @Service
-public class ScheduledService {
-    private final SpreadSheet spreadSheet;
+public class TelegramBotService {
     private final TelegramBot telegramBot;
     private final SettingsService settingsService;
+    protected Log logger = LogFactory.getLog(this.getClass());
 
     @Autowired
-    public ScheduledService(SpreadSheet spreadSheet, TelegramBot telegramBot, SettingsService settingsService) {
-        this.spreadSheet = spreadSheet;
+    public TelegramBotService(TelegramBot telegramBot, SettingsService settingsService) {
         this.telegramBot = telegramBot;
         this.settingsService = settingsService;
-    }
-
-    public void writeSpreadSheetTable(String code, User user, TableDTO combinedStats, LocalDate date) {
-        String sheetId = settingsService.userSettings(user).getSpreadSheetId();
-        spreadSheet.writeTable(code, sheetId, StatisticsUtilities.convertTableDTOToObject(combinedStats), date);
     }
 
     public void sendTelegramMessage(User user, TableDTO combinedStats) {
@@ -38,6 +34,15 @@ public class ScheduledService {
                 "*Profit: *$" + (int) combinedStats.getTotalProfit() + "\n" +
                 "*ROI: *" + combinedStats.getTotalROI() + "%";
 
-        telegramBot.setAnswer(Long.parseLong(telegramId), text);
+        sendMessage(telegramId, text);
+    }
+
+    public void sendMessage(String chatId, String text) {
+        try {
+            telegramBot.execute(new SendMessage(chatId, text));
+        } catch (TelegramApiException e) {
+            logger.debug(e.getMessage());
+
+        }
     }
 }

@@ -27,7 +27,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
+        http.csrf().ignoringAntMatchers("/telegram-webhook").and()
+                .authorizeRequests()
+                .antMatchers("/telegram-webhook").permitAll()
                 .antMatchers("/admin").hasRole("ADMIN")
                 .antMatchers("/", "/registration", "/error", "/assets/**").permitAll()
                 .antMatchers("/admin/list").hasRole("ADMIN")

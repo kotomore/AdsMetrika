@@ -30,10 +30,7 @@ public class CustomUrlAuthenticationSuccessHandler implements AuthenticationSucc
         clearAuthenticationAttributes(request);
     }
 
-    protected void handle(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            Authentication authentication
+    protected void handle(HttpServletRequest request, HttpServletResponse response, Authentication authentication
     ) throws IOException {
 
         String targetUrl = determineTargetUrl(authentication);

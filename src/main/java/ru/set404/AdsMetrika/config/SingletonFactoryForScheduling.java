@@ -10,9 +10,8 @@ import ru.set404.AdsMetrika.network.cpa.Adcombo;
 import ru.set404.AdsMetrika.repositories.CredentialsRepository;
 import ru.set404.AdsMetrika.scheduled.googlesheets.GoogleAuthorizeConfig;
 import ru.set404.AdsMetrika.scheduled.googlesheets.SpreadSheet;
-import ru.set404.AdsMetrika.scheduled.telegram.TelegramBot;
 import ru.set404.AdsMetrika.services.NetworksService;
-import ru.set404.AdsMetrika.services.ScheduledService;
+import ru.set404.AdsMetrika.services.GoogleSpreadSheetService;
 import ru.set404.AdsMetrika.services.SettingsService;
 
 @Component
@@ -20,7 +19,6 @@ public class SingletonFactoryForScheduling {
     private final ObjectMapper objectMapper;
     private final CredentialsRepository credentialsRepository;
     private final SettingsService settingsService;
-    private final TelegramBot telegramBot;
     @Value("${google.application.name}")
     private String applicationName;
     @Value("${google.credentials.file.path}")
@@ -31,14 +29,13 @@ public class SingletonFactoryForScheduling {
     private String redirectUri;
 
     private NetworksService networksService;
-    private ScheduledService scheduledService;
+    private GoogleSpreadSheetService googleSpreadSheetService;
 
     @Autowired
-    public SingletonFactoryForScheduling(ObjectMapper objectMapper, CredentialsRepository credentialsRepository, SettingsService settingsService, TelegramBot telegramBot) {
+    public SingletonFactoryForScheduling(ObjectMapper objectMapper, CredentialsRepository credentialsRepository, SettingsService settingsService) {
         this.objectMapper = objectMapper;
         this.credentialsRepository = credentialsRepository;
         this.settingsService = settingsService;
-        this.telegramBot = telegramBot;
     }
 
     private TrafficFactory getTrafficFactory() {
@@ -72,9 +69,9 @@ public class SingletonFactoryForScheduling {
         return networksService;
     }
 
-    public ScheduledService getScheduledServiceSingleton() {
-        if (scheduledService == null)
-            scheduledService = new ScheduledService(getSpreadSheet(), telegramBot, settingsService);
-        return scheduledService;
+    public GoogleSpreadSheetService getScheduledServiceSingleton() {
+        if (googleSpreadSheetService == null)
+            googleSpreadSheetService = new GoogleSpreadSheetService(getSpreadSheet(), settingsService);
+        return googleSpreadSheetService;
     }
 }
