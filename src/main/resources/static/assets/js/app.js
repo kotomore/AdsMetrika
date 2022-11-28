@@ -16,10 +16,6 @@
         for (var e = document.getElementById("topnav-menu-content").getElementsByTagName("a"), t = 0, n = e.length; t < n; t++) "nav-item dropdown active" === e[t].parentElement.getAttribute("class") && (e[t].parentElement.classList.remove("active"), e[t].nextElementSibling.classList.remove("show"))
     }
 
-    function t(e) {
-        1 == n("#light-mode-switch").prop("checked") && "light-mode-switch" === e ? (n("html").removeAttr("dir"), n("#dark-mode-switch").prop("checked", !1), n("#rtl-mode-switch").prop("checked", !1), n("#bootstrap-style").attr("href", "assets/css/bootstrap.min.css"), n("#app-style").attr("href", "assets/css/app.min.css"), sessionStorage.setItem("is_visited", "dark-mode-switch")) : 1 == n("#dark-mode-switch").prop("checked") && "dark-mode-switch" === e ? (n("html").removeAttr("dir"), n("#light-mode-switch").prop("checked", !1), n("#rtl-mode-switch").prop("checked", !1), n("#bootstrap-style").attr("href", "assets/css/bootstrap-dark.min.css"), n("#app-style").attr("href", "assets/css/app-dark.min.css"), sessionStorage.setItem("is_visited", "dark-mode-switch")) : 1 == n("#rtl-mode-switch").prop("checked") && "rtl-mode-switch" === e && (n("#light-mode-switch").prop("checked", !1), n("#dark-mode-switch").prop("checked", !1), n("#bootstrap-style").attr("href", "assets/css/bootstrap-rtl.min.css"), n("#app-style").attr("href", "assets/css/app-rtl.min.css"), n("html").attr("dir", "rtl"), sessionStorage.setItem("is_visited", "rtl-mode-switch"))
-    }
-
     function e() {
         document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || (console.log("pressed"), n("body").removeClass("fullscreen-enable"))
     }
@@ -58,9 +54,7 @@
         return new bootstrap.Tooltip(e)
     }), [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]')).map(function(e) {
         return new bootstrap.Popover(e)
-    }), n(window).on("load", function() {
+    }), n(window).on("DOMContentLoaded", function() {
         n("#status").fadeOut(), n("#preloader").delay(350).fadeOut("slow")
-    }), window.sessionStorage && ((a = sessionStorage.getItem("is_visited")) ? (n(".right-bar input:checkbox").prop("checked", !1), n("#" + a).prop("checked", !0), t(a)) : sessionStorage.setItem("is_visited", "dark-mode-switch")), n("#light-mode-switch, #dark-mode-switch, #rtl-mode-switch").on("change", function(e) {
-        t(e.target.id)
     }), Waves.init()
 }(jQuery);

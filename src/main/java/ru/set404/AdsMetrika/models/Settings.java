@@ -37,4 +37,12 @@ public class Settings {
 
     @Column(name = "adcombo_id")
     private String adcomboId = "";
+
+    @Column(name = "theme")
+    @Enumerated(EnumType.STRING)
+    private Theme theme = Theme.DARK;
+}
+
+enum Theme {
+    LIGHT, DARK
 }

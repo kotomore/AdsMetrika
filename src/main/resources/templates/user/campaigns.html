@@ -9,28 +9,30 @@
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description"/>
     <meta content="Themesdesign" name="author"/>
     <!-- App favicon -->
-    <link rel="icon" type="image/x-icon" href="../assets/favicon.ico">
+    <!-- App favicon -->
+    <link rel="icon" type="image/x-icon" th:href="@{/assets/favicon.ico}">
+    <link rel="stylesheet" type="text/css" th:href="@{/assets/libs/toastr/build/toastr.min.css}">
 
-    <link rel="stylesheet" type="text/css" href="../assets/libs/toastr/build/toastr.min.css">
-
-    <!-- jquery.vectormap css -->
-    <link href="../assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet"
+    <link th:href="@{/assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css}" rel="stylesheet"
           type="text/css"/>
 
     <!-- DataTables -->
-    <link href="../assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet"
+    <link th:href="@{/assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css}" rel="stylesheet"
           type="text/css"/>
 
     <!-- Responsive datatable examples -->
-    <link href="../assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet"
+    <link th:href="@{/assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css}" rel="stylesheet"
           type="text/css"/>
 
-    <!-- Bootstrap Css -->
-    <link href="../assets/css/bootstrap-dark.min.css" id="bootstrap-style" rel="stylesheet" type="text/css"/>
     <!-- Icons Css -->
-    <link href="../assets/css/icons.min.css" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/assets/css/icons.min.css}" rel="stylesheet" type="text/css"/>
     <!-- App Css-->
-    <link href="../assets/css/app-dark.min.css" id="app-style" rel="stylesheet" type="text/css"/>
+    <script th:src="@{/assets/libs/jquery/jquery.min.js}"></script>
+
+    <link th:if="${settings.theme.name() == 'DARK'}" th:href="@{/assets/css/bootstrap-dark.min.css}" id="bootstrap-style" rel="stylesheet" type="text/css"/>
+    <link th:if="${settings.theme.name() == 'DARK'}" th:href="@{/assets/css/app-dark.min.css}" id="app-style" rel="stylesheet" type="text/css"/>
+    <link th:if="${settings.theme.name() == 'LIGHT'}" th:href="@{/assets/css/bootstrap.min.css}" id="bootstrap-style" rel="stylesheet" type="text/css"/>
+    <link th:if="${settings.theme.name() == 'LIGHT'}" th:href="@{/assets/css/app.min.css}" id="app-style" rel="stylesheet" type="text/css"/>
 
 </head>
 
@@ -496,60 +498,21 @@
 <div class="rightbar-overlay"></div>
 
 
-<!-- JAVASCRIPT -->
-<script src="../assets/libs/toastr/build/toastr.min.js"></script>
-
-<!-- toastr init -->
-<script src="../assets/js/pages/toastr.init.js"></script>
-
-
-
-
-<script src="../assets/libs/jquery/jquery.min.js"></script>
-<script src="../assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="../assets/libs/metismenu/metisMenu.min.js"></script>
-<script src="../assets/libs/simplebar/simplebar.min.js"></script>
-<script src="../assets/libs/node-waves/waves.min.js"></script>
-
-
-
-
-<!-- apexcharts -->
-<script src="../assets/libs/apexcharts/apexcharts.min.js"></script>
-
-<!-- jquery.vectormap map -->
-<script src="../assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js"></script>
-<script src="../assets/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js"></script>
+<script th:src="@{/assets/libs/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/libs/metismenu/metisMenu.min.js}"></script>
 
 <!-- Required datatable js -->
-<script src="../assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
-<script src="../assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script th:src="@{/assets/libs/datatables.net/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js}"></script>
 
-<!-- Responsive examples -->
-<!--<script src="../assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>-->
-<!--<script src="../assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>-->
+<script th:src="@{/assets/libs/toastr/build/toastr.min.js}"></script>
+<script th:src="@{/assets/js/pages/toastr.init.js}"></script>
 
-<script src="../assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-<script src="../assets/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
-<script src="../assets/libs/jszip/jszip.min.js"></script>
-<script src="../assets/libs/pdfmake/build/pdfmake.min.js"></script>
-<script src="../assets/libs/pdfmake/build/vfs_fonts.js"></script>
-<script src="../assets/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
-<script src="../assets/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
-<script src="../assets/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
-
-<script src="../assets/libs/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
-<script src="../assets/libs/datatables.net-select/js/dataTables.select.min.js"></script>
+<script th:src="@{/assets/js/pages/datatables.init.js}"></script>
 
 
-<script src="../assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-<script src="../assets/js/pages/datatables.init.js"></script>
-<script src="../assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
 
-<script src="../assets/libs/toastr/build/toastr.min.js"></script>
 
-<!-- toastr init -->
-<script src="../assets/js/pages/toastr.init.js"></script>
 
 <script th:if="${error}" th:inline="javascript">
     toastr["error"]([[${error}]]);
@@ -593,7 +556,7 @@
     }
 </script>
 <!-- App js -->
-<script src="../assets/js/app.js"></script>
+<script th:src="@{/assets/js/app.js}"></script>
 </body>
 
 </html>

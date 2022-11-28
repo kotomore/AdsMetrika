@@ -9,26 +9,31 @@
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description"/>
     <meta content="Themesdesign" name="author"/>
     <!-- App favicon -->
-    <link rel="icon" type="image/x-icon" th:href="@{../assets/favicon.ico}">
-    <link rel="stylesheet" type="text/css" href="assets/libs/toastr/build/toastr.min.css">
-    <!-- jquery.vectormap css -->
-    <link th:href="@{assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css}" rel="stylesheet"
+    <link rel="icon" type="image/x-icon" th:href="@{/assets/favicon.ico}">
+    <link rel="stylesheet" type="text/css" th:href="@{/assets/libs/toastr/build/toastr.min.css}">
+
+    <link th:href="@{/assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css}" rel="stylesheet"
           type="text/css"/>
 
     <!-- DataTables -->
-    <link th:href="@{assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css}" rel="stylesheet"
+    <link th:href="@{/assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css}" rel="stylesheet"
           type="text/css"/>
 
     <!-- Responsive datatable examples -->
-    <link th:href="@{assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css}" rel="stylesheet"
+    <link th:href="@{/assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css}" rel="stylesheet"
           type="text/css"/>
-
-    <!-- Bootstrap Css -->
-    <link href="assets/css/bootstrap-dark.min.css" id="bootstrap-style" rel="stylesheet" type="text/css"/>
     <!-- Icons Css -->
-    <link th:href="@{assets/css/icons.min.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/assets/css/icons.min.css}" rel="stylesheet" type="text/css"/>
     <!-- App Css-->
-    <link th:href="@{assets/css/app-dark.min.css}" id="app-style" rel="stylesheet" type="text/css"/>
+    <script th:src="@{/assets/libs/jquery/jquery.min.js}"></script>
+
+
+    <link th:if="${settings.theme.name() == 'DARK'}" th:href="@{/assets/css/bootstrap-dark.min.css}" id="bootstrap-style" rel="stylesheet" type="text/css"/>
+    <link th:if="${settings.theme.name() == 'DARK'}" th:href="@{/assets/css/app-dark.min.css}" id="app-style" rel="stylesheet" type="text/css"/>
+    <link th:if="${settings.theme.name() == 'LIGHT'}" th:href="@{/assets/css/bootstrap.min.css}" id="bootstrap-style" rel="stylesheet" type="text/css"/>
+    <link th:if="${settings.theme.name() == 'LIGHT'}" th:href="@{/assets/css/app.min.css}" id="app-style" rel="stylesheet" type="text/css"/>
+
+
 
 </head>
 
@@ -42,7 +47,6 @@
     </div>
 </div>
 
-<!-- <body data-layout="horizontal" data-topbar="dark"> -->
 
 <!-- Begin page -->
 <div id="layout-wrapper">
@@ -55,19 +59,19 @@
                 <div class="navbar-brand-box">
                     <a th:href="@{/statistics}" class="logo logo-dark">
                                 <span class="logo-sm">
-                                    <img src="assets/images/logo-sm.png" alt="logo-sm" height="36">
+                                    <img th:src="@{/assets/images/logo-sm.png}" alt="logo-sm" height="36">
                                 </span>
                         <span style="height: 36px;" class="logo-lg">
-                                    <img src="assets/images/logo-dark.png" alt="logo-dark" height="36">
+                                    <img th:src="@{/assets/images/logo-dark.png}" alt="logo-dark" height="36">
                                 </span>
                     </a>
 
                     <a th:href="@{/statistics}" class="logo logo-light">
                                 <span class="logo-sm">
-                                    <img src="assets/images/logo-sm.png" alt="logo-sm-light" height="36">
+                                    <img th:src="@{/assets/images/logo-sm.png}" alt="logo-sm-light" height="36">
                                 </span>
                         <span class="logo-lg">
-                                    <img src="assets/images/logo-light.png" alt="logo-light" height="36">
+                                    <img th:src="@{/assets/images/logo-dark.png}" alt="logo-light" height="36">
                                 </span>
                     </a>
                 </div>
@@ -137,12 +141,6 @@
                     </div>
                 </div>
 
-                <div class="dropdown d-inline-block">
-                    <button type="button" class="btn header-item noti-icon right-bar-toggle waves-effect">
-                        <i class="ri-settings-2-line"></i>
-                    </button>
-                </div>
-
             </div>
         </div>
     </header>
@@ -208,6 +206,7 @@
                             <span>TrafficFactory</span>
                         </a>
                     </li>
+
                     <li>
                         <a href="#" data-bs-toggle="modal" data-bs-target="#myModal3" class=" waves-effect">
                             <i class="ri-account-circle-line"></i>
@@ -366,7 +365,7 @@
                                                 </span>
                                     </div>
                                 </div>
-                            </div><!-- end cardbody -->
+                            </div>
                         </div><!-- end card -->
                     </div><!-- end col -->
                 </div><!-- end row -->
@@ -396,8 +395,8 @@
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr th:style="${offer.getProfit() < 0 ? 'color: red;' : 'color: green;'}"
-                                                        th:each="offer : ${favorite}">
+                                                    <tr th:each="offer : ${favorite}"
+                                                        th:style="${offer.getProfit() < 0 ? 'color: red;' : 'color: green;'}">
                                                         <td th:text="'[' + ${offer.getCampaignId()} + '] ' + ${offer.getCampaignName()}">
                                                             Table cell
                                                         </td>
@@ -442,7 +441,7 @@
                     <div class="col-xl-6">
                         <div class="card">
                             <div class="card-body pb-0">
-                                <h4 class="card-title mb-4">Last 7 days statistics</h4>
+                                <h4 th:text="'Last ' + ${chartDates.size()} + ' days statistics'" class="card-title mb-4">Last 6 days statistics</h4>
 
                                 <div class="text-center pt-3">
                                     <div th:if="${chartTotal}" class="row">
@@ -488,7 +487,6 @@
                                             <p th:text="${network.getFullName()}" class="mb-2 text-truncate">Network</p>
                                         </div>
                                     </div>
-                                    <!-- end col -->
                                 </div>
                                 <!-- end row -->
 
@@ -525,7 +523,7 @@
                         <div class="tab-content p-3 text-muted">
 
                             <div class="tab-pane" th:id="${statistic.getNetwork()}"
-                                 th:each="statistic : ${statistics}"
+                                 th:each="statistic, iter : ${statistics}"
                                  role="tabpanel">
                                 <div class="row">
                                     <div class="col-xl-12">
@@ -536,7 +534,7 @@
                                                     <h4 th:text="${statistic.getNetwork().getFullName()} + ' Offers'"
                                                         class="card-title mb-4">
                                                         Offers Statistics</h4>
-                                                    <table id="key-datatable"
+                                                    <table th:id="'datatable'+${iter.index}" id="key-datatable"
                                                            class="table table-centered mb-0 align-middle table-hover table-nowrap">
                                                         <thead class="table-light">
                                                         <tr>
@@ -551,6 +549,20 @@
                                                             <th style="width: 120px;">ROI %</th>
                                                         </tr>
                                                         </thead><!-- end thead -->
+                                                        <tfoot>
+                                                        <tr>
+                                                            <th>Total</th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+
+                                                        </tr>
+                                                        </tfoot>
                                                         <tbody>
                                                         <tr th:style="${offer.getProfit() < 0 ? 'color: red;' : 'color: green;'}"
                                                             th:each="offer : ${statistic.getCurrentStats()}">
@@ -576,28 +588,6 @@
                                                             </td>
                                                             <td th:text="${offer.getROI()} + '%'">roi</td>
                                                         </tr>
-                                                        <tr>
-                                                            <td><h6 class="mb-0">Total</h6></td>
-                                                            <td></td>
-                                                            <td th:text="${statistic.getTotalClicks()}">clicks</td>
-                                                            <td th:text="${#numbers.formatDecimal(statistic.getTotalSpend(), 1, 2)} + '$'">
-                                                                cost
-                                                            </td>
-                                                            <td th:text="${#numbers.formatDecimal(statistic.getTotalHoldCost(), 1, 2)} + '$'">
-                                                                hold cost
-                                                            </td>
-                                                            <td th:text="${statistic.getTotalApproveCount()}">
-                                                                approve
-                                                                count
-                                                            </td>
-                                                            <td th:text="${#numbers.formatDecimal(statistic.getTotalRevenue(), 1, 2)} + '$'">
-                                                                approve cost
-                                                            </td>
-                                                            <td th:text="${#numbers.formatDecimal(statistic.getTotalProfit(), 1, 2)} + '$'">
-                                                                profit
-                                                            </td>
-                                                            <td th:text="${statistic.getTotalROI()} + '%'">roi</td>
-                                                        </tr>
                                                         </tbody><!-- end tbody -->
                                                     </table> <!-- end table -->
                                                 </div>
@@ -617,7 +607,7 @@
                                                 <div style="margin-bottom: 50px;" class="table-responsive">
                                                     <h4>Combined Offer Statistics</h4>
 
-                                                    <table id="datatable1"
+                                                    <table id="datatable2"
                                                            class="table table-centered mb-0 align-middle table-hover table-nowrap">
                                                         <thead class="table-light">
                                                         <tr>
@@ -658,7 +648,7 @@
                                                             <td th:text="${#numbers.formatDecimal(offer.getSpend(), 1, 2)} + '$'">
                                                                 cost
                                                             </td>
-                                                            <td th:text="${#numbers.formatDecimal(offer.getHoldCost(), 1, 2)}">
+                                                            <td th:text="${#numbers.formatDecimal(offer.getHoldCost(), 1, 2)} + '$'">
                                                                 hold cost
                                                             </td>
                                                             <td th:text="${offer.getApproveCount()}">approve count
@@ -891,7 +881,7 @@
 
         <div class="p-4">
             <div class="mb-2">
-                <img src="assets/images/layouts/layout-1.jpg" class="img-fluid img-thumbnail" alt="layout-1">
+                <img th:src="@{/assets/images/layouts/layout-1.jpg}" class="img-fluid img-thumbnail" alt="layout-1">
             </div>
 
             <div class="form-check form-switch mb-3">
@@ -900,7 +890,7 @@
             </div>
 
             <div class="mb-2">
-                <img src="assets/images/layouts/layout-2.jpg" class="img-fluid img-thumbnail" alt="layout-2">
+                <img th:src="@{/assets/images/layouts/layout-2.jpg}" class="img-fluid img-thumbnail" alt="layout-2">
             </div>
             <div class="form-check form-switch mb-3">
                 <input class="form-check-input theme-choice" type="checkbox" id="dark-mode-switch"
@@ -919,33 +909,19 @@
 <div class="rightbar-overlay"></div>
 
 <!-- JAVASCRIPT -->
-<script src="assets/libs/jquery/jquery.min.js"></script>
-<script src="assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="assets/libs/metismenu/metisMenu.min.js"></script>
-<script src="assets/libs/simplebar/simplebar.min.js"></script>
-<script src="assets/libs/node-waves/waves.min.js"></script>
+<script th:src="@{/assets/libs/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/libs/metismenu/metisMenu.min.js}"></script>
 
 
 <!-- apexcharts -->
-<script src="assets/libs/apexcharts/apexcharts.min.js"></script>
-
-<!-- jquery.vectormap map -->
-<script src="assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js"></script>
-<script src="assets/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js"></script>
+<script th:src="@{/assets/libs/apexcharts/apexcharts.min.js}"></script>
 
 <!-- Required datatable js -->
-<script src="assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
-<script src="assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script th:src="@{/assets/libs/datatables.net/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js}"></script>
 
-<!-- Responsive examples -->
-<script src="assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-<script src="assets/js/pages/datatables.init.js"></script>
-<script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
-
-<script src="assets/libs/toastr/build/toastr.min.js"></script>
-
-<!-- toastr init -->
-<script src="assets/js/pages/toastr.init.js"></script>
+<script th:src="@{/assets/libs/toastr/build/toastr.min.js}"></script>
+<script th:src="@{/assets/js/pages/toastr.init.js}"></script>
 
 <script th:if="${error}" th:inline="javascript">
     toastr["error"]([[${error}]]);
@@ -1014,7 +990,121 @@
 
 <script>
     $(document).ready(function () {
+        $('#datatable0').DataTable({
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api();
+
+                // Remove the formatting to get integer data for summation
+                var intVal = function (i) {
+                    return typeof i === 'string' ? i.replace(",", ".").replace(/[\$,]/g, '') * 1 : typeof i === 'number' ? i : 0;
+                };
+
+                total = api
+                    .column(2)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                $(api.column(2).footer()).html(total);
+                total = api
+                    .column(3)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                $(api.column(3).footer()).html('$' + total.toFixed(2));
+                total = api
+                    .column(4)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                $(api.column(4).footer()).html('$' + total.toFixed(2));
+                total = api
+                    .column(5)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                $(api.column(5).footer()).html(total);
+                total = api
+                    .column(6)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                $(api.column(6).footer()).html('$' + total.toFixed(2));
+                total = api
+                    .column(7)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                $(api.column(7).footer()).html(total.toFixed(2) + '$');
+            },
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
         $('#datatable1').DataTable({
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api();
+
+                // Remove the formatting to get integer data for summation
+                var intVal = function (i) {
+                    return typeof i === 'string' ? i.replace(",", ".").replace(/[\$,]/g, '') * 1 : typeof i === 'number' ? i : 0;
+                };
+
+                total = api
+                    .column(2)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                $(api.column(2).footer()).html(total);
+                total = api
+                    .column(3)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                $(api.column(3).footer()).html('$' + total.toFixed(2));
+                total = api
+                    .column(4)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                $(api.column(4).footer()).html('$' + total.toFixed(2));
+                total = api
+                    .column(5)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                $(api.column(5).footer()).html(total);
+                total = api
+                    .column(6)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                $(api.column(6).footer()).html('$' + total.toFixed(2));
+                total = api
+                    .column(7)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                $(api.column(7).footer()).html(total.toFixed(2) + '$');
+            },
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('#datatable2').DataTable({
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api();
 

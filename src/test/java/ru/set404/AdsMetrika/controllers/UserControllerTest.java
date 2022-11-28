@@ -89,8 +89,13 @@ public class UserControllerTest {
     @Test
     public void test_report_page_with_guest_role_without_types() throws Exception {
         User user = getNewUser();
+        Settings settings = getSettings(user);
+        user.setSettings(settings);
+        List<Credentials> credentials = getCredentials(user);
+        user.setCredentials(credentials);
         user.setRole("ROLE_GUEST");
         UserDetails userDetails = new UserDetails(user);
+        when(settingsService.userSettings(user)).thenReturn(settings);
         mockMvc.perform(get("/report")
                         .with(user(userDetails))
                 )
@@ -147,8 +152,15 @@ public class UserControllerTest {
     @Test
     public void test_campaigns_page_with_guest_role_without_dates() throws Exception {
         User user = getNewUser();
+        Settings settings = getSettings(user);
+        user.setSettings(settings);
+        List<Credentials> credentials = getCredentials(user);
+        user.setCredentials(credentials);
         user.setRole("ROLE_GUEST");
         UserDetails userDetails = new UserDetails(user);
+
+        when(settingsService.userSettings(user)).thenReturn(settings);
+        when(credentialsRepository.findByOwner(user)).thenReturn(credentials);
         mockMvc.perform(get("/campaigns")
                         .with(user(userDetails))
                 )
@@ -162,11 +174,14 @@ public class UserControllerTest {
     @Test
     public void test_campaigns_page_with_guest_role_with_network_TF_and_dates_and_credentials() throws Exception {
         User user = getNewUser();
+        Settings settings = getSettings(user);
+        user.setSettings(settings);
         List<Credentials> credentials = getCredentials(user);
         user.setCredentials(credentials);
         user.setRole("ROLE_GUEST");
         UserDetails userDetails = new UserDetails(user);
 
+        when(settingsService.userSettings(user)).thenReturn(settings);
         when(credentialsRepository.findByOwner(user)).thenReturn(credentials);
         mockMvc.perform(get("/campaigns?network=TF&ds=2022-11-07&de=2022-11-08")
                         .with(user(userDetails))
@@ -181,11 +196,14 @@ public class UserControllerTest {
     @Test
     public void test_campaigns_page_with_guest_role_with_network_EXO_and_dates_and_credentials() throws Exception {
         User user = getNewUser();
+        Settings settings = getSettings(user);
+        user.setSettings(settings);
         List<Credentials> credentials = getCredentials(user);
         user.setCredentials(credentials);
         user.setRole("ROLE_GUEST");
         UserDetails userDetails = new UserDetails(user);
 
+        when(settingsService.userSettings(user)).thenReturn(settings);
         when(credentialsRepository.findByOwner(user)).thenReturn(credentials);
         mockMvc.perform(get("/campaigns?network=EXO&ds=2022-11-07&de=2022-11-08")
                         .with(user(userDetails))

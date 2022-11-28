@@ -62,7 +62,7 @@ public class UserController {
                 tableStats = getStatsForTables(currentUser, dateStart, dateEnd);
                 model.addAttribute("success", "Success");
             }
-            final int COUNT_DAYS_IN_CHART = 7;
+            final int COUNT_DAYS_IN_CHART = 6;
             oldStats = statsService.getStatsList(currentUser, LocalDate.now().minusDays(COUNT_DAYS_IN_CHART));
             chartStats = StatisticsUtilities.convertToChartDTOList(oldStats);
         } catch (Exception e) {
@@ -76,6 +76,7 @@ public class UserController {
                 .filter(statDTO -> favoriteOffers.contains(String.valueOf(statDTO.getCampaignId()))).toList();
 
         putCredentialsInModel(model);
+        model.addAttribute("settings", settingsService.userSettings(currentUser));
         model.addAttribute("currentDate", LocalDate.now());
 
         //Favorite offers statistics
@@ -131,6 +132,7 @@ public class UserController {
         }
 
         putCredentialsInModel(model);
+        model.addAttribute("settings", settingsService.userSettings(currentUser));
         model.addAttribute("currentDate", LocalDate.now());
         model.addAttribute("dates", headerText);
         model.addAttribute("combinedStats", combinedStats);
@@ -148,6 +150,7 @@ public class UserController {
         TableDTO combinedStats = StatisticsUtilities.convertForSingleTable(tableStats);
 
         putCredentialsInModel(model);
+        model.addAttribute("settings", settingsService.userSettings(currentUser));
         model.addAttribute("currentDate", LocalDate.now());
         model.addAttribute("dates", headerText);
         model.addAttribute("combinedStats", combinedStats);
@@ -185,6 +188,7 @@ public class UserController {
         }
 
         putCredentialsInModel(model);
+        model.addAttribute("settings", settingsService.userSettings(currentUser));
         model.addAttribute("dates", headerText);
         model.addAttribute("currentDate", LocalDate.now());
         model.addAttribute("combinedStats", campaignStats);

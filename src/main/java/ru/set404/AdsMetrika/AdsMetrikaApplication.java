@@ -11,19 +11,13 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.set404.AdsMetrika.scheduled.telegram.TelegramBot;
 
 @SpringBootApplication
 @EnableCaching
 @EnableScheduling
 public class AdsMetrikaApplication {
     @Value("${telegram.webhook-path}")
-    private String webhookPath;
-    @Value("${telegram.bot-name}")
-    private String botName;
-    @Value("${telegram.bot-token}")
-    private String botToken;
+    private String botPath;
 
     public static void main(String[] args) {
         SpringApplication.run(AdsMetrikaApplication.class, args);
@@ -47,11 +41,6 @@ public class AdsMetrikaApplication {
 
     @Bean
     public SetWebhook setWebhookInstance() {
-        return SetWebhook.builder().url(webhookPath).build();
-    }
-
-    @Bean
-    public TelegramBot springWebhookBot(SetWebhook setWebhook) throws TelegramApiException {
-        return new TelegramBot(setWebhook).setup(webhookPath, botName, botToken);
+        return SetWebhook.builder().url(botPath).build();
     }
 }
