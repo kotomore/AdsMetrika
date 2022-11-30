@@ -39,7 +39,9 @@ public class TelegramBotService {
 
     public void sendMessage(String chatId, String text) {
         try {
-            telegramBot.execute(new SendMessage(chatId, text));
+            SendMessage message = new SendMessage(chatId, text);
+            message.enableMarkdown(true);
+            telegramBot.execute(message);
         } catch (TelegramApiException e) {
             logger.debug(e.getMessage());
 

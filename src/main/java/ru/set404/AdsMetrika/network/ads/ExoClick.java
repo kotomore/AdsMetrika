@@ -10,12 +10,8 @@ import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.context.annotation.SessionScope;
 import ru.set404.AdsMetrika.models.Credentials;
-import ru.set404.AdsMetrika.models.User;
-import ru.set404.AdsMetrika.network.Network;
-import ru.set404.AdsMetrika.repositories.CredentialsRepository;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -74,7 +70,10 @@ public class ExoClick implements AffiliateNetwork {
         }
     }
 
-    public Map<Integer, NetworkStats> getCampaignStatsMap(Credentials credentials, LocalDate dateStart, LocalDate dateEnd) {
+    ///////////////////////////////////////
+    //return all campaigns stats by network Map<campaign_id, network_stats>
+    ///////////////////////////////////////
+    public Map<Integer, NetworkStats> getCampaignsStats(Credentials credentials, LocalDate dateStart, LocalDate dateEnd) {
         authorization(credentials);
         Map<Integer, NetworkStats> stat = new HashMap<>();
         try {
@@ -93,7 +92,10 @@ public class ExoClick implements AffiliateNetwork {
         return stat;
     }
 
-    public NetworkStats getNetworkStatsByOfferCampaigns(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+    ///////////////////////////////////////
+    //return combined stats by list of campaigns
+    ///////////////////////////////////////
+    public NetworkStats getCombinedStatsByOfferCampaigns(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
         authorization(credentials);
         int clicks = 0;
         double cost = 0;

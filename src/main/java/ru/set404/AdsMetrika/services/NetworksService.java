@@ -58,9 +58,12 @@ public class NetworksService {
                         new RuntimeException("Couldn't find %s API. Check it".formatted(network.getFullName())));
     }
 
-    @Cacheable("network_stats")
-    public List<StatDTO> getNetworkStatisticsList(User user, Network network, LocalDate dateStart,
-                                                  LocalDate dateEnd) {
+    ////////////////////////////////////////////////
+    //StatDTO contains campaignId = adcombo offer id
+    ////////////////////////////////////////////////
+    @Cacheable(value = "network_stats")
+    public List<StatDTO> getOfferStats(User user, Network network, LocalDate dateStart,
+                                       LocalDate dateEnd) {
         AffiliateNetwork affiliateNetwork = null;
         switch (network) {
             case TF -> affiliateNetwork = trafficFactory;
@@ -76,7 +79,7 @@ public class NetworksService {
         for (int offerId : adcomboStatsMap.keySet()) {
             if (adcomboStatsMap.containsKey(offerId)) {
                 assert affiliateNetwork != null;
-                NetworkStats stat = affiliateNetwork.getNetworkStatsByOfferCampaigns(credentials,
+                NetworkStats stat = affiliateNetwork.getCombinedStatsByOfferCampaigns(credentials,
                         adcomboStatsMap.get(offerId).getCampaigns(), dateStart, dateEnd);
                 statsEntities.add(StatisticsUtilities.createStatsDTO(offerId, stat, adcomboStatsMap));
             }
@@ -84,7 +87,10 @@ public class NetworksService {
         return statsEntities;
     }
 
-    @Cacheable("network_stats")
+    ////////////////////////////////////////////////
+    //StatDTO contains campaignId = network campaign id
+    ////////////////////////////////////////////////
+    @Cacheable("campaign_stats")
     public List<StatDTO> getCampaignStats(User user, Network network, LocalDate dateStart,
                                           LocalDate dateEnd) {
         AffiliateNetwork affiliateNetwork = null;
@@ -95,7 +101,7 @@ public class NetworksService {
 
         assert affiliateNetwork != null;
         Map<Integer, NetworkStats> networkStatsMap = affiliateNetwork
-                .getCampaignStatsMap(getUserCredentials(user, network), dateStart, dateEnd);
+                .getCampaignsStats(getUserCredentials(user, network), dateStart, dateEnd);
         Map<Integer, AdcomboStats> adcomboStatsMap = adCombo.getCampaignStatMap(getUserCredentials(user, Network.ADCOMBO),
                 network, dateStart, dateEnd);
 

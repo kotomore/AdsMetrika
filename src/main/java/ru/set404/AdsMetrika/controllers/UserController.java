@@ -244,7 +244,7 @@ public class UserController {
             if (user.getRole().equals("ROLE_GUEST"))
                 currentNetworkStat = networksService.getNetworkStatisticsListMock(network);
             else
-                currentNetworkStat = networksService.getNetworkStatisticsList(user, network, dateStart, dateEnd);
+                currentNetworkStat = networksService.getOfferStats(user, network, dateStart, dateEnd);
             tableStats.add(new TableDTO(currentNetworkStat, network));
             if (dateStart.equals(dateEnd))
                 statsService.saveStatDTOList(currentNetworkStat, user, network, dateStart);

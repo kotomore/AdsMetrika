@@ -26,7 +26,7 @@ public class NetworksServiceTestContextConfiguration {
     public TrafficFactory trafficFactory () {
         return new TrafficFactory(new ObjectMapper()) {
             @Override
-            public Map<Integer, NetworkStats> getCampaignStatsMap(Credentials credentials, LocalDate dateStart, LocalDate dateEnd) {
+            public Map<Integer, NetworkStats> getCampaignsStats(Credentials credentials, LocalDate dateStart, LocalDate dateEnd) {
                 Map<Integer, NetworkStats> networkStatsMap = new HashMap<>();
                 networkStatsMap.put(12345, getNetworkStats());
                 networkStatsMap.put(54321, getNetworkStats());
@@ -34,7 +34,7 @@ public class NetworksServiceTestContextConfiguration {
             }
 
             @Override
-            public NetworkStats getNetworkStatsByOfferCampaigns(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+            public NetworkStats getCombinedStatsByOfferCampaigns(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
                 return getNetworkStats();
             }
         };
@@ -44,7 +44,7 @@ public class NetworksServiceTestContextConfiguration {
     public ExoClick exoClick () {
         return new ExoClick(new ObjectMapper()) {
             @Override
-            public Map<Integer, NetworkStats> getCampaignStatsMap(Credentials credentials, LocalDate dateStart, LocalDate dateEnd) {
+            public Map<Integer, NetworkStats> getCampaignsStats(Credentials credentials, LocalDate dateStart, LocalDate dateEnd) {
                 Map<Integer, NetworkStats> networkStatsMap = new HashMap<>();
                 networkStatsMap.put(12345, getNetworkStats());
                 networkStatsMap.put(54321, getNetworkStats());
@@ -52,7 +52,7 @@ public class NetworksServiceTestContextConfiguration {
             }
 
             @Override
-            public NetworkStats getNetworkStatsByOfferCampaigns(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+            public NetworkStats getCombinedStatsByOfferCampaigns(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
                 return getNetworkStats();
             }
         };

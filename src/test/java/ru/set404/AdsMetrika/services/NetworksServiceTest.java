@@ -51,8 +51,8 @@ public class NetworksServiceTest {
         when(credentialsRepository.findCredentialsByOwnerAndNetworkName(user, Network.TF)).thenReturn(Optional.of(credentialsTF));
 
         NetworksService networksService = new NetworksService(exoClick, trafficFactory, adcombo, credentialsRepository);
-        assertEquals(2, networksService.getNetworkStatisticsList(user, Network.TF, LocalDate.now(), LocalDate.now()).size());
-        assertTrue(networksService.getNetworkStatisticsList(user, Network.TF, LocalDate.now(), LocalDate.now()).contains(
+        assertEquals(2, networksService.getOfferStats(user, Network.TF, LocalDate.now(), LocalDate.now()).size());
+        assertTrue(networksService.getOfferStats(user, Network.TF, LocalDate.now(), LocalDate.now()).contains(
                 new StatDTO(12345, "TestName", 100, 100.0, 100.0, 10, 100.0)));
     }
 
@@ -74,7 +74,7 @@ public class NetworksServiceTest {
 
         NetworksService networksService = new NetworksService(exoClick, trafficFactory, adcombo, credentialsRepository);
         assertEquals(2, networksService.getCampaignStats(user, Network.TF, LocalDate.now(), LocalDate.now()).size());
-        assertTrue(networksService.getNetworkStatisticsList(user, Network.TF, LocalDate.now(), LocalDate.now()).contains(
+        assertTrue(networksService.getOfferStats(user, Network.TF, LocalDate.now(), LocalDate.now()).contains(
                 new StatDTO(12345, "TestName", 100, 100.0, 100.0, 10, 100.0)));
     }
 

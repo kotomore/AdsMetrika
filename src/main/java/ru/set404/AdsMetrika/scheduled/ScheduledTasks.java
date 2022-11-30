@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.set404.AdsMetrika.config.SingletonFactoryForScheduling;
 import ru.set404.AdsMetrika.dto.StatDTO;
 import ru.set404.AdsMetrika.dto.TableDTO;
@@ -43,8 +42,17 @@ public class ScheduledTasks {
     }
 
 
+    @Scheduled(fixedRate = Timer.ONE_MINUTE * 10)
+    @CacheEvict(value = {"network_stats", "campaign_stats"}, allEntries = true)
+    public void clearCache() {
+        logger.debug("Cache {network_stats, campaign_stats} cleared.");
+    }
+
     @Scheduled(cron = "0 0 11 * * *", zone = "Europe/Moscow")
-    public void scheduleTask() throws TelegramApiException {
+    public void scheduleTask()
+    {
+        logger.debug("Sheduled task execute");
+
         LocalDate date = LocalDate.now().minusDays(1);
 
         List<Settings> settingsList = settingsService.findSettingsWithScheduledTask();
@@ -60,12 +68,6 @@ public class ScheduledTasks {
         }
     }
 
-    @Scheduled(fixedRate = Timer.ONE_MINUTE * 10)
-    @CacheEvict(value = "network_stats")
-    public void clearCache() {
-        logger.debug("Cache {network_stats} cleared.");
-    }
-
     private List<TableDTO> getStatsForTables(User user, LocalDate dateStart, LocalDate dateEnd) {
 
         Set<Network> userNetworks = credentialsService.userNetworks(user);
@@ -76,7 +78,7 @@ public class ScheduledTasks {
             if (user.getRole().equals("ROLE_GUEST"))
                 currentNetworkStat = schedulingObjects.getNetworksServiceSingleton().getNetworkStatisticsListMock(network);
             else
-                currentNetworkStat = schedulingObjects.getNetworksServiceSingleton().getNetworkStatisticsList(user,
+                currentNetworkStat = schedulingObjects.getNetworksServiceSingleton().getOfferStats(user,
                         network, dateStart, dateEnd);
             tableStats.add(new TableDTO(currentNetworkStat, network));
         }

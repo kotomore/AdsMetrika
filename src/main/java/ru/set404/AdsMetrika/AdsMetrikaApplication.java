@@ -36,7 +36,7 @@ public class AdsMetrikaApplication {
     @Bean
     public CacheManager cacheManager() {
         return new ConcurrentMapCacheManager("credentials", "networks",
-                "settings", "stats", "network_stats");
+                "settings", "stats", "campaign_stats", "network_stats");
     }
 
     @Bean

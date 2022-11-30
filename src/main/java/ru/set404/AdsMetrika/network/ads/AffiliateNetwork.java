@@ -9,8 +9,8 @@ import java.util.Map;
 
 @Service
 public interface AffiliateNetwork {
-    Map<Integer, NetworkStats> getCampaignStatsMap(Credentials credentials, LocalDate dateStart, LocalDate dateEnd);
+    Map<Integer, NetworkStats> getCampaignsStats(Credentials credentials, LocalDate dateStart, LocalDate dateEnd);
 
-    NetworkStats getNetworkStatsByOfferCampaigns(Credentials credentials, List<Integer> campaigns, LocalDate dateStart,
-                                                 LocalDate dateEnd);
+    NetworkStats getCombinedStatsByOfferCampaigns(Credentials credentials, List<Integer> campaigns, LocalDate dateStart,
+                                                  LocalDate dateEnd);
 }
