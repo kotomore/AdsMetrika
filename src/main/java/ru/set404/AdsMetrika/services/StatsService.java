@@ -7,12 +7,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.set404.AdsMetrika.dto.StatDTO;
+import ru.set404.AdsMetrika.dto.TableDTO;
 import ru.set404.AdsMetrika.models.Stat;
 import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.repositories.StatsRepository;
-import ru.set404.AdsMetrika.network.Network;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,21 +32,24 @@ public class StatsService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @CacheEvict(value = "stats", allEntries = true)
-    public void saveStatDTOList(List<StatDTO> statDTOList, User user, Network network, LocalDate date) {
-
-        double spend = 0;
-        double revenue = 0;
-        for (StatDTO statDTO : statDTOList) {
-            spend += statDTO.getSpend();
-            revenue += statDTO.getRevenue();
+    public void saveStatDTOList(List<TableDTO> tableDTOList, User user, LocalDate date) {
+        List<Stat> statList = new ArrayList<>();
+        for (TableDTO tableDTO : tableDTOList) {
+            double spend = 0;
+            double revenue = 0;
+            for (StatDTO statDTO : tableDTO.getCurrentStats()) {
+                spend += statDTO.getSpend();
+                revenue += statDTO.getRevenue();
+            }
+            Stat stat = new Stat();
+            stat.setSpend(spend);
+            stat.setRevenue(revenue);
+            stat.setOwner(user);
+            stat.setNetworkName(tableDTO.getNetwork());
+            stat.setCreatedDate(date);
+            stat.setId(statsRepository.findSimilar(user, tableDTO.getNetwork(), date).orElse(0));
+            statList.add(stat);
         }
-        Stat stat = new Stat();
-        stat.setSpend(spend);
-        stat.setRevenue(revenue);
-        stat.setOwner(user);
-        stat.setNetworkName(network);
-        stat.setCreatedDate(date);
-        stat.setId(statsRepository.findSimilar(user, network, date).orElse(0));
-        statsRepository.save(stat);
+        statsRepository.saveAll(statList);
     }
 }

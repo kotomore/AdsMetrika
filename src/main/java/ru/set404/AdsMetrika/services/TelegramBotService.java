@@ -44,7 +44,6 @@ public class TelegramBotService {
             telegramBot.execute(message);
         } catch (TelegramApiException e) {
             logger.debug(e.getMessage());
-
         }
     }
 }

@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 import ru.set404.AdsMetrika.network.ads.ExoClick;
 import ru.set404.AdsMetrika.network.ads.TrafficFactory;
 import ru.set404.AdsMetrika.network.cpa.Adcombo;
-import ru.set404.AdsMetrika.repositories.CredentialsRepository;
 import ru.set404.AdsMetrika.scheduled.googlesheets.GoogleAuthorizeConfig;
 import ru.set404.AdsMetrika.scheduled.googlesheets.SpreadSheet;
+import ru.set404.AdsMetrika.services.CredentialsService;
 import ru.set404.AdsMetrika.services.NetworksService;
 import ru.set404.AdsMetrika.services.GoogleSpreadSheetService;
 import ru.set404.AdsMetrika.services.SettingsService;
@@ -17,7 +17,7 @@ import ru.set404.AdsMetrika.services.SettingsService;
 @Component
 public class SingletonFactoryForScheduling {
     private final ObjectMapper objectMapper;
-    private final CredentialsRepository credentialsRepository;
+    private final CredentialsService credentialsService;
     private final SettingsService settingsService;
     @Value("${google.application.name}")
     private String applicationName;
@@ -32,9 +32,9 @@ public class SingletonFactoryForScheduling {
     private GoogleSpreadSheetService googleSpreadSheetService;
 
     @Autowired
-    public SingletonFactoryForScheduling(ObjectMapper objectMapper, CredentialsRepository credentialsRepository, SettingsService settingsService) {
+    public SingletonFactoryForScheduling(ObjectMapper objectMapper, CredentialsService credentialsService, SettingsService settingsService) {
         this.objectMapper = objectMapper;
-        this.credentialsRepository = credentialsRepository;
+        this.credentialsService = credentialsService;
         this.settingsService = settingsService;
     }
 
@@ -65,7 +65,7 @@ public class SingletonFactoryForScheduling {
 
     public NetworksService getNetworksServiceSingleton() {
         if (networksService == null)
-            networksService = new NetworksService(getExoClick(), getTrafficFactory(), getAdcombo(), credentialsRepository);
+            networksService = new NetworksService(getExoClick(), getTrafficFactory(), getAdcombo(), credentialsService);
         return networksService;
     }
 

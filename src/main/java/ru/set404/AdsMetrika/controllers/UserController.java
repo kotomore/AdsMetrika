@@ -177,7 +177,7 @@ public class UserController {
         try {
             if (dateStart != null && dateEnd != null) {
                 if (currentUser.getRole().equals("ROLE_GUEST"))
-                    campaignStats = networksService.getNetworkStatisticsListMock(network);
+                    campaignStats = networksService.getCampaignsStatisticsListMock(network);
                 else
                     campaignStats = networksService.getCampaignStats(currentUser, network, dateStart, dateEnd);
                 headerText = dateStart + " - " + dateEnd;
@@ -235,20 +235,13 @@ public class UserController {
     }
 
     private List<TableDTO> getStatsForTables(User user, LocalDate dateStart, LocalDate dateEnd) {
-
-        Set<Network> userNetworks = credentialsService.userNetworks(user);
-        List<TableDTO> tableStats = new ArrayList<>();
-
-        for (Network network : userNetworks) {
-            List<StatDTO> currentNetworkStat;
+            List<TableDTO> tableStats;
             if (user.getRole().equals("ROLE_GUEST"))
-                currentNetworkStat = networksService.getNetworkStatisticsListMock(network);
+                tableStats = networksService.getNetworkStatisticsListMock(user);
             else
-                currentNetworkStat = networksService.getOfferStats(user, network, dateStart, dateEnd);
-            tableStats.add(new TableDTO(currentNetworkStat, network));
+                tableStats = networksService.getOfferStats(user, dateStart, dateEnd);
             if (dateStart.equals(dateEnd))
-                statsService.saveStatDTOList(currentNetworkStat, user, network, dateStart);
-        }
+                statsService.saveStatDTOList(tableStats, user, dateStart);
         return tableStats;
     }
 
