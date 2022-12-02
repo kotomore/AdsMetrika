@@ -28,6 +28,12 @@ public class Credentials {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "client_id")
+    private String clientId;
+
+    @Column(name = "client_secret")
+    private String secret;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "network_name", nullable = false)
     private Network networkName;

@@ -95,7 +95,7 @@ public class ExoClick implements AffiliateNetwork {
     ///////////////////////////////////////
     //return combined stats by list of campaigns
     ///////////////////////////////////////
-    public NetworkStats getCombinedStatsByOfferCampaigns(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+    public NetworkStats getOfferCombinedStats(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
         authorization(credentials);
         int clicks = 0;
         double cost = 0;

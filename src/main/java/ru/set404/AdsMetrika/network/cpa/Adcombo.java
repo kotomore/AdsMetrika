@@ -47,7 +47,7 @@ public class Adcombo {
         Map<Integer, AdcomboStats> stats = new HashMap<>();
         List<Integer> campaignsToCheck = new ArrayList<>();
         for (JsonNode campaign : parseNetwork(url, network, dateStart, dateEnd)) {
-            if (campaign.get("uniq_traffic").asInt(-1) > 10) {
+            if (campaign.get("uniq_traffic").asInt(-1) > 20) {
                 AdcomboStats adcomboStat = new AdcomboStats(
                         campaign.get("group_by").asInt(),
                         campaign.get("key_for_groupping").asText(),

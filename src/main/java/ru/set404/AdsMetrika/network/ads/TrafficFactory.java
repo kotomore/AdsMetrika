@@ -113,7 +113,7 @@ public class TrafficFactory implements AffiliateNetwork {
     ///////////////////////////////////////
     //return combined stats by list of campaigns
     ///////////////////////////////////////
-    public NetworkStats getCombinedStatsByOfferCampaigns(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+    public NetworkStats getOfferCombinedStats(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
         authorization(credentials);
         int deliveries = 0;
         double total = 0;

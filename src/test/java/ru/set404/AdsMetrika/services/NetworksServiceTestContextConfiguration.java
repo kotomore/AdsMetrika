@@ -34,7 +34,7 @@ public class NetworksServiceTestContextConfiguration {
             }
 
             @Override
-            public NetworkStats getCombinedStatsByOfferCampaigns(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+            public NetworkStats getOfferCombinedStats(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
                 return getNetworkStats();
             }
         };
@@ -52,7 +52,7 @@ public class NetworksServiceTestContextConfiguration {
             }
 
             @Override
-            public NetworkStats getCombinedStatsByOfferCampaigns(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+            public NetworkStats getOfferCombinedStats(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
                 return getNetworkStats();
             }
         };

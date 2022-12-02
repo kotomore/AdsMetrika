@@ -176,6 +176,7 @@
                         <ul class="sub-menu" aria-expanded="false">
                             <li><a href="/campaigns?network=TF">Traffic Factory</a></li>
                             <li><a href="/campaigns?network=EXO">ExoClick</a></li>
+                            <li><a href="/campaigns?network=STARS">Traffic Stars</a></li>
                         </ul>
                     </li>
 
@@ -211,6 +212,16 @@
                             <span th:if="${credentialsEXO.getUsername()==null}" class="badge rounded-pill bg-danger float-end">NO</span>
                             <span th:unless="${credentialsEXO.getUsername()==null}" class="badge rounded-pill bg-success float-end">OK</span>
                             <span>ExoClick</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#myModal4" class=" waves-effect">
+                            <i class="ri-account-circle-line"></i>
+                            <span th:if="${credentialsSTARS.getUsername()==null}"
+                                  class="badge rounded-pill bg-danger float-end">NO</span>
+                            <span th:unless="${credentialsSTARS.getUsername()==null}"
+                                  class="badge rounded-pill bg-success float-end">OK</span>
+                            <span>TrafficStars</span>
                         </a>
                     </li>
 
@@ -416,6 +427,88 @@
                         </div><!-- /.modal -->
                     </div>
 
+                    <div class="col-sm-6 col-md-4 col-xl-3">
+                        <!-- sample modal content -->
+                        <div id="myModal4" class="modal fade" tabindex="-1" role="dialog"
+                             aria-labelledby="myModalLabel2" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="myModalLabel">Add credentials</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                    </div>
+                                    <form th:method="POST" th:action="@{/credentials/save}"
+                                          th:object="${credentialsSTARS}">
+                                        <div class="modal-body">
+                                            <h5>Enter Network Credentials from TrafficStars.com</h5>
+
+                                            <p>You can get it - <strong>(User Profile - TRAFFICSTARS API)</strong></p>
+                                            <div class="row mb-4">
+                                                <input hidden th:field="${credentialsSTARS.id}"
+                                                       th:name="${credentialsSTARS.id}"
+                                                       th:value="${credentialsSTARS.getId()}"/>
+                                            </div>
+                                            <div class="row mb-4">
+                                                <label  for="example-text-input"
+                                                        class="col-sm-2 col-form-label">Username</label>
+                                                <div class="col-sm-9">
+                                                    <input th:field="${credentialsSTARS.username}"
+                                                           th:name="${credentialsSTARS.username}"
+                                                           th:value="${credentialsSTARS.getUsername()}"
+                                                           class="form-control" type="text" id="example-text-input">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-4">
+
+                                                <label for="example-text-input"
+                                                       class="col-sm-2 col-form-label">Password</label>
+                                                <div class="col-sm-9">
+                                                    <input th:field="${credentialsSTARS.password}"
+                                                           th:name="${credentialsSTARS.password}"
+                                                           th:value="${credentialsSTARS.getPassword()}"
+                                                           class="form-control" type="text" id="example-text-input">
+                                                </div>
+
+                                            </div>
+                                            <div class="row mb-4">
+
+                                                <label  for="example-text-input"
+                                                        class="col-sm-3 col-form-label">Client ID</label>
+                                                <div class="col-sm-8">
+                                                    <input th:field="${credentialsSTARS.clientId}"
+                                                           th:name="${credentialsSTARS.clientId}"
+                                                           th:value="${credentialsSTARS.getClientId()}"
+                                                           class="form-control" type="text" id="example-text-input">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-4">
+
+                                                <label for="example-text-input"
+                                                       class="col-sm-3 col-form-label">Client secret</label>
+                                                <div class="col-sm-8">
+                                                    <input th:field="${credentialsSTARS.secret}"
+                                                           th:name="${credentialsSTARS.secret}"
+                                                           th:value="${credentialsSTARS.getSecret()}"
+                                                           class="form-control" type="text" id="example-text-input">
+                                                </div>
+                                            </div>
+                                            <input hidden name="networkName" value="STARS"/>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-light waves-effect"
+                                                    data-bs-dismiss="modal">Close
+                                            </button>
+                                            <button type="submit" class="btn btn-primary waves-effect waves-light">Save
+                                                changes
+                                            </button>
+                                        </div>
+                                    </form>
+
+                                </div><!-- /.modal-content -->
+                            </div><!-- /.modal-dialog -->
+                        </div><!-- /.modal -->
+                    </div>
                 </div> <!-- end row -->
             </div>
 

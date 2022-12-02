@@ -3,7 +3,9 @@ package ru.set404.AdsMetrika.network;
 public enum Network {
     ADCOMBO("adcombo", "Adcombo"),
     EXO("exo", "ExoClick"),
-    TF("tf", "Traffic Factory");
+    TF("tf", "Traffic Factory"),
+    STARS("stars", "Traffic Stars");
+
     private final String name;
     private final String fullName;
 

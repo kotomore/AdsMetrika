@@ -9,10 +9,7 @@ import ru.set404.AdsMetrika.dto.TableDTO;
 import ru.set404.AdsMetrika.models.Credentials;
 import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.network.Network;
-import ru.set404.AdsMetrika.network.ads.ExoClick;
-import ru.set404.AdsMetrika.network.ads.NetworkStats;
-import ru.set404.AdsMetrika.network.ads.AffiliateNetwork;
-import ru.set404.AdsMetrika.network.ads.TrafficFactory;
+import ru.set404.AdsMetrika.network.ads.*;
 import ru.set404.AdsMetrika.network.cpa.Adcombo;
 import ru.set404.AdsMetrika.network.cpa.AdcomboStats;
 import ru.set404.AdsMetrika.util.StatisticsUtilities;
@@ -25,14 +22,16 @@ import java.util.*;
 public class NetworksService {
     private final ExoClick exoClick;
     private final TrafficFactory trafficFactory;
+    private final TrafficStars trafficStars;
     private final Adcombo adCombo;
     private final CredentialsService credentialsService;
 
     @Autowired
     public NetworksService(ExoClick exoClick, TrafficFactory trafficFactory,
-                           Adcombo adCombo, CredentialsService credentialsService) {
+                           TrafficStars trafficStars, Adcombo adCombo, CredentialsService credentialsService) {
         this.exoClick = exoClick;
         this.trafficFactory = trafficFactory;
+        this.trafficStars = trafficStars;
         this.adCombo = adCombo;
         this.credentialsService = credentialsService;
     }
@@ -75,6 +74,8 @@ public class NetworksService {
             switch (network) {
                 case TF -> affiliateNetwork = trafficFactory;
                 case EXO -> affiliateNetwork = exoClick;
+                case STARS -> affiliateNetwork = trafficStars;
+
             }
 
             Map<Network, Credentials> userCredentials = credentialsService.getUserCredentials(user);
@@ -87,9 +88,10 @@ public class NetworksService {
             for (int offerId : adcomboStatsMap.keySet()) {
                 if (adcomboStatsMap.containsKey(offerId)) {
                     assert affiliateNetwork != null;
-                    NetworkStats stat = affiliateNetwork.getCombinedStatsByOfferCampaigns(userCredentials.get(network),
+                    NetworkStats stat = affiliateNetwork.getOfferCombinedStats(userCredentials.get(network),
                             adcomboStatsMap.get(offerId).getCampaigns(), dateStart, dateEnd);
-                    statsEntities.add(StatisticsUtilities.createStatsDTO(offerId, stat, adcomboStatsMap));
+                    if (stat.getCost() > 0)
+                        statsEntities.add(StatisticsUtilities.createStatsDTO(offerId, stat, adcomboStatsMap));
                 }
             }
             tableStats.add(new TableDTO(statsEntities, network));
@@ -107,6 +109,7 @@ public class NetworksService {
         switch (network) {
             case TF -> affiliateNetwork = trafficFactory;
             case EXO -> affiliateNetwork = exoClick;
+            case STARS -> affiliateNetwork = trafficStars;
         }
 
         assert affiliateNetwork != null;

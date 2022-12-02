@@ -255,8 +255,10 @@ public class UserController {
         credentials.putIfAbsent(Network.ADCOMBO, new CredentialsDTO());
         credentials.putIfAbsent(Network.EXO, new CredentialsDTO());
         credentials.putIfAbsent(Network.TF, new CredentialsDTO());
+        credentials.putIfAbsent(Network.STARS, new CredentialsDTO());
 
         model.addAttribute("credentialsADCOMBO", credentials.get(Network.ADCOMBO));
+        model.addAttribute("credentialsSTARS", credentials.get(Network.STARS));
         model.addAttribute("credentialsEXO", credentials.get(Network.EXO));
         model.addAttribute("credentialsTF", credentials.get(Network.TF));
         model.addAttribute("username", getUser().getUsername());

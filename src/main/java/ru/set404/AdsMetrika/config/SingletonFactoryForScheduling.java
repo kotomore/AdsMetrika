@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.set404.AdsMetrika.network.ads.ExoClick;
 import ru.set404.AdsMetrika.network.ads.TrafficFactory;
+import ru.set404.AdsMetrika.network.ads.TrafficStars;
 import ru.set404.AdsMetrika.network.cpa.Adcombo;
 import ru.set404.AdsMetrika.scheduled.googlesheets.GoogleAuthorizeConfig;
 import ru.set404.AdsMetrika.scheduled.googlesheets.SpreadSheet;
@@ -45,6 +46,10 @@ public class SingletonFactoryForScheduling {
     private ExoClick getExoClick() {
         return new ExoClick(objectMapper);
     }
+    private TrafficStars getTrafficStars() {
+        return new TrafficStars(objectMapper);
+    }
+
 
     private Adcombo getAdcombo() {
         return new Adcombo(objectMapper);
@@ -65,7 +70,7 @@ public class SingletonFactoryForScheduling {
 
     public NetworksService getNetworksServiceSingleton() {
         if (networksService == null)
-            networksService = new NetworksService(getExoClick(), getTrafficFactory(), getAdcombo(), credentialsService);
+            networksService = new NetworksService(getExoClick(), getTrafficFactory(), getTrafficStars(), getAdcombo(), credentialsService);
         return networksService;
     }
 

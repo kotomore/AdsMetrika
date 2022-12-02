@@ -13,7 +13,8 @@ public class CredentialsDTO {
     private int id;
     private String username;
     private String password;
-
+    private String clientId;
+    private String secret;
     @Enumerated(EnumType.STRING)
     private Network networkName;
 }
