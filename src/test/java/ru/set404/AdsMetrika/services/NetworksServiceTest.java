@@ -12,6 +12,7 @@ import ru.set404.AdsMetrika.models.User;
 import ru.set404.AdsMetrika.network.Network;
 import ru.set404.AdsMetrika.network.ads.ExoClick;
 import ru.set404.AdsMetrika.network.ads.TrafficFactory;
+import ru.set404.AdsMetrika.network.ads.TrafficStars;
 import ru.set404.AdsMetrika.network.cpa.Adcombo;
 
 import java.time.LocalDate;
@@ -30,6 +31,8 @@ public class NetworksServiceTest {
     private ExoClick exoClick;
     @Autowired
     private Adcombo adcombo;
+    @Autowired
+    private TrafficStars trafficStars;
     @MockBean
     private CredentialsService credentialsService;
 
