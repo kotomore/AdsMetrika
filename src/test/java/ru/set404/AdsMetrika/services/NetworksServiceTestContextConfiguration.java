@@ -30,10 +30,10 @@ public class NetworksServiceTestContextConfiguration {
                 return networkStatsMap;
             }
 
-            @Override
-            public NetworkStats getOfferCombinedStats(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
-                return getNetworkStats();
-            }
+//            @Override
+//            public Map<Integer, NetworkStats> getOfferCombinedStats(Credentials credentials, Map<Integer, AdcomboStats> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+//                return getNetworkStats();
+//            }
         };
     }
 
@@ -48,10 +48,10 @@ public class NetworksServiceTestContextConfiguration {
                 return networkStatsMap;
             }
 
-            @Override
-            public NetworkStats getOfferCombinedStats(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
-                return getNetworkStats();
-            }
+//            @Override
+//            public NetworkStats getOfferCombinedStats(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+//                return getNetworkStats();
+//            }
         };
     }
 
@@ -66,10 +66,10 @@ public class NetworksServiceTestContextConfiguration {
                 return networkStatsMap;
             }
 
-            @Override
-            public NetworkStats getOfferCombinedStats(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
-                return getNetworkStats();
-            }
+//            @Override
+//            public NetworkStats getOfferCombinedStats(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+//                return getNetworkStats();
+//            }
         };
     }
 

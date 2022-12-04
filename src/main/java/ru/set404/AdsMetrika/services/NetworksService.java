@@ -66,6 +66,8 @@ public class NetworksService {
     @Cacheable(value = "network_stats")
     public List<TableDTO> getOfferStats(User user, LocalDate dateStart, LocalDate dateEnd) {
 
+        Map<Network, Credentials> userCredentials = credentialsService.getUserCredentials(user);
+
         Set<Network> userNetworks = credentialsService.userNetworks(user);
         List<TableDTO> tableStats = new ArrayList<>();
 
@@ -75,25 +77,23 @@ public class NetworksService {
                 case TF -> affiliateNetwork = trafficFactory;
                 case EXO -> affiliateNetwork = exoClick;
                 case STARS -> affiliateNetwork = trafficStars;
-
             }
-
-            Map<Network, Credentials> userCredentials = credentialsService.getUserCredentials(user);
 
             Map<Integer, AdcomboStats> adcomboStatsMap = adCombo.getNetworkStatMap(userCredentials.get(Network.ADCOMBO),
                     network, dateStart.minusDays(1), dateEnd);
 
             List<StatDTO> statsEntities = new ArrayList<>();
 
-            for (int offerId : adcomboStatsMap.keySet()) {
-                if (adcomboStatsMap.containsKey(offerId)) {
-                    assert affiliateNetwork != null;
-                    NetworkStats stat = affiliateNetwork.getOfferCombinedStats(userCredentials.get(network),
-                            adcomboStatsMap.get(offerId).getCampaigns(), dateStart, dateEnd);
-                    if (stat.getCost() > 0)
-                        statsEntities.add(StatisticsUtilities.createStatsDTO(offerId, stat, adcomboStatsMap));
+            assert affiliateNetwork != null;
+            Map<Integer, NetworkStats> networkStatsMap = affiliateNetwork.getOfferCombinedStats(userCredentials.get(network),
+                        adcomboStatsMap, dateStart, dateEnd);
+
+            for (int campaignId : networkStatsMap.keySet()) {
+                if (adcomboStatsMap.containsKey(campaignId)) {
+                    statsEntities.add(StatisticsUtilities.createStatsDTO(campaignId, networkStatsMap, adcomboStatsMap));
                 }
             }
+
             tableStats.add(new TableDTO(statsEntities, network));
         }
         return tableStats;
@@ -122,7 +122,7 @@ public class NetworksService {
 
         List<StatDTO> stats = new ArrayList<>();
         for (int campaignId : networkStatsMap.keySet()) {
-            if (networkStatsMap.containsKey(campaignId) && adcomboStatsMap.containsKey(campaignId))
+            if (adcomboStatsMap.containsKey(campaignId))
                 stats.add(StatisticsUtilities.createStatsDTO(campaignId, networkStatsMap, adcomboStatsMap));
         }
         return stats;

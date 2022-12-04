@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 import ru.set404.AdsMetrika.models.Credentials;
+import ru.set404.AdsMetrika.network.cpa.AdcomboStats;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -55,12 +56,14 @@ public class ExoClick implements AffiliateNetwork {
                         .requestBody(jsonBody)
                         .execute();
             } catch (IOException e) {
+                logger.info(e.getMessage());
                 throw new RuntimeException("Couldn't connect to ExoClick. Check API");
             }
 
             try {
                 token = objectMapper.readTree(response.body()).get("token");
             } catch (JsonProcessingException e) {
+                logger.info(e.getMessage());
                 throw new RuntimeException("Couldn't get statistics from ExoClick");
             }
 
@@ -86,7 +89,7 @@ public class ExoClick implements AffiliateNetwork {
                         new NetworkStats(node.get("clicks").asInt(), node.get("cost").asDouble()));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info(e.getMessage());
             throw new RuntimeException("Couldn't get statistics from ExoClick. Check API");
         }
         return stat;
@@ -95,34 +98,42 @@ public class ExoClick implements AffiliateNetwork {
     ///////////////////////////////////////
     //return combined stats by list of campaigns
     ///////////////////////////////////////
-    public NetworkStats getOfferCombinedStats(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+    public Map<Integer, NetworkStats> getOfferCombinedStats(Credentials credentials, Map<Integer, AdcomboStats> adcomboStatsMap, LocalDate dateStart, LocalDate dateEnd) {
         authorization(credentials);
-        int clicks = 0;
-        double cost = 0;
+        Map<Integer, NetworkStats> result = new HashMap<>();
 
-        List<Future<JsonNode>> statFuture = new ArrayList<>();
         Future<JsonNode> networkStatsJson;
         ExecutorService executor = Executors.newFixedThreadPool(9);
 
         try {
-            for (Integer campaign : campaigns) {
-                networkStatsJson = executor.submit(() -> {
-                    String url = "https://api.exoclick.com/v2/statistics/a/campaign?campaignid=" + campaign
-                            + "&date-to=" + dateStart
-                            + "&date-from=" + dateEnd
-                            + "&include=totals&detailed=false";
-                    return objectMapper.readTree(parseNetwork(url).body());
-                });
-                statFuture.add(networkStatsJson);
-            }
-            for (Future<JsonNode> node : statFuture) {
-                if (node.get().hasNonNull("resultTotal")) {
-                    JsonNode resultTotal = node.get().get("resultTotal");
-                    clicks += resultTotal.get("clicks").asInt();
-                    cost += resultTotal.get("cost").asDouble();
+            //cycle for all adcombo offers
+            for (AdcomboStats adcomboStats : adcomboStatsMap.values()) {
+                int clicks = 0;
+                double cost = 0;
+                List<Future<JsonNode>> statFuture = new ArrayList<>();
+                //cycle for all offer campaigns
+                for (Integer campaign : adcomboStats.getCampaigns()) {
+                    networkStatsJson = executor.submit(() -> {
+                        String url = "https://api.exoclick.com/v2/statistics/a/campaign?campaignid=" + campaign
+                                + "&date-to=" + dateStart
+                                + "&date-from=" + dateEnd
+                                + "&include=totals&detailed=false";
+                        return objectMapper.readTree(parseNetwork(url).body());
+                    });
+                    statFuture.add(networkStatsJson);
                 }
+                for (Future<JsonNode> node : statFuture) {
+                    if (node.get().hasNonNull("resultTotal")) {
+                        JsonNode resultTotal = node.get().get("resultTotal");
+                        clicks += resultTotal.get("clicks").asInt();
+                        cost += resultTotal.get("cost").asDouble();
+                    }
+                }
+                result.put(adcomboStats.getOfferId(), new NetworkStats(clicks, cost));
+
             }
         } catch (Exception e) {
+            logger.info(e.getMessage());
             throw new RuntimeException("Couldn't get statistics from ExoClick. Check API");
         }
         executor.shutdown();
@@ -134,7 +145,7 @@ public class ExoClick implements AffiliateNetwork {
         } catch (InterruptedException e) {
             executor.shutdownNow();
         }
-        return new NetworkStats(clicks, cost);
+        return result;
     }
 
     private Connection.Response parseNetwork(String url) throws IOException {
@@ -158,9 +169,11 @@ public class ExoClick implements AffiliateNetwork {
                     .header("Authorization", "Bearer " + authToken)
                     .execute();
         } catch (HttpStatusException e) {
+            logger.info(e.getMessage());
             if (e.getStatusCode() == 401)
                 return false;
         } catch (IOException e) {
+            logger.info(e.getMessage());
             throw new RuntimeException("Couldn't connect to ExoClick. Check API");
         }
 

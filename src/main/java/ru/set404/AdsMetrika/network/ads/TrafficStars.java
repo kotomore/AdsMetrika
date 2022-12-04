@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 import ru.set404.AdsMetrika.models.Credentials;
+import ru.set404.AdsMetrika.network.cpa.AdcomboStats;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -58,11 +59,13 @@ public class TrafficStars implements AffiliateNetwork {
                         .data("password", password)
                         .execute();
             } catch (IOException e) {
+                logger.info(e.getMessage());
                 throw new RuntimeException("Couldn't connect to TrafficStars. Check API");
             }
             try {
                 token = objectMapper.readTree(response.body()).get("access_token");
             } catch (JsonProcessingException e) {
+                logger.info(e.getMessage());
                 throw new RuntimeException("Couldn't get statistics from TrafficStars");
             }
 
@@ -94,7 +97,7 @@ public class TrafficStars implements AffiliateNetwork {
                         new NetworkStats(node.get("clicks").asInt(), node.get("amount").asDouble()));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info(e.getMessage());
             throw new RuntimeException("Couldn't get statistics from TrafficStars. Check API");
         }
         return stat;
@@ -103,44 +106,59 @@ public class TrafficStars implements AffiliateNetwork {
     ///////////////////////////////////////
     //return combined stats by list of campaigns
     ///////////////////////////////////////
-    public NetworkStats getOfferCombinedStats(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
+    public Map<Integer, NetworkStats> getOfferCombinedStats(Credentials credentials, Map<Integer, AdcomboStats> adcomboStatsMap, LocalDate dateStart, LocalDate dateEnd) {
         if (authToken == null)
             authorization(credentials);
-        int clicks = 0;
-        double cost = 0;
+        Map<Integer, NetworkStats> result = new HashMap<>();
 
-        List<Future<JsonNode>> statFuture = new ArrayList<>();
         Future<JsonNode> networkStatsJson;
         ExecutorService executor = Executors.newFixedThreadPool(9);
+        Map<Integer, List<Future<JsonNode>>> combinedStatsFuture = new HashMap<>();
 
         try {
-            for (Integer campaign : campaigns) {
-                networkStatsJson = executor.submit(() -> {
-                    Connection.Response response = Jsoup
-                            .connect("https://api.trafficstars.com/v1.1/advertiser/custom/report/by-campaign")
-                            .method(Connection.Method.GET)
-                            .ignoreContentType(true)
-                            .data("campaign_id", String.valueOf(campaign))
-                            .data("date_from", dateStart.toString())
-                            .data("date_to", dateEnd.toString())
-                            .header("Authorization", "Bearer " + authToken)
-                            .execute();
-                    return objectMapper.readTree(response.body());
-                });
-                statFuture.add(networkStatsJson);
-            }
-            for (Future<JsonNode> node : statFuture) {
-                if (node.get().get(0) != null) {
-                    JsonNode resultTotal = node.get().get(0);
-                    clicks += resultTotal.get("clicks").asInt();
-                    cost += resultTotal.get("amount").asDouble();
+            //cycle for all adcombo offers
+            for (AdcomboStats adcomboStats : adcomboStatsMap.values()) {
+                List<Future<JsonNode>> statFuture = new ArrayList<>();
+                //cycle for all offer campaigns
+                for (Integer campaign : adcomboStats.getCampaigns()) {
+                    networkStatsJson = executor.submit(() -> {
+                        Connection.Response response = Jsoup
+                                .connect("https://api.trafficstars.com/v1.1/advertiser/custom/report/by-campaign")
+                                .method(Connection.Method.GET)
+                                .ignoreContentType(true)
+                                .data("campaign_id", String.valueOf(campaign))
+                                .data("date_from", dateStart.toString())
+                                .data("date_to", dateEnd.toString())
+                                .header("Authorization", "Bearer " + authToken)
+                                .execute();
+                        return objectMapper.readTree(response.body());
+                    });
+                    statFuture.add(networkStatsJson);
                 }
+                combinedStatsFuture.put(adcomboStats.getOfferId(),statFuture);
             }
+
+            for (Map.Entry<Integer, List<Future<JsonNode>>> entry : combinedStatsFuture.entrySet()) {
+                int clicks = 0;
+                double cost = 0;
+                for (Future<JsonNode> node : entry.getValue()) {
+                    if (node.get().get(0) != null) {
+                        JsonNode resultTotal = node.get().get(0);
+                        clicks += resultTotal.get("clicks").asInt();
+                        cost += resultTotal.get("amount").asDouble();
+                    }
+                }
+                if (cost > 0)
+                    result.put(entry.getKey(), new NetworkStats(clicks, cost));
+            }
+
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info(e.getMessage());
             throw new RuntimeException("Couldn't get statistics from TrafficStars. Check API");
         }
+
         executor.shutdown();
+
         try {
             if (!executor.awaitTermination(1, TimeUnit.MINUTES)) {
                 logger.error("Parse TrafficStars timed out error");
@@ -149,7 +167,7 @@ public class TrafficStars implements AffiliateNetwork {
         } catch (InterruptedException e) {
             executor.shutdownNow();
         }
-        return new NetworkStats(clicks, cost);
+        return result;
     }
 }
 

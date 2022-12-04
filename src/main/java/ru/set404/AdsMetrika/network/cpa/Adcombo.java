@@ -113,12 +113,14 @@ public class Adcombo {
                     .maxBodySize(0)
                     .execute();
         } catch (IOException e) {
+            logger.info(e.getMessage());
             throw new RuntimeException("Couldn't access to adcombo. Check API");
         }
         JsonNode result;
         try {
             result = objectMapper.readTree(response.body()).get("data").elements().next().get("rows");
         } catch (JsonProcessingException e) {
+            logger.info(e.getMessage());
             throw new RuntimeException("Couldn't get statistics from adcombo");
         }
 

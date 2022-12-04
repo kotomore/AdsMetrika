@@ -619,7 +619,7 @@
                                                 <div style="margin-bottom: 50px;" class="table-responsive">
                                                     <h4>Combined Offer Statistics</h4>
 
-                                                    <table id="datatable2"
+                                                    <table id="datatable3"
                                                            class="table table-centered mb-0 align-middle table-hover table-nowrap">
                                                         <thead class="table-light">
                                                         <tr>
@@ -1200,6 +1200,63 @@
 <script>
     $(document).ready(function () {
         $('#datatable2').DataTable({
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api();
+
+                // Remove the formatting to get integer data for summation
+                var intVal = function (i) {
+                    return typeof i === 'string' ? i.replace(",", ".").replace(/[\$,]/g, '') * 1 : typeof i === 'number' ? i : 0;
+                };
+
+                total = api
+                    .column(2)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                $(api.column(2).footer()).html(total);
+                total = api
+                    .column(3)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                $(api.column(3).footer()).html('$' + total.toFixed(2));
+                total = api
+                    .column(4)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                $(api.column(4).footer()).html('$' + total.toFixed(2));
+                total = api
+                    .column(5)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                $(api.column(5).footer()).html(total);
+                total = api
+                    .column(6)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                $(api.column(6).footer()).html('$' + total.toFixed(2));
+                total = api
+                    .column(7)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                $(api.column(7).footer()).html(total.toFixed(2) + '$');
+            },
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('#datatable3').DataTable({
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api();
 
