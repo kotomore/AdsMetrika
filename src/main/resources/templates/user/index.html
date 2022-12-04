@@ -492,8 +492,8 @@
                                 <h4 class="card-title mb-4">Comparing networks spend</h4>
 
                                 <div th:if="${totalSpendByNetwork}" class="row">
-                                    <div th:each="network : ${totalSpendByNetwork.keySet()}" class="col-6">
-                                        <div class="text-center mt-4">
+                                    <div th:each="network : ${totalSpendByNetwork.keySet()}" class="col-4">
+                                        <div class="text-center mt-3">
                                             <h5 th:text="${#numbers.formatDecimal(totalSpendByNetwork.get(network), 1, 2)} + '$'">
                                                 spend count</h5>
                                             <p th:text="${network.getFullName()}" class="mb-2 text-truncate">Network</p>

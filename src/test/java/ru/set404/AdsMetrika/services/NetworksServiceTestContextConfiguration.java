@@ -29,11 +29,6 @@ public class NetworksServiceTestContextConfiguration {
                 networkStatsMap.put(54321, getNetworkStats());
                 return networkStatsMap;
             }
-
-//            @Override
-//            public Map<Integer, NetworkStats> getOfferCombinedStats(Credentials credentials, Map<Integer, AdcomboStats> campaigns, LocalDate dateStart, LocalDate dateEnd) {
-//                return getNetworkStats();
-//            }
         };
     }
 
@@ -47,11 +42,6 @@ public class NetworksServiceTestContextConfiguration {
                 networkStatsMap.put(54321, getNetworkStats());
                 return networkStatsMap;
             }
-
-//            @Override
-//            public NetworkStats getOfferCombinedStats(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
-//                return getNetworkStats();
-//            }
         };
     }
 
@@ -65,11 +55,6 @@ public class NetworksServiceTestContextConfiguration {
                 networkStatsMap.put(54321, getNetworkStats());
                 return networkStatsMap;
             }
-
-//            @Override
-//            public NetworkStats getOfferCombinedStats(Credentials credentials, List<Integer> campaigns, LocalDate dateStart, LocalDate dateEnd) {
-//                return getNetworkStats();
-//            }
         };
     }
 
@@ -79,8 +64,8 @@ public class NetworksServiceTestContextConfiguration {
             @Override
             public Map<Integer, AdcomboStats> getNetworkStatMap(Credentials credentials, Network network, LocalDate dateStart, LocalDate dateEnd) {
                 Map<Integer, AdcomboStats> adcomboStatsMap = new HashMap<>();
-                adcomboStatsMap.put(12345, getAdcomboStats());
-                adcomboStatsMap.put(54321, getAdcomboStats());
+                adcomboStatsMap.put(12345, getAdcomboStatsWithCampaigns());
+                adcomboStatsMap.put(54321, getAdcomboStatsWithCampaigns());
                 return adcomboStatsMap;
             }
 
@@ -99,5 +84,11 @@ public class NetworksServiceTestContextConfiguration {
 
     private AdcomboStats getAdcomboStats() {
         return new AdcomboStats(12345, "TestName", 100.0, 10, 100.0);
+    }
+
+    private AdcomboStats getAdcomboStatsWithCampaigns() {
+        AdcomboStats adcomboStats = new AdcomboStats(12345, "TestName", 100.0, 10, 100.0);
+        adcomboStats.setCampaigns(List.of(12345, 54321));
+        return adcomboStats;
     }
 }

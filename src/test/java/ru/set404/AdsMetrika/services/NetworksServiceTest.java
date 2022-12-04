@@ -57,7 +57,7 @@ public class NetworksServiceTest {
         NetworksService networksService = new NetworksService(exoClick, trafficFactory, trafficStars, adcombo, credentialsService);
         assertEquals(2, networksService.getOfferStats(user, LocalDate.now(), LocalDate.now()).get(0).getCurrentStats().size());
         assertTrue(networksService.getOfferStats(user, LocalDate.now(), LocalDate.now()).get(0).getCurrentStats().contains(
-                new StatDTO(12345, "TestName", 100, 100.0, 100.0, 10, 100.0)));
+                new StatDTO(12345, "TestName", 200, 200.0, 100.0, 10, 100.0)));
     }
 
     @Test
