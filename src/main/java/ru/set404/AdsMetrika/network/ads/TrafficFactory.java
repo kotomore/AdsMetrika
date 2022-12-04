@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 import ru.set404.AdsMetrika.models.Credentials;
-import ru.set404.AdsMetrika.network.cpa.AdcomboStats;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
@@ -86,8 +85,7 @@ public class TrafficFactory implements AffiliateNetwork {
             }
             for (Integer campaign : campaignStatsFuture.keySet()) {
                 NetworkStats stats = campaignStatsFuture.get(campaign).get();
-                if (stats.getCost() > 0)
-                    campaignStats.put(campaign, stats);
+                campaignStats.put(campaign, stats);
             }
             executor.shutdown();
             try {
@@ -108,68 +106,6 @@ public class TrafficFactory implements AffiliateNetwork {
         }
 
         return campaignStats;
-    }
-
-    ///////////////////////////////////////
-    //return combined stats by list of campaigns
-    ///////////////////////////////////////
-    public Map<Integer, NetworkStats> getOfferCombinedStats(Credentials credentials, Map<Integer, AdcomboStats> adcomboStatsMap, LocalDate dateStart, LocalDate dateEnd) {
-        authorization(credentials);
-        Map<Integer, NetworkStats> result = new HashMap<>();
-
-        Future<JsonNode> networkStatJson;
-        ExecutorService executor = Executors.newFixedThreadPool(9);
-        Map<Integer, List<Future<JsonNode>>> combinedStatsFuture = new HashMap<>();
-
-        try {
-            //cycle for all adcombo offers
-            for (AdcomboStats adcomboStats : adcomboStatsMap.values()) {
-                List<Future<JsonNode>> statFuture = new ArrayList<>();
-                //cycle for all offer campaigns
-                for (Integer campaign : adcomboStats.getCampaigns()) {
-                    if (campaign > 0) {
-                        networkStatJson = executor.submit(() ->
-                        {
-                            String url = "https://main.trafficfactory.biz/webservices/" + apiToken + "/stats/campaign/" +
-                                    campaign + "/" + dateStart + "/" + dateEnd + ".json";
-                            return objectMapper.readTree(parseNetwork(url).body()).get("stats");
-                        });
-                        statFuture.add(networkStatJson);
-                    }
-                }
-                combinedStatsFuture.put(adcomboStats.getOfferId(), statFuture);
-            }
-
-            for (Map.Entry<Integer, List<Future<JsonNode>>> entry : combinedStatsFuture.entrySet()) {
-                int deliveries = 0;
-                double total = 0;
-                for (Future<JsonNode> networkStat : entry.getValue()) {
-                    for (JsonNode node : networkStat.get()) {
-                        deliveries += node.get("deliveries").asInt();
-                        total += node.get("total").asDouble();
-                    }
-                }
-                if (total > 0)
-                    result.put(entry.getKey(), new NetworkStats(deliveries, total));
-            }
-
-            executor.shutdown();
-
-            try {
-                if (!executor.awaitTermination(1, TimeUnit.MINUTES)) {
-                    logger.error("Parse Traffic Factory timed out error");
-                    executor.shutdownNow();
-                }
-            } catch (InterruptedException e) {
-                logger.info(e.getMessage());
-                executor.shutdownNow();
-            }
-        } catch (Exception e) {
-            logger.info(e.getMessage());
-            throw new RuntimeException("Couldn't get statistics from traffic factory. Try later");
-        }
-
-        return result;
     }
 
     private Connection.Response parseNetwork(String url) {

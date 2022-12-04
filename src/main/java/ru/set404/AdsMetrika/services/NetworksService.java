@@ -88,9 +88,9 @@ public class NetworksService {
             Map<Integer, NetworkStats> networkStatsMap = affiliateNetwork.getOfferCombinedStats(userCredentials.get(network),
                         adcomboStatsMap, dateStart, dateEnd);
 
-            for (int campaignId : networkStatsMap.keySet()) {
-                if (adcomboStatsMap.containsKey(campaignId)) {
-                    statsEntities.add(StatisticsUtilities.createStatsDTO(campaignId, networkStatsMap, adcomboStatsMap));
+            for (int offerId : networkStatsMap.keySet()) {
+                if (adcomboStatsMap.containsKey(offerId)) {
+                    statsEntities.add(StatisticsUtilities.createStatsDTO(offerId, networkStatsMap, adcomboStatsMap));
                 }
             }
 
