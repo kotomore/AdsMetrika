@@ -1,12 +1,10 @@
 package ru.set404.AdsMetrika.network.ads;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Connection;
-import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,50 +28,39 @@ public class ExoClick implements AffiliateNetwork {
         this.objectMapper = objectMapper;
     }
 
-    private void authorization(Credentials credentials) {
-        if (authToken == null || !isAuth()) {
-            logger.debug("ExoClick authorization...");
+    private boolean authorization(Credentials credentials) {
 
-            String apiToken = credentials.getUsername();
-
-            String jsonBody = """
-                    {
-                    "api_token": "%s"
-                    }
-                    """.formatted(apiToken);
-            Connection.Response response;
-            JsonNode token;
-            try {
-                response = Jsoup
-                        .connect("https://api.exoclick.com/v2/login")
-                        .method(Connection.Method.POST)
-                        .ignoreContentType(true)
-                        .header("Content-Type", "application/json")
-                        .requestBody(jsonBody)
-                        .execute();
-            } catch (IOException e) {
-                logger.info(e.getMessage());
-                throw new RuntimeException("Couldn't connect to ExoClick. Check API");
-            }
-
-            try {
-                token = objectMapper.readTree(response.body()).get("token");
-            } catch (JsonProcessingException e) {
-                logger.info(e.getMessage());
-                throw new RuntimeException("Couldn't get statistics from ExoClick");
-            }
-
-            if (token.isNull())
-                throw new RuntimeException("Couldn't connect to ExoClick. Check API");
-            authToken = token.asText();
+        logger.debug("ExoClick authorization...");
+        String apiToken = credentials.getUsername();
+        String jsonBody = """
+                {
+                "api_token": "%s"
+                }
+                """.formatted(apiToken);
+        Connection.Response response;
+        try {
+            response = Jsoup
+                    .connect("https://api.exoclick.com/v2/login")
+                    .method(Connection.Method.POST)
+                    .ignoreContentType(true)
+                    .header("Content-Type", "application/json")
+                    .requestBody(jsonBody)
+                    .execute();
+            authToken = objectMapper.readTree(response.body()).get("token").asText();
+            return response.statusCode() == 200;
+        } catch (IOException e) {
+            logger.info(e.getMessage());
+            throw new RuntimeException("Couldn't connect to ExoClick. Check API");
         }
+
     }
 
     ///////////////////////////////////////
     //return all campaigns stats by network Map<campaign_id, network_stats>
     ///////////////////////////////////////
     public Map<Integer, NetworkStats> getCampaignsStats(Credentials credentials, LocalDate dateStart, LocalDate dateEnd) {
-        authorization(credentials);
+        if (!authorization(credentials))
+            throw new RuntimeException("Couldn't get statistics from ExoClick. Check API");
         Map<Integer, NetworkStats> stat = new HashMap<>();
         try {
             String url = "https://api.exoclick.com/v2/statistics/a/campaign"
@@ -101,26 +88,6 @@ public class ExoClick implements AffiliateNetwork {
                 .header("Authorization", "Bearer " + authToken)
                 .execute();
         return response;
-    }
-
-    private boolean isAuth() {
-        try {
-            Jsoup.connect("https://api.exoclick.com/v2/statistics/a/campaign")
-                    .method(Connection.Method.GET)
-                    .ignoreContentType(true)
-                    .header("Accept", "application/json")
-                    .header("Authorization", "Bearer " + authToken)
-                    .execute();
-        } catch (HttpStatusException e) {
-            logger.info(e.getMessage());
-            if (e.getStatusCode() == 401)
-                return false;
-        } catch (IOException e) {
-            logger.info(e.getMessage());
-            throw new RuntimeException("Couldn't connect to ExoClick. Check API");
-        }
-
-        return true;
     }
 }
 

@@ -36,6 +36,7 @@ public class UserController {
     private final SettingsService settingsService;
     private final CredentialsValidator credentialsValidator;
     private final SettingsValidator settingsValidator;
+    private int x = 0;
 
     @Autowired
     public UserController(NetworksService networksService, StatsService statsService, CredentialsService credentialsService,
@@ -53,6 +54,7 @@ public class UserController {
     @GetMapping("/statistics")
     public String index(@RequestParam(value = "ds", required = false) LocalDate dateStart,
                         @RequestParam(value = "de", required = false) LocalDate dateEnd, Model model) {
+
         User currentUser = getUser();
         List<TableDTO> tableStats = new ArrayList<>();
         List<Stat> oldStats = new ArrayList<>();
@@ -94,7 +96,7 @@ public class UserController {
 
         //donut-chart
         model.addAttribute("totalSpendByNetwork", StatisticsUtilities.getTotalChartSpend(oldStats));
-        return "user/index";
+        return "user/statistics";
     }
 
     @GetMapping("/report")

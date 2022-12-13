@@ -9,7 +9,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.store.FileDataStoreFactory;
+import com.google.api.client.util.store.MemoryDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import lombok.Setter;
@@ -32,8 +32,6 @@ public class GoogleAuthorizeConfig {
     private String applicationName;
     @Value("${google.credentials.file.path}")
     private String credentialsFilePath;
-    @Value("${google.tokens.directory.path}")
-    private String tokensDirectoryPath;
     @Value("${google.redirect-uri}")
     private String redirectUri;
     private AuthorizationCodeInstalledApp auth;
@@ -42,7 +40,16 @@ public class GoogleAuthorizeConfig {
     private Credential getCredential(String code) throws IOException, GeneralSecurityException {
         Credential var7;
 
+        if (auth != null && !code.equals(PERMISSION_DENIED) ) {
+            Credential credential = auth.getFlow().loadCredential("user");
+            if (credential != null && (credential.getRefreshToken() != null || credential.getExpiresInSeconds() == null || credential.getExpiresInSeconds() > 60L)) {
+                credential.refreshToken();
+                return credential;
+            }
+        }
+
         if (code.isEmpty() || code.equals(PERMISSION_DENIED)) {
+
             InputStream in = GoogleAuthorizeConfig.class.getResourceAsStream(credentialsFilePath);
             assert in != null;
             GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JacksonFactory.getDefaultInstance(),
@@ -52,21 +59,13 @@ public class GoogleAuthorizeConfig {
             GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                     GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(),
                     clientSecrets, scopes)
-                    .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(tokensDirectoryPath)))
-                    //.setDataStoreFactory(new MemoryDataStoreFactory())
+                    .setDataStoreFactory(new MemoryDataStoreFactory())
                     .setAccessType("offline").build();
 
             LocalServerReceiver localServerReceiver = new LocalServerReceiver.Builder()
                     .setPort(8888)
                     .build();
             auth = new AuthorizationCodeInstalledApp(flow, localServerReceiver);
-
-            if (!code.equals(PERMISSION_DENIED)) {
-                Credential credential = auth.getFlow().loadCredential("user");
-                if (credential != null && (credential.getRefreshToken() != null || credential.getExpiresInSeconds() == null || credential.getExpiresInSeconds() > 60L)) {
-                    return credential;
-                }
-            }
 
             AuthorizationCodeRequestUrl authorizationUrl = auth.getFlow().newAuthorizationUrl().setRedirectUri(redirectUri);
             throw new OAuthCredentialEmptyException(String.valueOf(authorizationUrl));

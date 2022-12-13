@@ -52,7 +52,7 @@ public class NetworksServiceTest {
 
         user.setCredentials(List.of(credentialsAdcombo, credentialsTF));
 
-        when(credentialsService.userNetworks(user)).thenReturn(Set.of(Network.TF));
+        when(credentialsService.userNetworks(user)).thenReturn(Set.of(Network.EXO));
 
         NetworksService networksService = new NetworksService(exoClick, trafficFactory, trafficStars, adcombo, credentialsService);
         assertEquals(2, networksService.getOfferStats(user, LocalDate.now(), LocalDate.now()).get(0).getCurrentStats().size());

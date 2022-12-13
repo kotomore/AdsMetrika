@@ -1,6 +1,5 @@
 package ru.set404.AdsMetrika.network.ads;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
@@ -22,49 +21,38 @@ import java.util.Map;
 public class TrafficStars implements AffiliateNetwork {
     private final ObjectMapper objectMapper;
     protected Log logger = LogFactory.getLog(this.getClass());
-    private static String authToken = null;
+    private String authToken = null;
+    private String refreshToken = null;
+
 
     @Autowired
     public TrafficStars(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
-    private void authorization(Credentials credentials) {
-        if (authToken == null) {
-
+    private boolean authorization(Credentials credentials) {
+        String clientId = credentials.getClientId();
+        String clientSecret = credentials.getSecret();
+        Connection.Response response;
+        try {
             String username = credentials.getUsername();
             String password = credentials.getPassword();
-
-            String clientId = credentials.getClientId();
-            String clientSecret = credentials.getSecret();
-
-            Connection.Response response;
-            JsonNode token;
-            try {
-                response = Jsoup
-                        .connect("https://api.trafficstars.com/v1/auth/token")
-                        .method(Connection.Method.POST)
-                        .ignoreContentType(true)
-                        .data("grant_type", "password")
-                        .data("client_id", clientId)
-                        .data("client_secret", clientSecret)
-                        .data("username", username)
-                        .data("password", password)
-                        .execute();
-            } catch (IOException e) {
-                logger.info(e.getMessage());
-                throw new RuntimeException("Couldn't connect to TrafficStars. Check API");
-            }
-            try {
-                token = objectMapper.readTree(response.body()).get("access_token");
-            } catch (JsonProcessingException e) {
-                logger.info(e.getMessage());
-                throw new RuntimeException("Couldn't get statistics from TrafficStars");
-            }
-
-            if (token.isNull())
-                throw new RuntimeException("Couldn't connect to TrafficStars. Check API");
-            authToken = token.asText();
+            response = Jsoup
+                    .connect("https://api.trafficstars.com/v1/auth/token")
+                    .method(Connection.Method.POST)
+                    .ignoreContentType(true)
+                    .data("grant_type", "password")
+                    .data("client_id", clientId)
+                    .data("client_secret", clientSecret)
+                    .data("username", username)
+                    .data("password", password)
+                    .execute();
+            authToken = objectMapper.readTree(response.body()).get("access_token").asText();
+            refreshToken = objectMapper.readTree(response.body()).get("refresh_token").asText();
+            return response.statusCode() == 200;
+        } catch (IOException e) {
+            logger.info(e.getMessage());
+            throw new RuntimeException("Couldn't connect to TrafficStars. Check API");
         }
     }
 
@@ -72,8 +60,10 @@ public class TrafficStars implements AffiliateNetwork {
     //return all campaigns stats by network Map<campaign_id, network_stats>
     ///////////////////////////////////////
     public Map<Integer, NetworkStats> getCampaignsStats(Credentials credentials, LocalDate dateStart, LocalDate dateEnd) {
-        if (authToken == null)
-            authorization(credentials);
+
+        if (!authorization(credentials))
+            throw new RuntimeException("Couldn't get statistics from TrafficStars. Check API");
+
         Map<Integer, NetworkStats> stat = new HashMap<>();
         try {
             Connection.Response response = Jsoup

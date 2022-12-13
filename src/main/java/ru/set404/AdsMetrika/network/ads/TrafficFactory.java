@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 import ru.set404.AdsMetrika.models.Credentials;
+import ru.set404.AdsMetrika.network.cpa.AdcomboStats;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
@@ -47,22 +48,19 @@ public class TrafficFactory implements AffiliateNetwork {
             throw new RuntimeException("Couldn't get statistics from traffic factory. Try later");
         }
         for (JsonNode campaign : json.get("campaigns")) {
-            if (campaign.get("daily_spent").asDouble(0) > 0)
-                campaigns.add(campaign.get("id").asInt());
+            campaigns.add(campaign.get("id").asInt());
         }
         return campaigns;
     }
 
-    ///////////////////////////////////////
-    //return all campaigns stats by network Map<campaign_id, network_stats>
-    ///////////////////////////////////////
-    public Map<Integer, NetworkStats> getCampaignsStats(Credentials credentials, LocalDate dateStart, LocalDate dateEnd) {
+    private Map<Integer, NetworkStats> getStats(List<Integer> campaigns, Credentials credentials, LocalDate dateStart, LocalDate dateEnd) {
         authorization(credentials);
         Map<Integer, NetworkStats> campaignStats = new HashMap<>();
         Map<Integer, Future<NetworkStats>> campaignStatsFuture = new HashMap<>();
 
         try {
-            List<Integer> campaigns = getCampaignList(credentials);
+            if (campaigns == null)
+                campaigns = getCampaignList(credentials);
             ExecutorService executor = Executors.newFixedThreadPool(9);
             Future<NetworkStats> networkStats;
             for (Integer campaign : campaigns) {
@@ -78,7 +76,6 @@ public class TrafficFactory implements AffiliateNetwork {
                             total += node.get("total").asDouble();
                         }
                         return new NetworkStats(deliveries, total);
-
                     });
                     campaignStatsFuture.put(campaign, networkStats);
                 }
@@ -106,6 +103,37 @@ public class TrafficFactory implements AffiliateNetwork {
         }
 
         return campaignStats;
+    }
+
+
+    ///////////////////////////////////////
+    //return all campaigns stats by network Map<campaign_id, network_stats>
+    ///////////////////////////////////////
+    public Map<Integer, NetworkStats> getCampaignsStats(Credentials credentials, LocalDate dateStart, LocalDate dateEnd) {
+        return getStats(null, credentials, dateStart, dateEnd);
+    }
+
+    @Override
+    public Map<Integer, NetworkStats> getOfferCombinedStats(Credentials credentials, Map<Integer, AdcomboStats> adcomboStatsMap, LocalDate dateStart, LocalDate dateEnd) {
+        authorization(credentials);
+        List<Integer> campaigns = adcomboStatsMap.values().stream()
+                .flatMap(c -> c.getCampaigns().stream()).toList();
+        Map<Integer, NetworkStats> campaignStats = getStats(campaigns, credentials, dateStart, dateEnd);
+
+        Map<Integer, NetworkStats> result = new HashMap<>();
+        for (Map.Entry<Integer, AdcomboStats> entry : adcomboStatsMap.entrySet()) {
+            int clicks = 0;
+            double cost = 0;
+            for (Integer campaign : entry.getValue().getCampaigns()) {
+                if (campaignStats.containsKey(campaign)) {
+                    clicks += campaignStats.get(campaign).getClicks();
+                    cost += campaignStats.get(campaign).getCost();
+                }
+            }
+            if (cost > 0)
+                result.put(entry.getKey(), new NetworkStats(clicks, cost));
+        }
+        return result;
     }
 
     private Connection.Response parseNetwork(String url) {

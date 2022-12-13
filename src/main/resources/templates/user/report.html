@@ -9,7 +9,7 @@
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description"/>
     <meta content="Themesdesign" name="author"/>
     <!-- App favicon -->
-    <link rel="icon" type="image/x-icon" th:href="@{/assets/favicon.ico}">
+    <link rel="icon" type="image/x-icon" th:href="@{/assets/images/favicon.ico}">
     <link rel="stylesheet" type="text/css" th:href="@{/assets/libs/toastr/build/toastr.min.css}">
 
     <link th:href="@{/assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css}" rel="stylesheet"
@@ -174,9 +174,9 @@
                             <span>Campaigns</span>
                         </a>
                         <ul class="sub-menu" aria-expanded="false">
-                            <li><a href="/campaigns?network=TF">Traffic Factory</a></li>
-                            <li><a href="/campaigns?network=EXO">ExoClick</a></li>
-                            <li><a href="/campaigns?network=STARS">Traffic Stars</a></li>
+                            <li th:unless="${credentialsTF.getUsername()==null}"><a href="/campaigns?network=TF">Traffic Factory</a></li>
+                            <li th:unless="${credentialsEXO.getUsername()==null}"><a href="/campaigns?network=EXO">ExoClick</a></li>
+                            <li th:unless="${credentialsSTARS.getUsername()==null}"><a href="/campaigns?network=STARS">Traffic Stars</a></li>
                         </ul>
                     </li>
 

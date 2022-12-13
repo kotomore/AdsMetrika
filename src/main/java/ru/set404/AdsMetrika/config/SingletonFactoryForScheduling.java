@@ -24,8 +24,6 @@ public class SingletonFactoryForScheduling {
     private String applicationName;
     @Value("${google.credentials.file.path}")
     private String credentialsFilePath;
-    @Value("${google.tokens.directory.path}")
-    private String tokensDirectoryPath;
     @Value("${google.redirect-uri}")
     private String redirectUri;
 
@@ -60,7 +58,6 @@ public class SingletonFactoryForScheduling {
         authorizeConfig.setApplicationName(applicationName);
         authorizeConfig.setRedirectUri(redirectUri);
         authorizeConfig.setCredentialsFilePath(credentialsFilePath);
-        authorizeConfig.setTokensDirectoryPath(tokensDirectoryPath);
         return authorizeConfig;
     }
 
