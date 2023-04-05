@@ -44,7 +44,7 @@ public class StatDTO {
 
     public int getROI() {
         if (revenue != null && spend != null)
-            return (int) (((revenue - spend) / spend) * 100);
+            return spend > 0 ? (int) (((revenue - spend) / spend) * 100) : 0;
         return 0;
     }
 

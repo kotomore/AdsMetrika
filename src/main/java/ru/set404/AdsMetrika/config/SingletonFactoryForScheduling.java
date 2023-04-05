@@ -20,37 +20,38 @@ public class SingletonFactoryForScheduling {
     private final ObjectMapper objectMapper;
     private final CredentialsService credentialsService;
     private final SettingsService settingsService;
+    private final ConfigProperties config;
     @Value("${google.application.name}")
     private String applicationName;
     @Value("${google.credentials.file.path}")
     private String credentialsFilePath;
     @Value("${google.redirect-uri}")
     private String redirectUri;
-
     private NetworksService networksService;
     private GoogleSpreadSheetService googleSpreadSheetService;
 
     @Autowired
-    public SingletonFactoryForScheduling(ObjectMapper objectMapper, CredentialsService credentialsService, SettingsService settingsService) {
+    public SingletonFactoryForScheduling(ObjectMapper objectMapper, CredentialsService credentialsService, SettingsService settingsService, ConfigProperties config) {
         this.objectMapper = objectMapper;
         this.credentialsService = credentialsService;
         this.settingsService = settingsService;
+        this.config = config;
     }
 
     private TrafficFactory getTrafficFactory() {
-        return new TrafficFactory(objectMapper);
+        return new TrafficFactory(objectMapper, config);
     }
 
     private ExoClick getExoClick() {
         return new ExoClick(objectMapper);
     }
+
     private TrafficStars getTrafficStars() {
         return new TrafficStars(objectMapper);
     }
 
-
     private Adcombo getAdcombo() {
-        return new Adcombo(objectMapper);
+        return new Adcombo(objectMapper, config);
     }
 
     private GoogleAuthorizeConfig getGoogleAuthConfig() {
@@ -67,7 +68,8 @@ public class SingletonFactoryForScheduling {
 
     public NetworksService getNetworksServiceSingleton() {
         if (networksService == null)
-            networksService = new NetworksService(getExoClick(), getTrafficFactory(), getTrafficStars(), getAdcombo(), credentialsService);
+            networksService = new NetworksService(getExoClick(), getTrafficFactory(), getTrafficStars(), getAdcombo(),
+                    credentialsService);
         return networksService;
     }
 

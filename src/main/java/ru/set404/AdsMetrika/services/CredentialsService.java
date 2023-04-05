@@ -31,15 +31,11 @@ public class CredentialsService {
 
     @Cacheable("networks")
     public Set<Network> userNetworks(User user) {
-        Set<Network> networks = getUserCredentialsList(user).stream()
-                .collect(Collectors.groupingBy(CredentialsDTO::getNetworkName)).keySet();
-        networks.remove(Network.ADCOMBO);
-        return networks;
-    }
-
-    public Credentials getUserCredentialsbyNetwork(User user, Network network) {
-        return credentialsRepository.findCredentialsByOwnerAndNetworkName(user, network).orElseThrow(() ->
-                new RuntimeException("Couldn't find %s API. Check it".formatted(network.getFullName())));
+        List<CredentialsDTO> credentials = getUserCredentialsList(user);
+        return credentials.stream()
+                .map(CredentialsDTO::getNetworkName)
+                .filter(network -> network != Network.ADCOMBO)
+                .collect(Collectors.toSet());
     }
 
     public Map<Network, Credentials> getUserCredentials(User user) {

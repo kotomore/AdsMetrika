@@ -3,6 +3,7 @@ package ru.set404.AdsMetrika.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import ru.set404.AdsMetrika.config.ConfigProperties;
 import ru.set404.AdsMetrika.models.Credentials;
 import ru.set404.AdsMetrika.network.Network;
 import ru.set404.AdsMetrika.network.ads.ExoClick;
@@ -21,7 +22,7 @@ import java.util.Map;
 public class NetworksServiceTestContextConfiguration {
     @Bean
     public TrafficFactory trafficFactory () {
-        return new TrafficFactory(new ObjectMapper()) {
+        return new TrafficFactory(new ObjectMapper(), new ConfigProperties()) {
             @Override
             public Map<Integer, NetworkStats> getCampaignsStats(Credentials credentials, LocalDate dateStart, LocalDate dateEnd) {
                 Map<Integer, NetworkStats> networkStatsMap = new HashMap<>();
@@ -60,7 +61,7 @@ public class NetworksServiceTestContextConfiguration {
 
     @Bean
     public Adcombo adcombo() {
-        return new Adcombo(new ObjectMapper()) {
+        return new Adcombo(new ObjectMapper(), new ConfigProperties()) {
             @Override
             public Map<Integer, AdcomboStats> getNetworkStatMap(Credentials credentials, Network network, LocalDate dateStart, LocalDate dateEnd) {
                 Map<Integer, AdcomboStats> adcomboStatsMap = new HashMap<>();

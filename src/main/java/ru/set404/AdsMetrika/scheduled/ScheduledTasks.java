@@ -59,6 +59,7 @@ public class ScheduledTasks {
             if (settings.isSpreadSheetScheduleEnabled())
                 schedulingObjects.getScheduledServiceSingleton().writeSpreadSheetTable("", user, combinedStats, date);
         }
+        logger.debug("Scheduled task end");
     }
 
     private List<TableDTO> getStatsForTables(User user, LocalDate dateStart, LocalDate dateEnd) {

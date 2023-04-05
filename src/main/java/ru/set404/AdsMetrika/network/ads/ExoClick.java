@@ -49,7 +49,7 @@ public class ExoClick implements AffiliateNetwork {
             authToken = objectMapper.readTree(response.body()).get("token").asText();
             return response.statusCode() == 200;
         } catch (IOException e) {
-            logger.info(e.getMessage());
+            logger.error(e.getMessage());
             throw new RuntimeException("Couldn't connect to ExoClick. Check API");
         }
 
@@ -72,7 +72,7 @@ public class ExoClick implements AffiliateNetwork {
                         new NetworkStats(node.get("clicks").asInt(), node.get("cost").asDouble()));
             }
         } catch (Exception e) {
-            logger.info(e.getMessage());
+            logger.error(e.getMessage());
             throw new RuntimeException("Couldn't get statistics from ExoClick. Check API");
         }
         return stat;

@@ -22,8 +22,6 @@ public class TrafficStars implements AffiliateNetwork {
     private final ObjectMapper objectMapper;
     protected Log logger = LogFactory.getLog(this.getClass());
     private String authToken = null;
-    private String refreshToken = null;
-
 
     @Autowired
     public TrafficStars(ObjectMapper objectMapper) {
@@ -48,10 +46,9 @@ public class TrafficStars implements AffiliateNetwork {
                     .data("password", password)
                     .execute();
             authToken = objectMapper.readTree(response.body()).get("access_token").asText();
-            refreshToken = objectMapper.readTree(response.body()).get("refresh_token").asText();
             return response.statusCode() == 200;
         } catch (IOException e) {
-            logger.info(e.getMessage());
+            logger.error(e.getMessage());
             throw new RuntimeException("Couldn't connect to TrafficStars. Check API");
         }
     }
@@ -80,7 +77,7 @@ public class TrafficStars implements AffiliateNetwork {
                         new NetworkStats(node.get("clicks").asInt(), node.get("amount").asDouble()));
             }
         } catch (Exception e) {
-            logger.info(e.getMessage());
+            logger.error(e.getMessage());
             throw new RuntimeException("Couldn't get statistics from TrafficStars. Check API");
         }
         return stat;

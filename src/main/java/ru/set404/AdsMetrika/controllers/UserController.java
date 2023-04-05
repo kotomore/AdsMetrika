@@ -1,5 +1,7 @@
 package ru.set404.AdsMetrika.controllers;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,7 +38,7 @@ public class UserController {
     private final SettingsService settingsService;
     private final CredentialsValidator credentialsValidator;
     private final SettingsValidator settingsValidator;
-    private int x = 0;
+    protected Log logger = LogFactory.getLog(this.getClass());
 
     @Autowired
     public UserController(NetworksService networksService, StatsService statsService, CredentialsService credentialsService,
@@ -68,6 +70,7 @@ public class UserController {
             oldStats = statsService.getStatsList(currentUser, LocalDate.now().minusDays(COUNT_DAYS_IN_CHART));
             chartStats = StatisticsUtilities.convertToChartDTOList(oldStats);
         } catch (Exception e) {
+            logger.error("method index exception with user - %s message - %s".formatted(getUser().getUsername(), e.getMessage()));
             model.addAttribute("error", e.getMessage());
         }
 
@@ -77,7 +80,7 @@ public class UserController {
         List<StatDTO> favoriteStatDTO = combinedStats.getCurrentStats().stream()
                 .filter(statDTO -> favoriteOffers.contains(String.valueOf(statDTO.getCampaignId()))).toList();
 
-        putCredentialsInModel(model);
+        populateCredentialsWithModel(model);
         model.addAttribute("settings", settingsService.userSettings(currentUser));
         model.addAttribute("currentDate", LocalDate.now());
 
@@ -130,10 +133,11 @@ public class UserController {
         } catch (OAuthCredentialEmptyException e) {
             model.addAttribute("notAuthorized", e.getMessage());
         } catch (Exception e) {
+            logger.error("method report exception with user - %s message - %s".formatted(getUser().getUsername(), e.getMessage()));
             model.addAttribute("error", e.getMessage());
         }
 
-        putCredentialsInModel(model);
+        populateCredentialsWithModel(model);
         model.addAttribute("settings", settingsService.userSettings(currentUser));
         model.addAttribute("currentDate", LocalDate.now());
         model.addAttribute("dates", headerText);
@@ -151,7 +155,7 @@ public class UserController {
         List<TableDTO> tableStats = getStatsForTables(currentUser, date, date);
         TableDTO combinedStats = StatisticsUtilities.convertForSingleTable(tableStats);
 
-        putCredentialsInModel(model);
+        populateCredentialsWithModel(model);
         model.addAttribute("settings", settingsService.userSettings(currentUser));
         model.addAttribute("currentDate", LocalDate.now());
         model.addAttribute("dates", headerText);
@@ -186,10 +190,11 @@ public class UserController {
                 model.addAttribute("success", "Success");
             }
         } catch (Exception e) {
+            logger.error("method campaigns exception with user - %s message - %s".formatted(getUser().getUsername(), e.getMessage()));
             model.addAttribute("error", e.getMessage());
         }
 
-        putCredentialsInModel(model);
+        populateCredentialsWithModel(model);
         model.addAttribute("settings", settingsService.userSettings(currentUser));
         model.addAttribute("dates", headerText);
         model.addAttribute("currentDate", LocalDate.now());
@@ -199,7 +204,7 @@ public class UserController {
 
     @GetMapping("/settings")
     public String settings(Model model) {
-        putCredentialsInModel(model);
+        populateCredentialsWithModel(model);
         model.addAttribute("settings", settingsService.userSettings(getUser()));
 
         return "user/settings";
@@ -247,22 +252,18 @@ public class UserController {
         return tableStats;
     }
 
-    private void putCredentialsInModel(Model model) {
+    private void populateCredentialsWithModel(Model model) {
         Map<Network, CredentialsDTO> credentials = credentialsService.getUserCredentialsList(getUser()).stream()
                 .collect(Collectors.toMap(CredentialsDTO::getNetworkName, Function.identity()));
         if (!credentials.containsKey(Network.ADCOMBO) || (credentials.containsKey(Network.ADCOMBO) &&
                 credentials.size() < 2))
             model.addAttribute("checkAPI", "Add API for Adcombo and ad network");
 
-        credentials.putIfAbsent(Network.ADCOMBO, new CredentialsDTO());
-        credentials.putIfAbsent(Network.EXO, new CredentialsDTO());
-        credentials.putIfAbsent(Network.TF, new CredentialsDTO());
-        credentials.putIfAbsent(Network.STARS, new CredentialsDTO());
+        for (Network network : Network.values()) {
+            model.addAttribute("credentials" + network.name().toUpperCase(),
+                    credentials.getOrDefault(network, new CredentialsDTO()));
+        }
 
-        model.addAttribute("credentialsADCOMBO", credentials.get(Network.ADCOMBO));
-        model.addAttribute("credentialsSTARS", credentials.get(Network.STARS));
-        model.addAttribute("credentialsEXO", credentials.get(Network.EXO));
-        model.addAttribute("credentialsTF", credentials.get(Network.TF));
         model.addAttribute("username", getUser().getUsername());
     }
 }

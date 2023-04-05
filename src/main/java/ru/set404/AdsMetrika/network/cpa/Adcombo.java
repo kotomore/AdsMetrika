@@ -10,6 +10,7 @@ import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
+import ru.set404.AdsMetrika.config.ConfigProperties;
 import ru.set404.AdsMetrika.models.Credentials;
 import ru.set404.AdsMetrika.network.Network;
 
@@ -28,10 +29,12 @@ public class Adcombo {
     protected Log logger = LogFactory.getLog(this.getClass());
     private final ObjectMapper objectMapper;
     private String apiKey;
+    private final ConfigProperties config;
 
     @Autowired
-    public Adcombo(ObjectMapper objectMapper) {
+    public Adcombo(ObjectMapper objectMapper, ConfigProperties config) {
         this.objectMapper = objectMapper;
+        this.config = config;
     }
 
     public Map<Integer, AdcomboStats> getNetworkStatMap(Credentials credentials, Network network, LocalDate dateStart, LocalDate dateEnd) {
@@ -46,23 +49,37 @@ public class Adcombo {
 
         Map<Integer, AdcomboStats> stats = new HashMap<>();
         List<Integer> campaignsToCheck = new ArrayList<>();
+        Map<String, Integer> offerNameMap = new HashMap<>();
+
         for (JsonNode campaign : parseNetwork(url, network, dateStart, dateEnd)) {
-            if (campaign.get("uniq_traffic").asInt(-1) > 20) {
-                AdcomboStats adcomboStat = new AdcomboStats(
-                        campaign.get("group_by").asInt(),
-                        campaign.get("key_for_groupping").asText(),
-                        campaign.get("user_total_hold_income").asDouble(),
-                        campaign.get("orders_confirmed").asInt(),
-                        campaign.get("user_orders_confirmed_income").asDouble());
-                List<Integer> campaigns = new ArrayList<>();
-                for (JsonNode group : campaign.get("sub_groups")) {
-                    if (!campaignsToCheck.contains(group.get("group_by").asInt())) {
-                        campaigns.add(group.get("group_by").asInt());
-                        campaignsToCheck.add(group.get("group_by").asInt());
+            if (campaign.get("uniq_traffic").asInt(-1) > config.getMinScanCount()) {
+                String offerName = campaign.get("key_for_groupping").asText();
+                AdcomboStats adcomboStat;
+                String substring = offerName.substring(offerName.length() - 2);
+                if (!offerNameMap.containsKey(substring)) {
+                    adcomboStat = new AdcomboStats(
+                            campaign.get("group_by").asInt(),
+                            offerName,
+                            campaign.get("user_total_hold_income").asDouble(),
+                            campaign.get("orders_confirmed").asInt(),
+                            campaign.get("user_orders_confirmed_income").asDouble());
+                    offerNameMap.put(substring, campaign.get("group_by").asInt());
+                    List<Integer> campaigns = new ArrayList<>();
+                    for (JsonNode group : campaign.get("sub_groups")) {
+                        if (!campaignsToCheck.contains(group.get("group_by").asInt())) {
+                            campaigns.add(group.get("group_by").asInt());
+                            campaignsToCheck.add(group.get("group_by").asInt());
+                        }
                     }
+                    adcomboStat.setCampaigns(campaigns);
+                    stats.put(campaign.get("group_by").asInt(), adcomboStat);
+                } else {
+                    adcomboStat = stats.get(offerNameMap.get(substring));
+                    adcomboStat.setCost(adcomboStat.getCost() + campaign.get("user_orders_confirmed_income").asDouble());
+                    adcomboStat.setHoldCost(adcomboStat.getHoldCost() + campaign.get("user_total_hold_income").asDouble());
+                    adcomboStat.setConfirmedCount(adcomboStat.getConfirmedCount() + campaign.get("orders_confirmed").asInt());
+                    stats.put(offerNameMap.get(substring), adcomboStat);
                 }
-                adcomboStat.setCampaigns(campaigns);
-                stats.put(campaign.get("group_by").asInt(), adcomboStat);
             }
         }
         logger.debug("Adcombo stats received");
@@ -79,7 +96,7 @@ public class Adcombo {
 
         Map<Integer, AdcomboStats> stats = new HashMap<>();
         for (JsonNode campaign : parseNetwork(url, network, dateStart.minusDays(1), dateEnd)) {
-            if (campaign.get("uniq_traffic").asInt(-1) > 10) {
+            if (campaign.get("uniq_traffic").asInt(-1) > config.getMinScanCount()) {
                 stats.put(campaign.get("group_by").asInt(), new AdcomboStats(
                         campaign.get("group_by").asInt(),
                         campaign.get("sub_groups").elements().next().get("key_for_groupping").asText(),
@@ -94,8 +111,8 @@ public class Adcombo {
 
 
     private JsonNode parseNetwork(String url, Network network, LocalDate dateStart, LocalDate dateEnd) {
-        String timeZone = "+03:00";
-        String tzOffset = "180";
+        String timeZone = config.getDefaultTimeZone();
+        String tzOffset = config.getDefaultOffset();
         int time = 0;
         if (network == Network.EXO) {
             tzOffset = "-240";
@@ -123,7 +140,6 @@ public class Adcombo {
             logger.info(e.getMessage());
             throw new RuntimeException("Couldn't get statistics from adcombo");
         }
-
         return result;
     }
 

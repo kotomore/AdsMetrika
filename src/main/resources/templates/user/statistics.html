@@ -321,7 +321,7 @@
                                         <p class="text-truncate font-size-14 mb-2">Total Revenue</p>
                                         <h4 th:text="${#numbers.formatDecimal(combinedStats.getTotalRevenue(), 1, 2)}+'$'"
                                             class="mb-2">total revenue</h4>
-                                        <p th:if="${chartDates.contains(currentDate.minusDays(1)) && chartCosts.size()>1}"
+                                        <p th:if="${chartDates.contains(currentDate.minusDays(1)) && chartCosts.size() > 1 && chartRevenue.get(chartDates.indexOf(currentDate.minusDays(1))) > 0}"
                                            class="text-muted mb-0">
                                             <span th:if="${((combinedStats.getTotalRevenue()-chartRevenue.get(chartDates.indexOf(currentDate.minusDays(1))))/chartRevenue.get(chartDates.indexOf(currentDate.minusDays(1)))*100)}>=0"
                                                   class="text-success fw-bold font-size-12 me-2">
