@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .antMatchers("/telegram-webhook").permitAll()
                 .antMatchers("/admin").hasRole("ADMIN")
                 .antMatchers("/", "/registration", "/error", "/assets/**").permitAll()
-                .antMatchers("/admin/list").hasRole("ADMIN")
+                .antMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().hasAnyRole("USER", "ADMIN", "GUEST")
                 .and()
                 .formLogin().loginPage("/")

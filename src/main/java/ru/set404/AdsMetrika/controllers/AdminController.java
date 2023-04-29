@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.set404.AdsMetrika.services.AdminService;
 
 @Controller
@@ -16,6 +17,7 @@ import ru.set404.AdsMetrika.services.AdminService;
 public class AdminController {
     private final AdminService adminService;
     private final ApplicationContext context;
+
     @Autowired
     public AdminController(AdminService adminService, ApplicationContext context) {
         this.adminService = adminService;
@@ -26,6 +28,12 @@ public class AdminController {
     public String listUsers(Model model) {
         model.addAttribute("users", adminService.loadUsers());
         return "admin/list";
+    }
+
+    @GetMapping("/role")
+    public String makeRole(@RequestParam int userId) {
+        adminService.makeRole(userId);
+        return "redirect:/admin";
     }
 
     @PostMapping("/shutdown")

@@ -1,23 +1,28 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>Hello world</title>
+    <meta charset="UTF-8">
+    <title>Admin Panel</title>
 </head>
 <body>
-Список пользователей
 <br>
+<p>Нажмите на пользователя для изменения роли</p>
+<br>
+<strong>Список пользователей</strong>
 <ul>
-  <li th:each="user : ${users}" th:text="${user.getUsername()}"></li>
+    <li th:each="user : ${users}"><a th:href="@{/admin/role(userId=${user.id})}" th:text="${user.getUsername()} + ' - ' + ${user.getRole()}"></a>
+    </li>
 </ul>
-<br><hr><br>
+<br>
+<hr>
+<br>
 
 <form th:action="@{admin/shutdown}" th:method="POST">
-  <input type="submit" value="shutdown ">
+    <input type="submit" value="shutdown ">
 </form>
 <br><br>
 <form th:action="@{/logout}" th:method="POST">
-  <input type="submit" value="Logout ">
+    <input type="submit" value="Logout ">
 </form>
 </body>
 </html>
